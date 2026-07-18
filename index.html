@@ -11,125 +11,316 @@
 </head>
 <body>
 
-<header class="site">
-  <div class="container nav">
-    <div class="brand"><i class='bx bxs-t-shirt tiger-mark'></i> Tiger <span style="color:var(--gold)">Jeans</span></div>
-    <nav class="nav-links" id="navLinks">
-      <a href="index.html" class="active">الرئيسية</a>
-      <a href="index.html#shop">المتجر</a>
-      <a href="index.html#about">من نحن</a>
-      <a href="track.html">تتبع الطلب</a>
-    </nav>
-    <div class="nav-actions">
-      <div class="icon-btn" onclick="document.getElementById('searchBox').classList.toggle('show')"><i class='bx bx-search'></i></div>
-      <a href="cart.html" class="icon-btn">
-        <i class='bx bx-cart'></i>
-        <span class="badge cart-badge" style="display:none">0</span>
-      </a>
-      <div class="burger" onclick="document.getElementById('navLinks').classList.toggle('show')"><i class='bx bx-menu'></i></div>
+<!-- ====== Top Bar ====== -->
+<div class="top-bar">
+  <div class="container">
+    <div class="top-bar-inner">
+      <div class="top-left">
+        <span><i class='bx bxs-phone-call'></i> شحن لجميع المحافظات 🇪🇬</span>
+        <span class="divider">|</span>
+        <a href="https://wa.me/201012345678" target="_blank"><i class='bx bxl-whatsapp'></i> الواتساب: 01012345678</a>
+      </div>
+      <div class="top-right">
+        <a href="#" onclick="openAuthModal()"><i class='bx bx-user'></i> حسابي</a>
+        <a href="#" onclick="openAuthModal()">سجل دخولك</a>
+      </div>
     </div>
   </div>
-  <div id="searchBox" style="display:none">
-    <div class="container" style="padding:0 0 1rem">
+</div>
+
+<!-- ====== Header ====== -->
+<header class="site-header">
+  <div class="container">
+    <div class="header-main">
+      <!-- Logo -->
+      <a href="index.html" class="logo">
+        <span class="logo-icon">Z</span>
+        <div class="logo-text">
+          <strong>TIGER JEANS</strong>
+          <small>متجر فخم</small>
+        </div>
+      </a>
+
+      <!-- Navigation -->
+      <nav class="main-nav" id="mainNav">
+        <a href="index.html" class="active">الرئيسية</a>
+        <a href="#products">المنتجات</a>
+        <a href="#featured">عروض مميزة 🔥</a>
+        <a href="#deals">الخصومات</a>
+        <a href="#">أضف متجرك</a>
+      </nav>
+
+      <!-- Actions -->
+      <div class="header-actions">
+        <button class="action-btn" onclick="toggleSearch()"><i class='bx bx-search'></i></button>
+        <button class="action-btn" onclick="openAuthModal()"><i class='bx bx-user'></i></button>
+        <a href="cart.html" class="action-btn cart-btn">
+          <i class='bx bx-cart-alt'></i>
+          <span class="cart-badge" style="display:none">0</span>
+        </a>
+        <button class="burger" onclick="toggleMobileNav()"><i class='bx bx-menu'></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Box -->
+  <div class="search-dropdown" id="searchDropdown">
+    <div class="container">
       <input type="text" id="searchInput" placeholder="ابحث عن منتج..." oninput="filterProducts()" />
     </div>
   </div>
 </header>
 
-<section class="hero">
-  <div class="stripes"><span style="top:20%;right:-30%"></span><span style="top:55%;right:-10%"></span><span style="top:80%;right:-40%"></span></div>
-  <div class="container hero-inner">
-    <div>
-      <span class="eyebrow" id="heroEyebrow">تشكيلة الموسم</span>
-      <h1 id="heroTitle">ستايلك <span>يبان من بعيد</span></h1>
-      <p id="heroSubtitle">أحدث موديلات الجينز والأزياء العصرية، جودة عالية وأسعار تناسب الجميع. اطلب دلوقتي واستلم بسهولة.</p>
-      <a href="#shop" class="btn" id="heroBtn">تسوق الآن <i class='bx bx-left-arrow-alt'></i></a>
-    </div>
-    <div class="hero-img">
-      <img id="heroImg" src="images/poster-1.png" alt="Tiger Jeans" />
+<!-- ====== Marquee Banner ====== -->
+<div class="marquee-bar">
+  <div class="marquee-content">
+    <span class="marquee-item">⭐ نقدم 5 توصيل من أجلنا من أكثر 10,000 عملي</span>
+    <span class="marquee-sep">✦</span>
+    <span class="marquee-item">🎁 خصم خاص لمحدود وقت</span>
+    <span class="marquee-sep">✦</span>
+    <span class="marquee-item">📢 مجددة خصوصية دجين وصلت حديثاً - تشكيل الربيع</span>
+    <span class="marquee-sep">✦</span>
+    <span class="marquee-item">🔥 التوصيل مجاني للطلبات فوق 500 جنيه</span>
+    <span class="marquee-sep">✦</span>
+    <span class="marquee-item">⭐ نقدم 5 توصيل من أجلنا من أكثر 10,000 عملي</span>
+    <span class="marquee-sep">✦</span>
+    <span class="marquee-item">🎁 خصم خاص لمحدود وقت</span>
+    <span class="marquee-sep">✦</span>
+    <span class="marquee-item">📢 مجددة خصوصية دجين وصلت حديثاً - تشكيل الربيع</span>
+    <span class="marquee-sep">✦</span>
+    <span class="marquee-item">🔥 التوصيل مجاني للطلبات فوق 500 جنيه</span>
+  </div>
+</div>
+
+<!-- ====== Hero Section ====== -->
+<section class="hero-section">
+  <div class="container">
+    <div class="hero-badge">✨ مجددة خصوصية دجين</div>
+    <h1 class="hero-title">اكتشِف أناقة<br><span class="gold-text">تليق بك</span></h1>
+    <p class="hero-desc">مشتري وصول البنر الذي تأثير أونر والملابس العصرية<br>بأسعار منافسة وجودة لا تضاهى</p>
+    <div class="hero-buttons">
+      <a href="#products" class="btn-primary">سوق الآن <i class='bx bx-left-arrow-alt'></i></a>
+      <a href="#featured" class="btn-secondary">عروض مميزة</a>
     </div>
   </div>
 </section>
 
-<section class="section" id="shop">
+<!-- ====== Stats Section ====== -->
+<section class="stats-section">
   <div class="container">
-    <div class="section-head">
-      <div>
-        <span class="eyebrow">التشكيلة</span>
-        <h2>أحدث المنتجات</h2>
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-number">4.9</div>
+        <div class="stat-label"><i class='bx bxs-star gold-text'></i> تقيم</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">500+</div>
+        <div class="stat-label">منتج</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">10K+</div>
+        <div class="stat-label">عملاء سعداء</div>
       </div>
     </div>
-    <div class="cats" id="catFilters">
-      <div class="cat-chip active" data-cat="all">الكل</div>
-    </div>
-    <div class="grid" id="productsGrid">
-      <div class="empty-note">جاري تحميل المنتجات...</div>
-    </div>
   </div>
 </section>
 
-<section class="section" style="padding-top:0">
+<!-- ====== Features Section ====== -->
+<section class="features-section">
   <div class="container">
-    <div class="section-head">
-      <div><span class="eyebrow">وصل حديثاً</span><h2>عروض مختارة لك</h2></div>
-    </div>
-    <div class="posters" id="postersRow">
-      <div class="poster"><img src="images/poster-1.png" alt=""><div class="cap"><span>تخفيضات</span><h3>تشكيلة الجينز الجديدة</h3></div></div>
-      <div class="poster"><img src="images/poster-2.png" alt=""><div class="cap"><span>الأكثر مبيعاً</span><h3>قمصان الموسم</h3></div></div>
-      <div class="poster"><img src="images/poster-3.png" alt=""><div class="cap"><span>اكتشف المزيد</span><h3>إكسسوارات مميزة</h3></div></div>
-    </div>
-  </div>
-</section>
-
-<section class="section" style="background:var(--bg-alt)" id="about">
-  <div class="container">
-    <div class="section-head"><div><span class="eyebrow">ليه تختارنا</span><h2>مميزاتنا</h2></div></div>
-    <div class="stats-grid">
-      <div class="stat"><i class='bx bx-check-shield'></i><h3>جودة مضمونة</h3><p>خامات مختارة بعناية لراحة ومتانة أطول</p></div>
-      <div class="stat"><i class='bx bx-package'></i><h3>توصيل سريع</h3><p>نوصلك طلبك لحد باب البيت في أسرع وقت</p></div>
-      <div class="stat"><i class='bx bx-credit-card'></i><h3>دفع آمن وسهل</h3><p>فودافون كاش وانستاباي مع تأكيد فوري</p></div>
-      <div class="stat"><i class='bx bx-support'></i><h3>دعم دائم</h3><p>فريقنا جاهز يساعدك في أي وقت</p></div>
-    </div>
-  </div>
-</section>
-
-<footer class="site">
-  <div class="container">
-    <div class="foot-grid">
-      <div>
-        <div class="brand" style="margin-bottom:1rem"><i class='bx bxs-t-shirt tiger-mark'></i> Tiger Jeans</div>
-        <p>وجهتك الأولى للأزياء العصرية بأفضل جودة وأسعار تنافسية.</p>
-        <div class="foot-social">
-          <div class="icon-btn"><i class='bx bxl-facebook'></i></div>
-          <div class="icon-btn"><i class='bx bxl-instagram'></i></div>
-          <div class="icon-btn"><i class='bx bxl-whatsapp'></i></div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><i class='bx bxs-truck'></i></div>
+        <div class="feature-info">
+          <h4>شحن سريع</h4>
+          <p>توصيل لجميع المحافظات</p>
         </div>
       </div>
+      <div class="feature-card">
+        <div class="feature-icon discount-icon">100%</div>
+        <div class="feature-info">
+          <h4>خصومات ممتازة</h4>
+          <p>أفضل الأسعار والموسمية</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class='bx bxs-package'></i></div>
+        <div class="feature-info">
+          <h4>إيصال سريع</h4>
+          <p>خلال ٤ أيام</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class='bx bxs-credit-card'></i></div>
+        <div class="feature-info">
+          <h4>دفع آمن</h4>
+          <p>طرق دفع موثوقة</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== Products Section ====== -->
+<section class="section" id="products">
+  <div class="container">
+    <div class="section-header">
       <div>
+        <span class="eyebrow">التشكيلة الكاملة</span>
+        <h2>أحدث المنتجات</h2>
+      </div>
+      <a href="#" class="view-all">عرض الكل ←</a>
+    </div>
+
+    <!-- Category Filters -->
+    <div class="category-filters" id="catFilters">
+      <button class="cat-chip active" data-cat="all">الكل</button>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="products-grid" id="productsGrid">
+      <div class="loading-state">جاري تحميل المنتجات...</div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== Featured/Deals Section ====== -->
+<section class="section featured-section" id="featured" style="background:var(--bg-alt)">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <span class="eyebrow">عروض حصرية</span>
+        <h2>عروض مميزة لك ✨</h2>
+      </div>
+      <a href="#" class="view-all">عرض الكل ←</a>
+    </div>
+
+    <div class="deals-grid" id="dealsGrid">
+      <div class="deal-card">
+        <div class="deal-badge">25%-</div>
+        <img src="images/product-1.png" alt="جينز كلاسيك" />
+        <div class="deal-info">
+          <span class="deal-tag">عرض</span>
+        </div>
+      </div>
+      <div class="deal-card">
+        <div class="deal-badge">29%-</div>
+        <img src="images/product-3.png" alt="جينز مودرن" />
+        <div class="deal-info">
+          <span class="deal-tag">عرض</span>
+        </div>
+      </div>
+      <div class="deal-card">
+        <div class="deal-badge">20%-</div>
+        <img src="images/product-5.png" alt="جاكيت جلد" />
+        <div class="deal-info">
+          <span class="deal-tag">عرض</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== Footer ====== -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="footer-brand">
+          <span class="logo-icon">Z</span>
+          <strong>TIGER JEANS</strong>
+        </div>
+        <p>وجهتك الأولى للأزياء العصرية بأفضل جودة وأسعار تنافسية.</p>
+        <div class="social-links">
+          <a href="#"><i class='bx bxl-facebook'></i></a>
+          <a href="#"><i class='bx bxl-instagram'></i></a>
+          <a href="#"><i class='bx bxl-whatsapp'></i></a>
+          <a href="#"><i class='bx bxl-tiktok'></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
         <h4>روابط سريعة</h4>
         <a href="index.html">الرئيسية</a>
-        <a href="index.html#shop">المتجر</a>
-        <a href="cart.html">السلة</a>
+        <a href="#products">المنتجات</a>
+        <a href="#featured">العروض</a>
         <a href="track.html">تتبع الطلب</a>
       </div>
-      <div>
+      <div class="footer-col">
         <h4>حسابي</h4>
         <a href="track.html">تتبع طلبي</a>
+        <a href="cart.html">السلة</a>
         <a href="checkout.html">إتمام الشراء</a>
       </div>
-      <div>
+      <div class="footer-col">
         <h4>تواصل معنا</h4>
         <p><i class='bx bxs-map'></i> جمهورية مصر العربية</p>
         <p><i class='bx bxs-envelope'></i> info@tiger-jeans.com</p>
-        <p><i class='bx bxs-phone'></i> tiger-jeans.com</p>
+        <p><i class='bx bxs-phone'></i> 01012345678</p>
       </div>
     </div>
-    <div class="stitch"></div>
-    <div class="foot-bottom">جميع الحقوق محفوظة © Tiger Jeans 2026 &nbsp;|&nbsp; تطوير <span class="credit">المهندس محمد حماد</span></div>
+    <div class="footer-bottom">
+      <p>جميع الحقوق محفوظة © Tiger Jeans 2026 | تطوير <span class="credit">المهندس محمد حماد</span></p>
+    </div>
   </div>
 </footer>
 
-<div class="overlay" id="overlay"></div>
+<!-- ====== Auth Modal ====== -->
+<div class="modal-overlay" id="authModal">
+  <div class="auth-modal">
+    <button class="close-modal" onclick="closeAuthModal()">&times;</button>
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login">تسجيل الدخول</button>
+      <button class="auth-tab" data-tab="signup">إنشاء حساب</button>
+    </div>
+    
+    <!-- Login Form -->
+    <div class="auth-form" id="loginForm">
+      <div class="field">
+        <label>البريد الإلكتروني أو رقم الموبايل</label>
+        <input type="text" placeholder="أدخل بريدك الإلكتروني أو الموبايل" />
+      </div>
+      <div class="field">
+        <label>كلمة المرور</label>
+        <input type="password" placeholder="••••••••" />
+      </div>
+      <button class="btn-primary full-width">دخول</button>
+      <div class="auth-divider">أو</div>
+      <button class="btn-google" onclick="googleLogin()">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        الدخول بحساب Google
+      </button>
+    </div>
+
+    <!-- Signup Form -->
+    <div class="auth-form hidden" id="signupForm">
+      <div class="field">
+        <label>الاسم الكامل</label>
+        <input type="text" placeholder="أدخل اسمك الكامل" />
+      </div>
+      <div class="field">
+        <label>البريد الإلكتروني</label>
+        <input type="email" placeholder="example@email.com" />
+      </div>
+      <div class="field">
+        <label>رقم الموبايل</label>
+        <input type="tel" placeholder="01xxxxxxxxx" />
+      </div>
+      <div class="field">
+        <label>كلمة المرور</label>
+        <input type="password" placeholder="••••••••" />
+      </div>
+      <button class="btn-primary full-width">إنشاء حساب</button>
+      <div class="auth-divider">أو</div>
+      <button class="btn-google" onclick="googleLogin()">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        التسجيل بحساب Google
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -139,6 +330,7 @@
 let ALL_PRODUCTS = [];
 let ACTIVE_CAT = "all";
 
+// Load products from Firebase
 db.ref("products").on("value", (snap) => {
   const val = snap.val() || {};
   ALL_PRODUCTS = Object.entries(val)
@@ -148,29 +340,12 @@ db.ref("products").on("value", (snap) => {
   renderProducts();
 });
 
+// Load banners
 db.ref("banners/hero").on("value", (snap) => {
   const b = snap.val();
   if (!b) return;
-  if (b.eyebrow) document.getElementById("heroEyebrow").textContent = b.eyebrow;
-  if (b.title) document.getElementById("heroTitle").innerHTML = b.title;
-  if (b.subtitle) document.getElementById("heroSubtitle").textContent = b.subtitle;
-  if (b.buttonText) document.getElementById("heroBtn").innerHTML = b.buttonText + " <i class='bx bx-left-arrow-alt'></i>";
-  if (b.image) document.getElementById("heroImg").src = b.image;
-});
-
-db.ref("banners/posters").on("value", (snap) => {
-  const p = snap.val();
-  if (!p) return;
-  const keys = ["p1", "p2", "p3"];
-  const row = document.getElementById("postersRow");
-  const posters = row.querySelectorAll(".poster");
-  keys.forEach((k, i) => {
-    if (p[k] && posters[i]) {
-      if (p[k].image) posters[i].querySelector("img").src = p[k].image;
-      if (p[k].tag) posters[i].querySelector(".cap span").textContent = p[k].tag;
-      if (p[k].title) posters[i].querySelector(".cap h3").textContent = p[k].title;
-    }
-  });
+  if (b.title) document.querySelector(".hero-title").innerHTML = b.title;
+  if (b.subtitle) document.querySelector(".hero-desc").textContent = b.subtitle;
 });
 
 function buildCategoryFilters() {
@@ -179,7 +354,7 @@ function buildCategoryFilters() {
   wrap.innerHTML = cats
     .map(
       (c) =>
-        `<div class="cat-chip ${c === ACTIVE_CAT ? "active" : ""}" data-cat="${c}" onclick="setCat('${c}')">${c === "all" ? "الكل" : c}</div>`
+        `<button class="cat-chip ${c === ACTIVE_CAT ? "active" : ""}" data-cat="${c}" onclick="setCat('${c}')">${c === "all" ? "الكل" : c}</button>`
     )
     .join("");
 }
@@ -202,27 +377,36 @@ function renderProducts() {
 
   const grid = document.getElementById("productsGrid");
   if (!list.length) {
-    grid.innerHTML = '<div class="empty-note">لا توجد منتجات متاحة حالياً</div>';
+    grid.innerHTML = '<div class="empty-state"><i class="bx bx-shopping-bag"></i><p>لا توجد منتجات متاحة حالياً</p></div>';
     return;
   }
+  
   grid.innerHTML = list
     .map((p) => {
       const img = (p.images && p.images[0]) || "images/product-1.png";
+      const sizes = (p.sizes && p.sizes.join(" ")) || "";
       return `
-      <div class="pcard">
+      <div class="product-card">
         <a href="product.html?id=${p.id}">
-          <div class="thumb">
+          <div class="product-image">
             <img src="${img}" alt="${p.name || ""}" loading="lazy" />
-            ${p.featured ? '<span class="tag">مميز</span>' : ""}
+            <div class="product-overlay">
+              <button class="overlay-btn" title="معاينة"><i class='bx bx-show'></i></button>
+              <button class="overlay-btn" title="المفضلة"><i class='bx bx-heart'></i></button>
+              <button class="overlay-btn add-cart-btn" onclick="event.preventDefault();quickAdd('${p.id}')"><i class='bx bx-cart-add'></i> أضف للسلة</button>
+            </div>
           </div>
         </a>
-        <div class="body">
-          <a href="product.html?id=${p.id}"><h4>${p.name || ""}</h4></a>
-          <div class="prices">
-            <span class="price">${fmtPrice(p.price)}</span>
+        <div class="product-body">
+          <h3 class="product-name"><a href="product.html?id=${p.id}">${p.name || ""}</a></h3>
+          <div class="product-meta">
+            <span class="meta-label">المقاس:</span>
+            <span class="meta-value">${sizes}</span>
+          </div>
+          <div class="product-pricing">
+            <span class="current-price">${fmtPrice(p.price)}</span>
             ${p.oldPrice ? `<span class="old-price">${fmtPrice(p.oldPrice)}</span>` : ""}
           </div>
-          <button class="btn add" onclick="quickAdd('${p.id}')">أضف للسلة</button>
         </div>
       </div>`;
     })
@@ -241,6 +425,44 @@ function quickAdd(id) {
     color: (p.colors && p.colors[0]) || "",
     qty: 1
   });
+}
+
+// UI Functions
+function toggleSearch() {
+  document.getElementById("searchDropdown").classList.toggle("show");
+}
+
+function toggleMobileNav() {
+  document.getElementById("mainNav").classList.toggle("show");
+}
+
+function openAuthModal() {
+  document.getElementById("authModal").classList.add("show");
+  document.body.style.overflow = "hidden";
+}
+
+function closeAuthModal() {
+  document.getElementById("authModal").classList.remove("show");
+  document.body.style.overflow = "";
+}
+
+// Auth tabs
+document.querySelectorAll(".auth-tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".auth-tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    const formId = tab.dataset.tab === "login" ? "loginForm" : "signupForm";
+    document.querySelectorAll(".auth-form").forEach(f => f.classList.add("hidden"));
+    document.getElementById(formId).classList.remove("hidden");
+  });
+});
+
+function googleLogin() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).then(() => {
+    closeAuthModal();
+    showToast("تم تسجيل الدخول بنجاح!");
+  }).catch(err => showToast("حدث خطأ: " + err.message));
 }
 </script>
 </body>

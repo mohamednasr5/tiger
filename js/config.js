@@ -20,7 +20,7 @@ const auth = firebase.auth();
 
 // ====== أدوات مساعدة عامة ======
 function fmtPrice(n) {
-  return Number(n || 0).toLocaleString("ar-EG") + " جنيه";
+  return Number(n || 0).toLocaleString("ar-EG") + " ج.م";
 }
 
 function genOrderCode() {
@@ -67,7 +67,7 @@ function addToCart(item) {
     cart.push(item);
   }
   saveCart(cart);
-  showToast("تمت الإضافة إلى السلة");
+  showToast("تمت الإضافة إلى السلة ✓");
 }
 
 function removeFromCart(index) {

@@ -31,7 +31,7 @@ function compressImage(file, maxDim = 1400, quality = 0.78) {
   });
 }
 
-// ====== رفع الصورة: اختيار -> ضغط -> Worker -> R2 -> رابط -> Firebase ======
+// ====== رفع الصورة: اختيار -> ضغط -> Worker -> R2 -> رابط ======
 async function uploadImageToWorker(file, onProgress) {
   const blob = await compressImage(file);
   const form = new FormData();
@@ -69,7 +69,7 @@ async function uploadImageToWorker(file, onProgress) {
   return url;
 }
 
-// ====== رفع صورة واحدة مع عرض حالة التحميل داخل عنصر معين ======
+// ====== رفع صورة واحدة مع عرض حالة التحميل ======
 async function handleImageInput(fileInput, callback, statusEl) {
   const file = fileInput.files[0];
   if (!file) return;
