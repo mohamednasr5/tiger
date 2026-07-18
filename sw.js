@@ -1,5 +1,5 @@
 // TIGER E-Commerce - Service Worker
-const CACHE_NAME = 'tiger-v1';
+const CACHE_NAME = 'tiger-v2';
 const OFFLINE_URL = '/index.html';
 
 const PRECACHE_URLS = [
