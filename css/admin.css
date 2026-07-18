@@ -1,0 +1,140 @@
+/* css/admin.css */
+
+.admin-body {
+    display: flex;
+    min-height: 100vh;
+    background-color: #09090b; /* أغمق قليلاً من المتجر */
+}
+
+.sidebar {
+    width: 260px;
+    background-color: #18181b;
+    border-left: 1px solid var(--border);
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar .logo {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.admin-nav {
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-nav a {
+    padding: 15px 25px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 600;
+    border-right: 3px solid transparent;
+    transition: var(--transition);
+}
+
+.admin-nav a:hover, .admin-nav a.active {
+    background-color: rgba(251, 191, 36, 0.1);
+    color: var(--primary);
+    border-right-color: var(--primary);
+}
+
+.admin-nav a.back-link {
+    margin-top: auto;
+    color: #ef4444;
+}
+
+.admin-content {
+    flex: 1;
+    padding: 40px;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.admin-panel {
+    background: #18181b;
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 800px;
+    border: 1px solid var(--border);
+}
+
+.admin-form .form-group {
+    margin-bottom: 20px;
+}
+
+.admin-form .form-row {
+    display: flex;
+    gap: 20px;
+}
+
+.admin-form .form-row .form-group {
+    flex: 1;
+}
+
+.admin-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.admin-form input {
+    width: 100%;
+    padding: 12px 15px;
+    background: #27272a;
+    border: 1px solid var(--border);
+    color: #fff;
+    border-radius: 8px;
+    font-family: var(--font);
+    transition: border-color 0.3s;
+}
+
+.admin-form input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.image-preview {
+    margin-top: 10px;
+    padding: 20px;
+    background: #27272a;
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.image-preview img {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 8px;
+}
+
+.btn-block {
+    width: 100%;
+    margin-top: 20px;
+    padding: 15px;
+    font-size: 1.1rem;
+}
+
+.status-message {
+    margin-top: 15px;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    display: none;
+    font-weight: bold;
+}
+
+.status-success { background: rgba(34, 197, 94, 0.2); color: #4ade80; display: block; }
+.status-error { background: rgba(239, 68, 68, 0.2); color: #f87171; display: block; }
+.status-loading { background: rgba(59, 130, 246, 0.2); color: #60a5fa; display: block; }
