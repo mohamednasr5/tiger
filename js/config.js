@@ -72,6 +72,16 @@ function updateAuthUI(user) {
       user ? openAccountMenu() : (typeof openAuthModal === "function" && openAuthModal());
     };
   }
+
+  const bottomAccountLink = document.getElementById("bottomAccountLink");
+  if (bottomAccountLink) {
+    const icon = bottomAccountLink.querySelector("i");
+    if (icon) icon.className = user ? "bx bxs-user-check" : "bx bx-user";
+    bottomAccountLink.onclick = (e) => {
+      e.preventDefault();
+      user ? openAccountMenu() : (typeof openAuthModal === "function" && openAuthModal());
+    };
+  }
 }
 
 // نافذة بسيطة لإدارة الحساب بعد تسجيل الدخول (تسجيل الخروج)
@@ -248,4 +258,40 @@ function updateWishlistBadge() {
 document.addEventListener("DOMContentLoaded", () => {
   updateCartBadge();
   updateWishlistBadge();
+  initTheme();
 });
+
+// ====== الثيم الليلي / النهاري (Dark / Light Mode) ======
+const THEME_KEY = "tj_theme";
+
+function initTheme() {
+  const saved = localStorage.getItem(THEME_KEY) || "dark";
+  applyTheme(saved);
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  document.querySelectorAll(".theme-toggle i").forEach((i) => {
+    i.className = theme === "dark" ? "bx bx-moon" : "bx bx-sun";
+  });
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute("data-theme") || "dark";
+  const next = current === "dark" ? "light" : "dark";
+  localStorage.setItem(THEME_KEY, next);
+  applyTheme(next);
+}
+
+// Apply theme immediately (before DOMContentLoaded) to avoid flash
+(function () {
+  const saved = localStorage.getItem(THEME_KEY) || "dark";
+  document.documentElement.setAttribute("data-theme", saved);
+})();
+
+// ====== تفعيل العنصر النشط في شريط التنقل السفلي (Bottom Nav) ======
+function setActiveBottomNav(pageKey) {
+  document.querySelectorAll(".bottom-nav a[data-nav]").forEach((a) => {
+    a.classList.toggle("active", a.dataset.nav === pageKey);
+  });
+}

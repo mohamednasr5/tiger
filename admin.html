@@ -311,6 +311,7 @@
       <a href="#" data-tab="dashboard" class="active" onclick="switchTab('dashboard')"><i class='bx bx-grid-alt'></i> الرئيسية</a>
       <a href="#" data-tab="products" onclick="switchTab('products')"><i class='bx bx-shopping-bag'></i> المنتجات</a>
       <a href="#" data-tab="orders" onclick="switchTab('orders')"><i class='bx bx-receipt'></i> الطلبات <span class="nav-badge" id="navOrdersBadge" style="display:none">0</span></a>
+      <a href="#" data-tab="customers" onclick="switchTab('customers')"><i class='bx bx-group'></i> العملاء</a>
       <a href="#" data-tab="shipping" onclick="switchTab('shipping')"><i class='bx bxs-truck'></i> الشحن</a>
       <a href="#" data-tab="promo" onclick="switchTab('promo')"><i class='bx bxs-tag'></i> الخصومات</a>
       <a href="#" data-tab="settings" onclick="switchTab('settings')"><i class='bx bx-cog'></i> الإعدادات</a>
@@ -321,6 +322,17 @@
     </div>
   </aside>
 
+  <!-- Admin Bottom Navigation (Mobile, <992px) -->
+  <nav class="bottom-nav admin-bottom-nav" aria-label="تنقل لوحة التحكم">
+    <div class="bottom-nav-inner">
+      <a href="#" data-tab="dashboard" data-nav="dashboard" class="active" onclick="switchTab('dashboard')"><i class='bx bx-grid-alt'></i><span>الرئيسية</span></a>
+      <a href="#" data-tab="products" data-nav="products" onclick="switchTab('products')"><i class='bx bx-shopping-bag'></i><span>المنتجات</span></a>
+      <a href="#" data-tab="orders" data-nav="orders" onclick="switchTab('orders')"><i class='bx bx-receipt'></i><span>الطلبات</span><span class="bn-badge" id="navOrdersBadgeMobile" style="display:none">0</span></a>
+      <a href="#" data-tab="customers" data-nav="customers" onclick="switchTab('customers')"><i class='bx bx-group'></i><span>العملاء</span></a>
+      <a href="#" data-tab="settings" data-nav="settings" onclick="switchTab('settings')"><i class='bx bx-cog'></i><span>الإعدادات</span></a>
+    </div>
+  </nav>
+
   <!-- Main Content -->
   <main class="admin-main">
     
@@ -328,7 +340,10 @@
     <div class="tab-content" id="tab-dashboard">
       <div class="admin-top">
         <h2>لوحة التحكم</h2>
-        <span style="color:var(--text-dim)">مرحباً بك في لوحة الإدارة</span>
+        <div style="display:flex;align-items:center;gap:.8rem">
+          <span style="color:var(--text-dim)">مرحباً بك في لوحة الإدارة</span>
+          <button class="theme-toggle" onclick="toggleTheme()" title="تبديل الوضع الليلي/النهاري"><i class='bx bx-moon'></i></button>
+        </div>
       </div>
       
       <!-- KPIs -->
@@ -396,6 +411,22 @@
           <tbody id="ordersTable"><tr><td colspan="7" style="text-align:center;color:var(--text-dim);padding:2rem">جاري التحميل...</td></tr></tbody>
         </table>
       </div>
+    </div>
+
+    <!-- Customers Tab -->
+    <div class="tab-content hidden" id="tab-customers">
+      <div class="admin-top">
+        <h2>العملاء</h2>
+        <input type="text" placeholder="بحث باسم العميل أو الهاتف..." oninput="filterCustomers(this.value)" style="max-width:320px" />
+      </div>
+
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="data-table">
+          <thead><tr><th>العميل</th><th>الهاتف</th><th>المدينة</th><th>عدد الطلبات</th><th>إجمالي المشتريات</th><th>آخر طلب</th></tr></thead>
+          <tbody id="customersTable"><tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:2rem">جاري التحميل...</td></tr></tbody>
+        </table>
+      </div>
+      <p style="color:var(--text-dim);font-size:.82rem;margin-top:1rem">* تُبنى هذه القائمة تلقائياً من بيانات الطلبات الحالية. صفحة عملاء مستقلة بحقول إضافية (عناوين متعددة، ملاحظات، حظر) قيد التطوير في مرحلة قادمة.</p>
     </div>
 
     <!-- Shipping Tab -->
@@ -653,18 +684,74 @@ function doLogout() {
 // ====== Tab Switching ======
 function switchTab(tab) {
   currentTab = tab;
-  document.querySelectorAll(".sidebar-nav a").forEach(a => a.classList.remove("active"));
-  document.querySelector(`[data-tab="${tab}"]`).classList.add("active");
+  document.querySelectorAll(".sidebar-nav a, .admin-bottom-nav a").forEach(a => a.classList.remove("active"));
+  document.querySelectorAll(`[data-tab="${tab}"]`).forEach(a => a.classList.add("active"));
   document.querySelectorAll(".tab-content").forEach(t => t.classList.add("hidden"));
   document.getElementById(`tab-${tab}`).classList.remove("hidden");
+  window.scrollTo({top:0, behavior:"smooth"});
   
   // Load data for tab
   if (tab === "products") loadProducts();
   if (tab === "orders") renderOrdersTable(allOrders);
+  if (tab === "customers") renderCustomersTable(allOrders);
   if (tab === "shipping") loadShippingRates();
   if (tab === "promo") loadPromoCodes();
   if (tab === "settings") loadSettings();
   if (tab === "dashboard") refreshDashboardKpis();
+}
+
+// ====== Customers (derived from orders) ======
+let allCustomers = [];
+
+function renderCustomersTable(orders) {
+  const map = {};
+  (orders || []).forEach(o => {
+    const phone = o.customer?.phone || "—";
+    const key = phone !== "—" ? phone : (o.customer?.name || "unknown") + Math.random();
+    if (!map[key]) {
+      map[key] = {
+        name: o.customer?.name || "-",
+        phone,
+        city: o.customer?.city || o.customer?.governorate || "-",
+        ordersCount: 0,
+        total: 0,
+        lastDate: o.createdAt || o.date || 0
+      };
+    }
+    map[key].ordersCount += 1;
+    map[key].total += (o.total || 0);
+    const d = o.createdAt || o.date || 0;
+    if (d > map[key].lastDate) map[key].lastDate = d;
+  });
+  allCustomers = Object.values(map).sort((a, b) => b.total - a.total);
+  paintCustomersTable(allCustomers);
+}
+
+function paintCustomersTable(list) {
+  const tbody = document.getElementById("customersTable");
+  if (!tbody) return;
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:2rem">لا يوجد عملاء بعد</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(c => `
+    <tr>
+      <td><b>${c.name}</b></td>
+      <td>${c.phone}</td>
+      <td>${c.city}</td>
+      <td>${c.ordersCount}</td>
+      <td>${fmtPrice(c.total)}</td>
+      <td>${c.lastDate ? new Date(c.lastDate).toLocaleDateString("ar-EG") : "-"}</td>
+    </tr>
+  `).join("");
+}
+
+function filterCustomers(q) {
+  q = (q || "").trim().toLowerCase();
+  if (!q) return paintCustomersTable(allCustomers);
+  paintCustomersTable(allCustomers.filter(c =>
+    (c.name || "").toLowerCase().includes(q) || (c.phone || "").includes(q)
+  ));
 }
 
 // ====== Dashboard ======
@@ -733,18 +820,22 @@ function initOrdersRealtime() {
 }
 
 function updateOrdersBadge(count) {
-  const b = document.getElementById("navOrdersBadge");
-  if (!b) return;
-  b.textContent = count;
-  b.style.display = count > 0 ? "flex" : "none";
+  ["navOrdersBadge", "navOrdersBadgeMobile"].forEach(id => {
+    const b = document.getElementById(id);
+    if (!b) return;
+    b.textContent = count;
+    b.style.display = count > 0 ? "flex" : "none";
+  });
 }
 
 function pulseOrdersNav() {
-  const b = document.getElementById("navOrdersBadge");
-  if (!b) return;
-  b.classList.remove("pulse");
-  void b.offsetWidth;
-  b.classList.add("pulse");
+  ["navOrdersBadge", "navOrdersBadgeMobile"].forEach(id => {
+    const b = document.getElementById(id);
+    if (!b) return;
+    b.classList.remove("pulse");
+    void b.offsetWidth;
+    b.classList.add("pulse");
+  });
 }
 
 // ====== Products ======

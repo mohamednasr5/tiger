@@ -306,6 +306,7 @@
 
       <!-- Actions -->
       <div class="header-actions">
+        <button class="theme-toggle" onclick="toggleTheme()" title="تبديل الوضع الليلي/النهاري"><i class='bx bx-moon'></i></button>
         <button class="action-btn" onclick="toggleSearch()"><i class='bx bx-search'></i></button>
         <button class="action-btn" id="headerAccountBtn" onclick="openAuthModal()"><i class='bx bx-user'></i></button>
         <a href="wishlist.html" class="action-btn wishlist-btn-header">
@@ -1080,5 +1081,16 @@ function showCopySuccess(btn) {
   }, 2000);
 }
 </script>
+
+<!-- ====== Bottom Navigation (Mobile, <992px) ====== -->
+<nav class="bottom-nav" aria-label="التنقل السفلي">
+  <div class="bottom-nav-inner">
+    <a href="index.html" data-nav="home" class="active"><i class='bx bx-home-alt'></i><span>الرئيسية</span></a>
+    <a href="index.html#products" data-nav="search" class="" onclick="if(window.location.pathname.endsWith('index.html')){event.preventDefault();toggleSearch();}"><i class='bx bx-search'></i><span>بحث</span></a>
+    <a href="index.html#products" data-nav="categories" class=""><i class='bx bx-category'></i><span>الأقسام</span></a>
+    <a href="cart.html" data-nav="cart" class=""><i class='bx bx-cart-alt'></i><span>السلة</span><span class="bn-badge cart-badge" style="display:none">0</span></a>
+    <a href="#" id="bottomAccountLink" data-nav="account" class="" onclick="event.preventDefault(); if(typeof openAuthModal==='function'){openAuthModal();} else if(typeof openAccountMenu==='function' && currentUser){openAccountMenu();} else {window.location.href='index.html';}"><i class='bx bx-user'></i><span>حسابي</span></a>
+  </div>
+</nav>
 </body>
 </html>
