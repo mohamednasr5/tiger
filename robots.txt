@@ -1,0 +1,24 @@
+User-agent: *
+Allow: /
+Sitemap: https://tiger-jeans.com/sitemap.xml
+Crawl-delay: 1
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Disallow: /pages/admin/
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+Disallow: /pages/admin/
+Disallow: /js/modules/
+Disallow: /js/admin/
+Disallow: /scripts/

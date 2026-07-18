@@ -1,53 +1,50 @@
 // TIGER E-Commerce - Service Worker
-const CACHE_NAME = 'tiger-v2';
-const BASE_PATH = '/tiger';
-const OFFLINE_URL = BASE_PATH + '/index.html';
+const CACHE_NAME = 'tiger-v1';
+const OFFLINE_URL = '/index.html';
 
 const PRECACHE_URLS = [
-  BASE_PATH + '/',
-  BASE_PATH + '/index.html',
-  BASE_PATH + '/manifest.json',
-  BASE_PATH + '/css/main.css',
-  BASE_PATH + '/css/components.css',
-  BASE_PATH + '/css/animations.css',
-  BASE_PATH + '/css/responsive.css',
-  BASE_PATH + '/js/firebase-config.js',
-  BASE_PATH + '/js/utils.js',
-  BASE_PATH + '/js/app.js',
-  BASE_PATH + '/js/modules/auth.js',
-  BASE_PATH + '/js/modules/products.js',
-  BASE_PATH + '/js/modules/cart.js',
-  BASE_PATH + '/js/modules/wishlist.js',
-  BASE_PATH + '/js/modules/orders.js',
-  BASE_PATH + '/js/modules/notifications.js',
-  BASE_PATH + '/pages/shop.html',
-  BASE_PATH + '/pages/product.html',
-  BASE_PATH + '/pages/cart.html',
-  BASE_PATH + '/pages/checkout.html',
-  BASE_PATH + '/pages/account.html',
-  BASE_PATH + '/pages/login.html',
-  BASE_PATH + '/pages/wishlist.html',
-  BASE_PATH + '/pages/about.html',
-  BASE_PATH + '/pages/contact.html',
-  BASE_PATH + '/pages/faq.html'
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/css/main.css',
+  '/css/components.css',
+  '/css/animations.css',
+  '/css/responsive.css',
+  '/js/firebase-config.js',
+  '/js/utils.js',
+  '/js/app.js',
+  '/js/modules/auth.js',
+  '/js/modules/products.js',
+  '/js/modules/cart.js',
+  '/js/modules/wishlist.js',
+  '/js/modules/orders.js',
+  '/js/modules/notifications.js',
+  '/pages/shop.html',
+  '/pages/product.html',
+  '/pages/cart.html',
+  '/pages/checkout.html',
+  '/pages/account.html',
+  '/pages/login.html',
+  '/pages/wishlist.html',
+  '/pages/about.html',
+  '/pages/contact.html',
+  '/pages/faq.html'
 ];
 
+// Install - precache core assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(PRECACHE_URLS).catch(err => {
         console.log('Precache failed for some URLs:', err);
-        return cache.addAll([
-          BASE_PATH + '/index.html',
-          BASE_PATH + '/manifest.json',
-          BASE_PATH + '/css/main.css'
-        ]);
+        return cache.addAll(['/index.html', '/manifest.json', '/css/main.css']);
       });
     })
   );
   self.skipWaiting();
 });
 
+// Activate - clean old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -61,63 +58,76 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
+// Fetch - Network first, fallback to cache
 self.addEventListener('fetch', (event) => {
+  const { request } = event;
+
   // Skip non-GET requests
-  if (event.request.method !== 'GET') return;
+  if (request.method !== 'GET') return;
 
-  const url = new URL(event.request.url);
-
-  // Skip external API requests (Firebase, etc.)
-  if (!url.origin.includes('github.io') && !url.pathname.startsWith(BASE_PATH)) {
+  // Skip Firebase and external API requests
+  if (request.url.includes('firebaseio.com') ||
+      request.url.includes('googleapis.com') ||
+      request.url.includes('firebaseapp.com') ||
+      request.url.includes('gstatic.com') ||
+      request.url.includes('fonts.googleapis.com') ||
+      request.url.includes('fonts.gstatic.com')) {
     return;
   }
 
-  // Navigation requests: network-first with offline fallback
-  if (event.request.mode === 'navigate') {
+  // For navigation requests (HTML pages) - network first
+  if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+      fetch(request)
+        .then((response) => {
+          const cloned = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(request, cloned);
+          });
           return response;
         })
         .catch(() => {
-          return caches.match(event.request)
-            .then(cached => cached || caches.match(OFFLINE_URL));
+          return caches.match(request).then((cached) => {
+            return cached || caches.match('/index.html');
+          });
         })
     );
     return;
   }
 
-  // Static assets: stale-while-revalidate
-  if (
-    url.pathname.match(/\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf)$/)
-  ) {
+  // For static assets - stale while revalidate
+  if (request.url.match(/\.(css|js|png|jpg|jpeg|svg|gif|webp|ico|woff2?)$/)) {
     event.respondWith(
-      caches.match(event.request).then(cached => {
-        const fetchPromise = fetch(event.request).then(response => {
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, response.clone()));
-          return response;
+      caches.open(CACHE_NAME).then((cache) => {
+        return cache.match(request).then((cached) => {
+          const fetchPromise = fetch(request).then((response) => {
+            if (response.ok) {
+              cache.put(request, response.clone());
+            }
+            return response;
+          }).catch(() => cached);
+          return cached || fetchPromise;
         });
-        return cached || fetchPromise;
       })
     );
     return;
   }
 
-  // Default: network-first
+  // Default - network first
   event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        const clone = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+    fetch(request)
+      .then((response) => {
+        if (response.ok) {
+          const cloned = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, cloned));
+        }
         return response;
       })
-      .catch(() => caches.match(event.request))
+      .catch(() => caches.match(request))
   );
 });
 
-// Sync cart data when back online
+// Background Sync
 self.addEventListener('sync', (event) => {
   if (event.tag === 'sync-cart') {
     event.waitUntil(syncCart());
@@ -125,8 +135,39 @@ self.addEventListener('sync', (event) => {
 });
 
 async function syncCart() {
-  const clients = await self.clients.matchAll();
-  clients.forEach(client => {
-    client.postMessage({ type: 'SYNC_CART' });
-  });
+  // Sync offline cart changes when back online
+  console.log('Cart sync triggered');
 }
+
+// Push Notifications
+self.addEventListener('push', (event) => {
+  const data = event.data ? event.data.json() : {};
+  const title = data.title || 'TIGER';
+  const options = {
+    body: data.body || 'You have a new notification',
+    icon: '/assets/icons/icon-192.png',
+    badge: '/assets/icons/icon-72.png',
+    vibrate: [100, 50, 100],
+    data: { url: data.url || '/' },
+    actions: [
+      { action: 'open', title: 'Open' },
+      { action: 'dismiss', title: 'Dismiss' }
+    ]
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  if (event.action === 'open' || !event.action) {
+    const url = event.notification.data?.url || '/';
+    event.waitUntil(self.clients.matchAll({ type: 'window' }).then((clients) => {
+      for (const client of clients) {
+        if (client.url.includes('tiger') && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      return self.clients.openWindow(url);
+    }));
+  }
+});
