@@ -164,6 +164,7 @@
         <a href="track.html">تتبع الطلب</a>
       </nav>
       <div class="header-actions">
+        <a href="orders.html" class="action-btn" title="طلباتي"><i class='bx bx-receipt'></i></a>
         <a href="wishlist.html" class="action-btn wishlist-btn-header"><i class='bx bx-heart'></i><span class="wishlist-badge" style="display:none">0</span></a>
         <a href="cart.html" class="action-btn cart-btn"><i class='bx bx-cart-alt'></i><span class="cart-badge" style="display:none">0</span></a>
       </div>
@@ -539,6 +540,7 @@ async function submitOrder() {
     discount: discountAmount,
     total: Math.max(0, total),
     customer: { name, phone, city, address, notes },
+    uid: (typeof currentUser !== "undefined" && currentUser) ? currentUser.uid : null,
     payment: { 
       method, 
       receiptImage: receiptUrl || null,
@@ -555,6 +557,7 @@ async function submitOrder() {
 
   try {
     await db.ref("orders").push(order);
+    localStorage.setItem("tj_customer_phone", phone);
     clearCart();
     
     // Hide form, show success
@@ -617,7 +620,7 @@ function showCopySuccess(btn) {
     <a href="index.html#products" data-nav="search" class="" onclick="if(window.location.pathname.endsWith('index.html')){event.preventDefault();toggleSearch();}"><i class='bx bx-search'></i><span>بحث</span></a>
     <a href="index.html#products" data-nav="categories" class=""><i class='bx bx-category'></i><span>الأقسام</span></a>
     <a href="cart.html" data-nav="cart" class="active"><i class='bx bx-cart-alt'></i><span>السلة</span><span class="bn-badge cart-badge" style="display:none">0</span></a>
-    <a href="#" id="bottomAccountLink" data-nav="account" class="" onclick="event.preventDefault(); if(typeof openAuthModal==='function'){openAuthModal();} else if(typeof openAccountMenu==='function' && currentUser){openAccountMenu();} else {window.location.href='index.html';}"><i class='bx bx-user'></i><span>حسابي</span></a>
+    <a href="orders.html" id="bottomAccountLink" data-nav="account" class=""><i class='bx bx-user'></i><span>طلباتي</span></a>
   </div>
 </nav>
 </body>
