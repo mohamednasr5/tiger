@@ -459,29 +459,7 @@
       <a href="#" class="view-all">عرض الكل ←</a>
     </div>
 
-    <div class="deals-grid" id="dealsGrid">
-      <div class="deal-card">
-        <div class="deal-badge">25%-</div>
-        <img src="images/product-1.png" alt="جينز كلاسيك" loading="lazy" />
-        <div class="deal-info">
-          <span class="deal-tag">عرض</span>
-        </div>
-      </div>
-      <div class="deal-card">
-        <div class="deal-badge">29%-</div>
-        <img src="images/product-3.png" alt="جينز مودرن" loading="lazy" />
-        <div class="deal-info">
-          <span class="deal-tag">عرض</span>
-        </div>
-      </div>
-      <div class="deal-card">
-        <div class="deal-badge">20%-</div>
-        <img src="images/product-5.png" alt="جاكيت جلد" loading="lazy" />
-        <div class="deal-info">
-          <span class="deal-tag">عرض</span>
-        </div>
-      </div>
-    </div>
+    <div class="deals-grid" id="dealsGrid"></div>
   </div>
 </section>
 
@@ -684,6 +662,7 @@ db.ref("products").on("value", (snap) => {
     .filter((p) => p.active !== false);
   buildCategoryFilters();
   renderProducts();
+  renderDeals();
 });
 
 // Load banners
@@ -770,6 +749,55 @@ function renderProducts() {
   observeReveals();
 }
 
+function renderDeals() {
+  const grid = document.getElementById("dealsGrid");
+  if (!grid) return;
+
+  // Prefer products with a real discount, fall back to the first products available
+  let deals = ALL_PRODUCTS.filter((p) => p.oldPrice && p.oldPrice > p.price).slice(0, 3);
+  if (deals.length < 3) {
+    const rest = ALL_PRODUCTS.filter((p) => !deals.includes(p)).slice(0, 3 - deals.length);
+    deals = deals.concat(rest);
+  }
+
+  if (!deals.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><i class="bx bx-gift"></i><p>لا توجد عروض متاحة حالياً</p></div>';
+    return;
+  }
+
+  grid.innerHTML = deals
+    .map((p, idx) => {
+      const img = (p.images && p.images[0]) || "images/product-1.png";
+      const wished = isWishlisted(p.id);
+      const discount = p.oldPrice && p.oldPrice > p.price
+        ? Math.round(100 - (p.price / p.oldPrice) * 100)
+        : null;
+
+      return `
+      <div class="deal-card reveal" style="transition-delay:${idx * 0.08}s">
+        <button class="corner-heart wishlist-btn ${wished ? "active" : ""}" data-id="${p.id}" onclick="event.preventDefault();toggleWishlistBtn('${p.id}', this)" title="أضف للمفضلة">
+          <i class='${wished ? "bx bxs-heart" : "bx bx-heart"}'></i>
+        </button>
+        ${discount ? `<div class="deal-badge">${discount}%-</div>` : ""}
+        <a href="product.html?id=${p.id}">
+          <img src="${img}" alt="${p.name || ""}" loading="lazy" />
+        </a>
+        <div class="deal-info">
+          <span class="deal-price">${fmtPrice(p.price)}</span>
+          <button class="deal-tag add-cart-btn" onclick="event.preventDefault();quickAdd('${p.id}', this, event)">
+            <i class='bx bx-cart-add'></i> <span>أضف للسلة</span>
+          </button>
+        </div>
+      </div>`;
+    })
+    .join("");
+
+  observeReveals();
+}
+
+// Colors can be plain strings (legacy products) or {name, image} objects (new products with optional per-color image)
+function colorName(c) { return typeof c === "string" ? c : (c && c.name) || ""; }
+
 function quickAdd(id, btnEl, evt) {
   const p = ALL_PRODUCTS.find((x) => x.id === id);
   if (!p) return;
@@ -779,7 +807,7 @@ function quickAdd(id, btnEl, evt) {
     price: p.price,
     image: (p.images && p.images[0]) || "",
     size: (p.sizes && p.sizes[0]) || "",
-    color: (p.colors && p.colors[0]) || "",
+    color: (p.colors && p.colors.length) ? colorName(p.colors[0]) : "",
     qty: 1
   });
   if (btnEl) {
@@ -798,7 +826,7 @@ function quickAdd(id, btnEl, evt) {
 function flyToCart(evt) {
   const cartBtn = document.querySelector(".cart-btn");
   if (!cartBtn) return;
-  const startEl = evt && evt.target ? evt.target.closest(".product-image") : null;
+  const startEl = evt && evt.target ? evt.target.closest(".product-image, .deal-card") : null;
   const startRect = startEl ? startEl.getBoundingClientRect() : { left: window.innerWidth / 2, top: window.innerHeight / 2, width: 40, height: 40 };
   const endRect = cartBtn.getBoundingClientRect();
 
@@ -843,7 +871,7 @@ function openQuickView(id) {
   const p = ALL_PRODUCTS.find((x) => x.id === id);
   if (!p) return;
   qvSelSize = (p.sizes && p.sizes[0]) || "";
-  qvSelColor = (p.colors && p.colors[0]) || "";
+  qvSelColor = (p.colors && p.colors.length) ? colorName(p.colors[0]) : "";
   const img = (p.images && p.images[0]) || "images/product-1.png";
   const modal = document.getElementById("quickViewModal");
   document.getElementById("qvBody").innerHTML = `

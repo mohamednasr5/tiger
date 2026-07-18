@@ -210,7 +210,11 @@
 const params = new URLSearchParams(location.search);
 const pid = params.get("id");
 let PRODUCT = null;
-let selSize = "", selColor = "", qty = 1;
+let selSize = "", selColor = "", selColorImage = "", qty = 1;
+
+// Colors can be plain strings (legacy products) or {name, image} objects (new products with optional per-color image)
+function colorName(c) { return typeof c === "string" ? c : (c.name || ""); }
+function colorImage(c) { return typeof c === "string" ? "" : (c.image || ""); }
 
 if (!pid) {
   document.getElementById("pdDetail").innerHTML = '<div class="empty-state"><i class="bx bx-error-circle"></i><p>المنتج غير موجود</p></div>';
@@ -223,7 +227,8 @@ if (!pid) {
     }
     
     selSize = (PRODUCT.sizes && PRODUCT.sizes[0]) || "";
-    selColor = (PRODUCT.colors && PRODUCT.colors[0]) || "";
+    selColor = (PRODUCT.colors && PRODUCT.colors.length) ? colorName(PRODUCT.colors[0]) : "";
+    selColorImage = (PRODUCT.colors && PRODUCT.colors.length) ? colorImage(PRODUCT.colors[0]) : "";
     
     document.getElementById("crumbName").textContent = PRODUCT.name || "منتج";
     document.title = (PRODUCT.name || "منتج") + " | Tiger Jeans";
@@ -246,10 +251,10 @@ function render() {
     <!-- Gallery -->
     <div class="pd-gallery">
       <div class="main-image">
-        <img id="mainImage" src="${images[0]}" alt="${PRODUCT.name}" />
+        <img id="mainImage" src="${selColorImage || images[0]}" alt="${PRODUCT.name}" />
       </div>
       <div class="pd-thumbs">
-        ${images.map((img, i) => `<img src="${img}" class="${i === 0 ? 'active' : ''}" onclick="switchImage('${img}', this)" alt="" />`).join("")}
+        ${images.map((img, i) => `<img src="${img}" class="${(!selColorImage && i === 0) ? 'active' : ''}" onclick="switchImage('${img}', this)" alt="" />`).join("")}
       </div>
     </div>
     
@@ -277,7 +282,7 @@ function render() {
       <div class="option-group">
         <label>اللون</label>
         <div class="option-list" id="colorList">
-          ${PRODUCT.colors.map(c => `<button class="option-btn ${c === selColor ? 'active' : ''}" onclick="pickColor('${c}', this)">${c}</button>`).join("")}
+          ${PRODUCT.colors.map(c => `<button class="option-btn ${colorName(c) === selColor ? 'active' : ''}" data-img="${colorImage(c)}" onclick="pickColor('${colorName(c)}', '${colorImage(c)}', this)">${colorImage(c) ? `<img src="${colorImage(c)}" alt="" style="width:18px;height:18px;border-radius:50%;object-fit:cover;margin-inline-end:.35rem;vertical-align:middle" />` : ""}${colorName(c)}</button>`).join("")}
         </div>
       </div>` : ""}
       
@@ -315,10 +320,17 @@ function pickSize(s, el) {
   el.classList.add("active");
 }
 
-function pickColor(c, el) {
+function pickColor(c, img, el) {
   selColor = c;
+  selColorImage = img || "";
   document.querySelectorAll("#colorList .option-btn").forEach(b => b.classList.remove("active"));
   el.classList.add("active");
+  
+  // Show the color-specific image if one was set; otherwise fall back to the product's general image
+  const images = (PRODUCT.images && PRODUCT.images.length) ? PRODUCT.images : ["images/product-1.png"];
+  const mainImg = document.getElementById("mainImage");
+  if (mainImg) mainImg.src = selColorImage || images[0];
+  document.querySelectorAll(".pd-thumbs img").forEach((t, i) => t.classList.toggle("active", !selColorImage && i === 0));
 }
 
 function changeQty(d) {
@@ -331,7 +343,7 @@ function addToCartNow() {
     id: pid,
     name: PRODUCT.name,
     price: PRODUCT.price,
-    image: (PRODUCT.images && PRODUCT.images[0]) || "",
+    image: selColorImage || (PRODUCT.images && PRODUCT.images[0]) || "",
     size: selSize,
     color: selColor,
     qty

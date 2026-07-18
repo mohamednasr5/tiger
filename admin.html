@@ -80,6 +80,37 @@
 .sidebar-nav a i{font-size:1.15rem;width:22px;text-align:center}
 .sidebar-nav a:hover{background:var(--surface);color:var(--text)}
 .sidebar-nav a.active{background:var(--gold);color:#000}
+.sidebar-nav a{position:relative}
+
+/* Nav notification badge */
+.nav-badge{
+  margin-inline-start:auto;
+  background:var(--danger);
+  color:#fff;
+  font-size:.72rem;
+  font-weight:800;
+  min-width:20px;height:20px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  padding:0 .3rem;
+  transition:transform .2s;
+}
+.sidebar-nav a.active .nav-badge{background:#000;color:var(--gold)}
+.nav-badge.pulse{animation:navBadgePulse .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes navBadgePulse{
+  0%{transform:scale(1)}
+  40%{transform:scale(1.5)}
+  70%{transform:scale(.9)}
+  100%{transform:scale(1)}
+}
+
+/* Tab content visibility (was missing — this is why clicking sections did nothing) */
+.tab-content{display:block;animation:tabFadeIn .35s ease}
+.tab-content.hidden{display:none}
+@keyframes tabFadeIn{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
 
 /* Top Bar */
 .admin-top{
@@ -210,6 +241,9 @@
   gap:.4rem;
 }
 .chip button{color:var(--danger);font-size:.9rem}
+.chip-color-thumb{width:18px;height:18px;border-radius:50%;object-fit:cover;border:1px solid var(--line)}
+.chip-img-btn{color:var(--text-dim)!important;font-size:.95rem!important}
+.chip-img-btn:hover{color:var(--gold)!important}
 
 /* Spinner */
 .spinner{
@@ -276,7 +310,7 @@
     <nav class="sidebar-nav">
       <a href="#" data-tab="dashboard" class="active" onclick="switchTab('dashboard')"><i class='bx bx-grid-alt'></i> الرئيسية</a>
       <a href="#" data-tab="products" onclick="switchTab('products')"><i class='bx bx-shopping-bag'></i> المنتجات</a>
-      <a href="#" data-tab="orders" onclick="switchTab('orders')"><i class='bx bx-receipt'></i> الطلبات</a>
+      <a href="#" data-tab="orders" onclick="switchTab('orders')"><i class='bx bx-receipt'></i> الطلبات <span class="nav-badge" id="navOrdersBadge" style="display:none">0</span></a>
       <a href="#" data-tab="shipping" onclick="switchTab('shipping')"><i class='bx bxs-truck'></i> الشحن</a>
       <a href="#" data-tab="promo" onclick="switchTab('promo')"><i class='bx bxs-tag'></i> الخصومات</a>
       <a href="#" data-tab="settings" onclick="switchTab('settings')"><i class='bx bx-cog'></i> الإعدادات</a>
@@ -368,8 +402,13 @@
     <div class="tab-content hidden" id="tab-shipping">
       <div class="admin-top">
         <h2>أسعار الشحن</h2>
-        <button class="btn-primary" onclick="openShippingModal()"><i class='bx bx-plus'></i> إضافة سعر</button>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+          <button class="btn-secondary" onclick="openBulkShippingModal()"><i class='bx bx-list-plus'></i> سعر موحد لكل المحافظات</button>
+          <button class="btn-primary" onclick="openShippingModal()"><i class='bx bx-plus'></i> إضافة سعر</button>
+        </div>
       </div>
+      
+      <div id="missingShippingAlert"></div>
       
       <div class="card" style="padding:0;overflow:hidden">
         <table class="data-table">
@@ -471,6 +510,43 @@
 </div>
 
 <!-- Product Modal -->
+<div class="modal-backdrop" id="shippingModal">
+  <div class="modal-box" style="width:420px">
+    <div class="modal-header">
+      <h3>إضافة سعر شحن</h3>
+      <button class="modal-close" onclick="closeModal('shippingModal')">&times;</button>
+    </div>
+
+    <div class="field">
+      <label>المحافظة</label>
+      <select id="shipGovernate"><option value="">اختر المحافظة</option></select>
+    </div>
+    <div class="field">
+      <label>تكلفة الشحن (ج.م)</label>
+      <input id="shipCost" type="number" placeholder="مثال: 50" />
+    </div>
+
+    <button class="btn-primary full-width" style="margin-top:1rem" onclick="saveShippingRate()">حفظ</button>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="bulkShippingModal">
+  <div class="modal-box" style="width:420px">
+    <div class="modal-header">
+      <h3>سعر شحن موحد لكل المحافظات</h3>
+      <button class="modal-close" onclick="closeModal('bulkShippingModal')">&times;</button>
+    </div>
+
+    <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:1rem">هيتطبق السعر ده على كل محافظات مصر دفعة واحدة. المحافظات اللي عندها سعر بالفعل هيتم تحديث سعرها بالقيمة الجديدة.</p>
+    <div class="field">
+      <label>تكلفة الشحن (ج.م)</label>
+      <input id="bulkShipCost" type="number" placeholder="مثال: 50" />
+    </div>
+
+    <button class="btn-primary full-width" style="margin-top:1rem" onclick="saveBulkShippingRate()">تطبيق على كل المحافظات</button>
+  </div>
+</div>
+
 <div class="modal-backdrop" id="productModal">
   <div class="modal-box">
     <div class="modal-header">
@@ -487,19 +563,21 @@
     <div class="field"><label>الفئة</label><input id="pCategory" placeholder="مثال: جينز، قمصان..." /></div>
     
     <div class="field">
-      <label>المقاسات (اضغط Enter لإضافة)</label>
-      <input id="pSizesInput" placeholder="S ثم اضغط Enter" onkeydown="addChip(event,'sizes')" />
+      <label>المقاسات (اكتب المقاس واضغط Enter أو مسطرة)</label>
+      <input id="pSizesInput" placeholder="مثال: S ثم مسطرة، وهيقترحلك M بعدها تلقائي" onkeydown="addChip(event,'sizes')" />
       <div class="chips-container" id="sizesChips"></div>
     </div>
     
     <div class="field">
-      <label>الألوان (اختياري)</label>
-      <input id="pColorsInput" placeholder="أسود ثم اضغط Enter" onkeydown="addChip(event,'colors')" />
+      <label>الألوان (اختياري) — اضغط على أيقونة الصورة على أي لون لإضافة صورة له</label>
+      <input id="pColorsInput" placeholder="أسود ثم Enter أو مسطرة" onkeydown="addChip(event,'colors')" />
       <div class="chips-container" id="colorsChips"></div>
+      <input type="file" id="colorImageInput" accept="image/*" style="display:none" onchange="onColorImageChange(this)" />
     </div>
     
     <div class="field">
       <label>صور المنتج</label>
+      <p style="color:var(--text-dim);font-size:.78rem;margin-top:-.3rem;margin-bottom:.5rem">الصور دي بتظهر كصور عامة للمنتج، ولأي لون ملهوش صورة خاصة به</p>
       <div class="upload-area" style="border-radius:10px" onclick="document.getElementById('pImages').click()">
         <i class='bx bx-cloud-upload' style="font-size:2rem;color:var(--gold)"></i>
         <p style="margin-top:.5rem;color:var(--text-dim)">اضغط لرفع الصور</p>
@@ -508,9 +586,12 @@
       <div class="img-grid" id="productImagesPreview"></div>
     </div>
     
-    <div style="display:flex;gap:1rem;margin-top:1.5rem">
+    <div style="display:flex;gap:1rem;margin-top:1.5rem;flex-wrap:wrap">
       <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer">
         <input type="checkbox" id="pFeatured" /> منتج مميز
+      </label>
+      <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer">
+        <input type="checkbox" id="pIsNew" /> منتج جديد 🆕
       </label>
       <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer">
         <input type="checkbox" id="pActive" checked /> نشط
@@ -555,6 +636,7 @@ function doAdminLogin() {
     document.getElementById("loginScreen").style.display = "none";
     document.getElementById("adminLayout").style.display = "grid";
     loadDashboardData();
+    initOrdersRealtime();
   }).catch(e => {
     errEl.textContent = "بيانات الدخول غير صحيحة";
     btn.disabled = false;
@@ -578,48 +660,91 @@ function switchTab(tab) {
   
   // Load data for tab
   if (tab === "products") loadProducts();
-  if (tab === "orders") loadOrders();
+  if (tab === "orders") renderOrdersTable(allOrders);
   if (tab === "shipping") loadShippingRates();
   if (tab === "promo") loadPromoCodes();
   if (tab === "settings") loadSettings();
+  if (tab === "dashboard") refreshDashboardKpis();
 }
 
 // ====== Dashboard ======
 function loadDashboardData() {
-  // Load orders count & sales
-  db.ref("orders").once("value").then(snap => {
-    const orders = snap.val() || {};
-    allOrders = Object.entries(orders).map(([id,o]) => ({id,...o}));
-    
-    let totalSales = 0;
-    let pendingCount = 0;
-    allOrders.forEach(o => {
-      totalSales += o.total || 0;
-      if (o.status === "pending") pendingCount++;
-    });
-    
-    document.getElementById("kpiOrders").textContent = allOrders.length;
-    document.getElementById("kpiSales").textContent = fmtPrice(totalSales);
-    document.getElementById("kpiPending").textContent = pendingCount;
-    
-    // Recent orders table
-    const recent = allOrders.slice(-5).reverse();
-    document.getElementById("recentOrdersTable").innerHTML = recent.map(o => `
-      <tr>
-        <td><b>${o.code}</b></td>
-        <td>${o.customer?.name || "-"}</td>
-        <td>${fmtPrice(o.total)}</td>
-        <td><span class="status-badge status-${o.status}">${STATUS_LABELS[o.status]||o.status}</span></td>
-        <td>${new Date(o.createdAt).toLocaleDateString("ar-EG")}</td>
-      </tr>`).join("") || '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem">لا توجد طلبات بعد</td></tr>';
-  });
-  
+  refreshDashboardKpis();
+
   // Load products count
   db.ref("products").once("value").then(snap => {
     const prods = snap.val() || {};
     allProducts = Object.entries(prods).map(([id,p]) => ({id,...p}));
     document.getElementById("kpiProducts").textContent = allProducts.length;
   });
+}
+
+function refreshDashboardKpis() {
+  let totalSales = 0;
+  let pendingCount = 0;
+  allOrders.forEach(o => {
+    totalSales += o.total || 0;
+    if (o.status === "pending" || !o.status) pendingCount++;
+  });
+
+  document.getElementById("kpiOrders").textContent = allOrders.length;
+  document.getElementById("kpiSales").textContent = fmtPrice(totalSales);
+  document.getElementById("kpiPending").textContent = pendingCount;
+
+  // Recent orders table
+  const recent = allOrders.slice(0, 5);
+  document.getElementById("recentOrdersTable").innerHTML = recent.map(o => `
+    <tr>
+      <td><b>${o.code}</b></td>
+      <td>${o.customer?.name || "-"}</td>
+      <td>${fmtPrice(o.total)}</td>
+      <td><span class="status-badge status-${o.status}">${STATUS_LABELS[o.status]||o.status}</span></td>
+      <td>${new Date(o.createdAt).toLocaleDateString("ar-EG")}</td>
+    </tr>`).join("") || '<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem">لا توجد طلبات بعد</td></tr>';
+}
+
+// ====== Orders notification system (real-time) ======
+let ordersLoaded = false;
+function initOrdersRealtime() {
+  db.ref("orders").on("value", snap => {
+    const val = snap.val() || {};
+    const newList = Object.entries(val).map(([id,o]) => ({id,...o})).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    const isFirstLoad = !ordersLoaded;
+    const prevIds = new Set(allOrders.map(o => o.id));
+    const addedOrders = isFirstLoad ? [] : newList.filter(o => !prevIds.has(o.id));
+
+    allOrders = newList;
+    ordersLoaded = true;
+
+    const pendingCount = allOrders.filter(o => (o.status || "pending") === "pending").length;
+    updateOrdersBadge(pendingCount);
+
+    if (addedOrders.length) {
+      const msg = addedOrders.length > 1
+        ? `🔔 وصلت ${addedOrders.length} طلبات جديدة!`
+        : `🔔 وصل طلب جديد: ${addedOrders[0].code || ""}`;
+      showToast(msg);
+      pulseOrdersNav();
+    }
+
+    if (currentTab === "orders") renderOrdersTable(allOrders);
+    if (currentTab === "dashboard") refreshDashboardKpis();
+  });
+}
+
+function updateOrdersBadge(count) {
+  const b = document.getElementById("navOrdersBadge");
+  if (!b) return;
+  b.textContent = count;
+  b.style.display = count > 0 ? "flex" : "none";
+}
+
+function pulseOrdersNav() {
+  const b = document.getElementById("navOrdersBadge");
+  if (!b) return;
+  b.classList.remove("pulse");
+  void b.offsetWidth;
+  b.classList.add("pulse");
 }
 
 // ====== Products ======
@@ -656,6 +781,7 @@ function openProductModal(id=null) {
     document.getElementById("pDesc").value = "";
     document.getElementById("pCategory").value = "";
     document.getElementById("pFeatured").checked = false;
+    document.getElementById("pIsNew").checked = false;
     document.getElementById("pActive").checked = true;
     editingProductImages = [];
     tempSizes = [];
@@ -677,11 +803,13 @@ function editProduct(id) {
   document.getElementById("pDesc").value = p.description || "";
   document.getElementById("pCategory").value = p.category || "";
   document.getElementById("pFeatured").checked = p.featured || false;
+  document.getElementById("pIsNew").checked = p.isNew || false;
   document.getElementById("pActive").checked = p.active !== false;
   
   editingProductImages = p.images || [];
   tempSizes = p.sizes || [];
-  tempColors = p.colors || [];
+  // Backward compatibility: older products may have colors saved as plain strings
+  tempColors = (p.colors || []).map(c => typeof c === "string" ? { name: c, image: "" } : { name: c.name || "", image: c.image || "" });
   
   renderChips("sizes");
   renderChips("colors");
@@ -701,6 +829,7 @@ async function saveProduct() {
   const desc = document.getElementById("pDesc").value.trim();
   const category = document.getElementById("pCategory").value.trim();
   const featured = document.getElementById("pFeatured").checked;
+  const isNew = document.getElementById("pIsNew").checked;
   const active = document.getElementById("pActive").checked;
   const editId = document.getElementById("editProductId").value;
   
@@ -716,6 +845,7 @@ async function saveProduct() {
     colors: tempColors,
     images: editingProductImages,
     featured,
+    isNew,
     active,
     updatedAt: Date.now()
   };
@@ -776,18 +906,55 @@ function removeEditImage(i) {
 }
 
 // Chips (sizes/colors)
+// tempSizes: array of strings, e.g. ["S","M","L"]
+// tempColors: array of {name, image} — image is optional; empty string means "use the general product images"
+const LETTER_SIZE_SEQUENCE = ["XS","S","M","L","XL","XXL","XXXL","XXXXL"];
+let pendingColorImageIndex = null;
+
+// Guesses the next size in the sequence so the merchant can just keep hitting
+// space/Enter without retyping (S -> M -> L -> XL..., or 38 -> 40 -> 42... based on the step already used)
+function guessNextSize(sizesArr) {
+  if (!sizesArr.length) return "";
+  const last = String(sizesArr[sizesArr.length - 1]).trim().toUpperCase();
+  
+  const idx = LETTER_SIZE_SEQUENCE.indexOf(last);
+  if (idx !== -1 && idx < LETTER_SIZE_SEQUENCE.length - 1) {
+    return LETTER_SIZE_SEQUENCE[idx + 1];
+  }
+  
+  if (/^\d+$/.test(last)) {
+    let step = 2; // common default step for jeans numeric sizes (e.g. 38,40,42...)
+    if (sizesArr.length >= 2) {
+      const prev = String(sizesArr[sizesArr.length - 2]).trim();
+      if (/^\d+$/.test(prev)) {
+        const detectedStep = parseInt(last) - parseInt(prev);
+        if (detectedStep > 0) step = detectedStep;
+      }
+    }
+    return String(parseInt(last) + step);
+  }
+  
+  return "";
+}
+
 function addChip(e, type) {
-  if (e.key !== "Enter") return;
+  if (e.key !== "Enter" && e.key !== " ") return;
   e.preventDefault();
   const input = e.target;
   const val = input.value.trim();
   if (!val) return;
   
-  if (type === "sizes") tempSizes.push(val);
-  else tempColors.push(val);
-  
-  input.value = "";
-  renderChips(type);
+  if (type === "sizes") {
+    tempSizes.push(val.toUpperCase());
+    renderChips(type);
+    // Auto-suggest the next size so the merchant can just hit space/Enter again
+    const next = guessNextSize(tempSizes);
+    input.value = next || "";
+  } else {
+    tempColors.push({ name: val, image: "" });
+    input.value = "";
+    renderChips(type);
+  }
 }
 
 function removeChip(type, idx) {
@@ -797,9 +964,45 @@ function removeChip(type, idx) {
 }
 
 function renderChips(type) {
-  const arr = type === "sizes" ? tempSizes : tempColors;
   const container = document.getElementById(type + "Chips");
-  container.innerHTML = arr.map((v,i) => `<span class="chip">${v}<button onclick="removeChip('${type}',${i})">×</button></span>`).join("");
+  
+  if (type === "sizes") {
+    container.innerHTML = tempSizes.map((v,i) => `
+      <span class="chip">${v}<button onclick="removeChip('sizes',${i})">×</button></span>`).join("");
+  } else {
+    container.innerHTML = tempColors.map((c,i) => `
+      <span class="chip color-chip">
+        ${c.image ? `<img src="${c.image}" class="chip-color-thumb" alt="" />` : ""}
+        ${c.name}
+        <button type="button" class="chip-img-btn" title="${c.image ? 'تغيير صورة اللون' : 'إضافة صورة لهذا اللون (اختياري)'}" onclick="pickColorImage(${i})"><i class='bx ${c.image ? 'bxs-image' : 'bx-image-add'}'></i></button>
+        <button onclick="removeChip('colors',${i})">×</button>
+      </span>`).join("");
+  }
+}
+
+// Triggers the hidden file picker for a specific color chip's optional image
+function pickColorImage(idx) {
+  pendingColorImageIndex = idx;
+  document.getElementById("colorImageInput").click();
+}
+
+async function onColorImageChange(input) {
+  const file = input.files[0];
+  if (!file || pendingColorImageIndex === null) return;
+  const idx = pendingColorImageIndex;
+  
+  try {
+    const url = await uploadImageToWorker(file);
+    if (tempColors[idx]) {
+      tempColors[idx].image = url;
+      renderChips("colors");
+    }
+  } catch (e) {
+    showToast("خطأ في رفع صورة اللون: " + (e.message || ""));
+  } finally {
+    input.value = "";
+    pendingColorImageIndex = null;
+  }
 }
 
 // ====== Orders ======
@@ -888,10 +1091,15 @@ async function deleteOrder(id) {
 }
 
 // ====== Shipping Rates ======
+let shippingRatesCache = {}; // governate -> {id, governate, cost, active}
+
 function loadShippingRates() {
   db.ref("shippingRates").on("value", snap => {
     const val = snap.val() || {};
     const rates = Object.entries(val).map(([id,r]) => ({id,...r}));
+    
+    shippingRatesCache = {};
+    rates.forEach(r => { if (r.governate) shippingRatesCache[r.governate] = r; });
     
     document.getElementById("shippingTable").innerHTML = rates.map(r => `
       <tr>
@@ -902,25 +1110,85 @@ function loadShippingRates() {
           <button class="action-btn" style="width:30px;height:30px;font-size:.85rem;color:var(--danger)" onclick="deleteShippingRate('${r.id}')"><i class='bx bx-trash'></i></button>
         </td>
       </tr>`).join("") || '<tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:2rem">لا توجد أسعار شحن</td></tr>';
+    
+    renderMissingShippingAlert();
   });
 }
 
-function openShippingModal() {
-  const gov = prompt("أدخل اسم المحافظة/المدينة:");
-  if (!gov) return;
-  const cost = prompt("أدخل تكلفة الشحن (ج.م):");
-  if (!cost) return;
+// Shows a warning listing governorates that don't have a shipping rate set yet
+// (checkout falls back to 0 EGP shipping for them until a rate is added)
+function renderMissingShippingAlert() {
+  const box = document.getElementById("missingShippingAlert");
+  if (!box) return;
+  const missing = EGYPT_GOVERNORATES.filter(g => !shippingRatesCache[g]);
   
-  db.ref("shippingRates").push({
-    governate: gov,
-    cost: parseFloat(cost),
-    active: true
-  }).then(() => showToast("تم إضافة سعر الشحن")).catch(() => showToast("حدث خطأ"));
+  if (!missing.length) { box.innerHTML = ""; return; }
+  
+  box.innerHTML = `
+    <div style="background:rgba(255,180,0,.1);border:1px solid var(--gold);color:var(--gold);padding:.9rem 1.1rem;border-radius:10px;margin-bottom:1.2rem;font-size:.86rem;display:flex;gap:.7rem;align-items:flex-start">
+      <i class='bx bx-error' style="font-size:1.3rem;flex-shrink:0"></i>
+      <div>
+        <b>${missing.length} محافظة لسه من غير سعر شحن مضاف</b>
+        <div style="color:var(--text-dim);margin-top:.3rem">هيبقى الشحن ليها 0 ج.م تلقائيًا في صفحة الدفع لحد ما تضيفلها سعر: <span style="color:var(--text)">${missing.join("، ")}</span></div>
+      </div>
+    </div>`;
+}
+
+function openShippingModal() {
+  const sel = document.getElementById("shipGovernate");
+  sel.innerHTML = '<option value="">اختر المحافظة</option>' +
+    EGYPT_GOVERNORATES.map((g) => `<option value="${g}">${g}</option>`).join("");
+  document.getElementById("shipCost").value = "";
+  document.getElementById("shippingModal").classList.add("show");
+}
+
+function saveShippingRate() {
+  const gov = document.getElementById("shipGovernate").value;
+  const cost = parseFloat(document.getElementById("shipCost").value);
+
+  if (!gov) { showToast("اختر المحافظة"); return; }
+  if (!cost && cost !== 0) { showToast("أدخل تكلفة الشحن"); return; }
+
+  const existing = shippingRatesCache[gov];
+  const req = existing
+    ? db.ref("shippingRates/" + existing.id).update({ cost, active: true })
+    : db.ref("shippingRates").push({ governate: gov, cost, active: true });
+
+  req.then(() => {
+    showToast("تم حفظ سعر الشحن");
+    closeModal("shippingModal");
+  }).catch(() => showToast("حدث خطأ"));
 }
 
 function deleteShippingRate(id) {
   if (!confirm("حذف هذا السعر؟")) return;
   db.ref("shippingRates/" + id).remove();
+}
+
+function openBulkShippingModal() {
+  document.getElementById("bulkShipCost").value = "";
+  document.getElementById("bulkShippingModal").classList.add("show");
+}
+
+// Applies the same shipping cost to all Egyptian governorates in one go.
+// Governorates that already have a rate get their cost updated; the rest get created.
+async function saveBulkShippingRate() {
+  const cost = parseFloat(document.getElementById("bulkShipCost").value);
+  if (!cost && cost !== 0) { showToast("أدخل تكلفة الشحن"); return; }
+
+  try {
+    const updates = {};
+    EGYPT_GOVERNORATES.forEach((g) => {
+      const existing = shippingRatesCache[g];
+      const id = existing ? existing.id : db.ref("shippingRates").push().key;
+      updates["shippingRates/" + id] = { governate: g, cost, active: true };
+    });
+    await db.ref().update(updates);
+    showToast(`تم تطبيق ${cost} ج.م على كل المحافظات (${EGYPT_GOVERNORATES.length})`);
+    closeModal("bulkShippingModal");
+  } catch (e) {
+    showToast("حدث خطأ: " + e.message);
+  }
 }
 
 // ====== Promo Codes ======

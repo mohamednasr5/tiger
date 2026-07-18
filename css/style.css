@@ -700,16 +700,38 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
   padding:1.2rem;
   background:linear-gradient(0deg,rgba(0,0,0,.85),transparent);
   display:flex;
-  justify-content:flex-end;
+  align-items:center;
+  justify-content:space-between;
+  gap:.7rem;
+}
+.deal-price{
+  color:var(--gold);
+  font-weight:900;
+  font-family:'Cairo',sans-serif;
+  font-size:1.1rem;
+  white-space:nowrap;
 }
 .deal-tag{
   background:var(--gold);
   color:#000;
   font-weight:800;
-  padding:.4rem 1rem;
+  padding:.55rem 1.1rem;
   border-radius:8px;
   font-size:.85rem;
   font-family:'Cairo',sans-serif;
+  display:flex;
+  align-items:center;
+  gap:.4rem;
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1), background .2s, box-shadow .2s;
+  white-space:nowrap;
+}
+.deal-tag:hover{transform:translateY(-2px) scale(1.04);box-shadow:0 8px 20px rgba(212,175,55,.4)}
+.deal-tag.added{background:var(--success)}
+.deal-card:hover .corner-heart{opacity:1;transform:translateY(0)}
+@media(max-width:480px){
+  .deal-price{font-size:.95rem}
+  .deal-tag{padding:.5rem .8rem;font-size:.78rem}
+  .deal-tag span{display:none}
 }
 
 /* ====== Footer ====== */

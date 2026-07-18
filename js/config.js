@@ -14,6 +14,16 @@ const UPLOAD_WORKER_URL = "https://tiger-upload.studegy10.workers.dev";
 const STORE_NAME = "Tiger Jeans";
 const CART_KEY = "tj_cart";
 
+// ====== محافظات مصر (لاستخدامها في قوائم الاختيار) ======
+const EGYPT_GOVERNORATES = [
+  "القاهرة", "الجيزة", "الإسكندرية", "الدقهلية", "البحر الأحمر",
+  "البحيرة", "الفيوم", "الغربية", "الإسماعيلية", "المنوفية",
+  "المنيا", "القليوبية", "الوادي الجديد", "السويس", "أسوان",
+  "أسيوط", "بني سويف", "بورسعيد", "دمياط", "الشرقية",
+  "جنوب سيناء", "كفر الشيخ", "مطروح", "الأقصر", "قنا",
+  "شمال سيناء", "سوهاج"
+];
+
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const auth = firebase.auth();

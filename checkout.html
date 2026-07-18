@@ -195,7 +195,7 @@
       </div>
       
       <div class="row2">
-        <div class="field"><label>المحافظة / المدينة</label><input id="cCity" placeholder="مثال: القاهرة" /></div>
+        <div class="field"><label>المحافظة</label><select id="cCity"><option value="">اختر المحافظة</option></select></div>
         <div class="field"><label>العنوان بالتفصيل</label><input id="cAddress" placeholder="الشارع، رقم العمارة..." /></div>
       </div>
       
@@ -216,7 +216,7 @@
         </div>
         <div class="pay-option" data-method="cod" onclick="selectPay('cod', this)">
           <i class='bx bx-money'></i>
-          <div>الدفع عند الاستلام (+30ج)</div>
+          <div>الدفع عند الاستلام</div>
         </div>
       </div>
 
@@ -316,6 +316,15 @@ let discountAmount = 0;
 const cart = getCart();
 if (!cart.length) location.href = "cart.html";
 
+// Populate governorates dropdown
+document.getElementById("cCity").innerHTML =
+  '<option value="">اختر المحافظة</option>' +
+  EGYPT_GOVERNORATES.map((g) => `<option value="${g}">${g}</option>`).join("");
+document.getElementById("cCity").addEventListener("change", () => {
+  updatePayNumber();
+  updateTotals();
+});
+
 // Render order items
 function renderOrder() {
   document.getElementById("orderItemsList").innerHTML = cart
@@ -338,6 +347,31 @@ db.ref("settings/payment").once("value").then((snap) => {
   if (!paySettings.instapayLink) paySettings.instapayLink = "https://ipn.eg/S/engmohamednasr/instapay/8NShbl";
   updatePayNumber();
 });
+
+// Load shipping rates per governorate (managed from admin > الشحن)
+let shippingRates = {}; // { governate: cost } — only active rates included
+db.ref("shippingRates").once("value").then((snap) => {
+  const val = snap.val() || {};
+  shippingRates = {};
+  Object.values(val).forEach((r) => {
+    if (r && r.governate && r.active !== false) {
+      shippingRates[r.governate] = r.cost;
+    }
+  });
+  updatePayNumber();
+  updateTotals();
+});
+
+// Returns the shipping cost for the currently selected governorate.
+// Falls back to 0 if no city selected yet, or no rate was set for it in admin.
+function getShippingCost() {
+  const city = document.getElementById("cCity").value;
+  if (!city) return 0;
+  if (Object.prototype.hasOwnProperty.call(shippingRates, city)) {
+    return shippingRates[city];
+  }
+  return 0;
+}
 
 function selectPay(m, el) {
   method = m;
@@ -370,18 +404,21 @@ function updatePayNumber() {
     document.getElementById("instapayLink").href = paySettings.instapayLink || "https://ipn.eg/S/engmohamednasr/instapay/8NShbl";
   } else {
     label.textContent = "الدفع عند الاستلام:";
-    val.textContent = "+30 جنيه مصاريف توصيل";
+    const city = document.getElementById("cCity").value;
+    const cost = getShippingCost();
+    val.textContent = city ? `مصاريف الشحن: ${fmtPrice(cost)}` : "اختر المحافظة لمعرفة مصاريف الشحن";
     copyBtn.style.display = "none";
   }
 }
 
 function updateTotals() {
   let subtotal = cartTotal();
-  let shippingCost = method === "cod" ? 30 : 0;
+  let shippingCost = getShippingCost();
   let total = subtotal + shippingCost - discountAmount;
+  const city = document.getElementById("cCity").value;
   
   document.getElementById("sSub").textContent = fmtPrice(subtotal);
-  document.getElementById("sShip").textContent = shippingCost > 0 ? fmtPrice(shippingCost) : "يحدد لاحقاً";
+  document.getElementById("sShip").textContent = city ? fmtPrice(shippingCost) : "يحدد حسب المحافظة";
   document.getElementById("sTotal").textContent = fmtPrice(Math.max(0, total));
   
   if (discountAmount > 0) {
@@ -491,13 +528,14 @@ async function submitOrder() {
   btn.innerHTML = '<span class="spinner"></span> جاري إرسال الطلب...';
 
   const code = genOrderCode();
-  let total = cartTotal() + (method === "cod" ? 30 : 0) - discountAmount;
+  const shippingCost = getShippingCost();
+  let total = cartTotal() + shippingCost - discountAmount;
   
   const order = {
     code,
     items: cart,
     subtotal: cartTotal(),
-    shippingCost: method === "cod" ? 30 : 0,
+    shippingCost,
     discount: discountAmount,
     total: Math.max(0, total),
     customer: { name, phone, city, address, notes },
