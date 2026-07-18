@@ -240,8 +240,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
 }
 .marquee-bar:hover .marquee-content{animation-play-state:paused}
 @keyframes marquee{
-  0%{transform:translateX(0)}
-  100%{transform:translateX(-50%)}
+  0%{transform:translateX(-50%)}
+  100%{transform:translateX(0)}
 }
 
 /* ====== Hero Section ====== */
@@ -281,6 +281,19 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
   letter-spacing:-1px;
 }
 .gold-text{color:var(--gold)}
+
+/* Typewriter cursor for hero title */
+.hero-title.typing-cursor::after{
+  content:'';
+  display:inline-block;
+  width:4px;
+  height:.85em;
+  margin-inline-start:5px;
+  background:var(--gold);
+  vertical-align:-0.08em;
+  animation:heroCaretBlink .85s steps(1) infinite;
+}
+@keyframes heroCaretBlink{50%{opacity:0}}
 .hero-desc{
   color:var(--text-dim);
   font-size:1.08rem;
@@ -407,6 +420,80 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
 .discount-icon{
   background:linear-gradient(135deg,#ff4757,#ff6b81);
   color:#fff;
+}
+
+/* ====== Animated Feature Icons ====== */
+.feature-icon svg{ overflow:visible }
+
+/* Shipping truck: wheels spin, whole truck drives in place, smoke puffs */
+.icon-shipping svg{ animation:truckBob 1.8s ease-in-out infinite }
+.icon-shipping .truck-wheel{
+  transform-origin:center;
+  animation:wheelSpin .7s linear infinite;
+}
+.icon-shipping .truck-smoke{ animation:smokePuff 1.4s ease-in-out infinite }
+@keyframes truckBob{
+  0%,100%{ transform:translateX(0) }
+  50%{ transform:translateX(-2px) }
+}
+@keyframes wheelSpin{ to{ transform:rotate(360deg) } }
+@keyframes smokePuff{
+  0%,100%{ opacity:.3; transform:translateX(0) }
+  50%{ opacity:1; transform:translateX(-2px) }
+}
+
+/* Discount tag: diagonal shine sweeps across, tag gently tilts */
+.icon-discount svg{
+  animation:tagTilt 2.6s ease-in-out infinite;
+  transform-origin:20% 20%;
+}
+.icon-discount .tag-shine{ animation:tagShine 2.2s ease-in-out infinite }
+@keyframes tagTilt{
+  0%,100%{ transform:rotate(0deg) }
+  50%{ transform:rotate(-8deg) }
+}
+@keyframes tagShine{
+  0%{ transform:translateX(-20px) }
+  60%,100%{ transform:translateX(70px) }
+}
+
+/* Package: lid flaps open and close like it's being unwrapped */
+.icon-package .box-lid-left{
+  transform-origin:10px 26px;
+  animation:lidLeft 2.4s ease-in-out infinite;
+}
+.icon-package .box-lid-right{
+  transform-origin:54px 26px;
+  animation:lidRight 2.4s ease-in-out infinite;
+}
+@keyframes lidLeft{
+  0%,20%,100%{ transform:rotate(0deg) }
+  50%{ transform:rotate(-18deg) }
+}
+@keyframes lidRight{
+  0%,20%,100%{ transform:rotate(0deg) }
+  50%{ transform:rotate(18deg) }
+}
+
+/* Secure payment: shield pulses, checkmark draws in on loop */
+.icon-secure .shield-shape{ animation:shieldPulse 2.4s ease-in-out infinite }
+.icon-secure .shield-check{ animation:checkDraw 2.4s ease-in-out infinite }
+@keyframes shieldPulse{
+  0%,100%{ filter:drop-shadow(0 0 0 rgba(212,175,55,0)) }
+  50%{ filter:drop-shadow(0 0 4px rgba(212,175,55,.6)) }
+}
+@keyframes checkDraw{
+  0%,15%{ stroke-dashoffset:1 }
+  55%,100%{ stroke-dashoffset:0 }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .icon-shipping svg,.icon-shipping .truck-wheel,.icon-shipping .truck-smoke,
+  .icon-discount svg,.icon-discount .tag-shine,
+  .icon-package .box-lid-left,.icon-package .box-lid-right,
+  .icon-secure .shield-shape,.icon-secure .shield-check{
+    animation:none !important;
+  }
 }
 .feature-info h4{
   font-size:.98rem;
