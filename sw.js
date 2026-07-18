@@ -1,135 +1,60 @@
-// Tiger Jeans Service Worker - PWA
-const CACHE_NAME = 'tiger-jeans-v1';
-const ASSETS_TO_CACHE = [
+const CACHE_NAME = 'tiger-store-v1';
+const DYNAMIC_CACHE = 'tiger-dynamic-v1';
+
+const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/cart.html',
-  '/checkout.html',
-  '/product.html',
-  '/track.html',
-  '/admin.html',
   '/css/style.css',
-  '/js/config.js',
-  '/js/upload.js',
-  '/images/favicon-32x32.png',
-  '/images/icon-192.png',
-  '/images/icon-512.png'
+  '/js/app.js',
+  '/js/firebase-config.js',
+  '/manifest.json',
+  'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap'
 ];
 
-// Install - Cache Assets
+// 1. التثبيت والتخزين الأولي
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing...');
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('[SW] Caching assets');
-        return cache.addAll(ASSETS_TO_CACHE);
-      })
-      .then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('تم التخزين المؤقت للملفات الأساسية');
+      return cache.addAll(STATIC_ASSETS);
+    })
   );
+  self.skipWaiting();
 });
 
-// Activate - Clean Old Caches
+// 2. التفعيل وتنظيف النسخ القديمة
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating...');
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
+    caches.keys().then((keys) => {
       return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('[SW] Removing old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
+        keys.filter((key) => key !== CACHE_NAME && key !== DYNAMIC_CACHE)
+            .map((key) => caches.delete(key))
       );
-    }).then(() => self.clients.claim())
+    })
   );
+  self.clients.claim();
 });
 
-// Fetch - Network First, Fallback to Cache
+// 3. استراتيجية جلب البيانات (Cache First للصور والملفات الثابتة، Network First للبيانات)
 self.addEventListener('fetch', (event) => {
-  // Skip non-GET requests
-  if (event.request.method !== 'GET') return;
-  
-  // Skip Firebase and external requests
-  if (event.request.url.includes('firebase') || 
-      event.request.url.includes('googleapis') ||
-      event.request.url.includes('gstatic') ||
-      event.request.url.includes('studegy10')) {
-    return;
-  }
+  const url = new URL(event.request.url);
 
-  event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        // Clone response and cache it
-        if (response && response.status === 200) {
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseClone);
+  // تخزين صور Cloudflare R2 مؤقتاً
+  if (url.origin.includes('r2.cloudflarestorage.com') || url.pathname.match(/\.(png|jpg|jpeg|svg|gif)$/)) {
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        return cachedResponse || fetch(event.request).then((networkResponse) => {
+          return caches.open(DYNAMIC_CACHE).then((cache) => {
+            cache.put(event.request, networkResponse.clone());
+            return networkResponse;
           });
-        }
-        return response;
-      })
-      .catch(() => {
-        // Fallback to cache
-        return caches.match(event.request).then((cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-          // Return offline page for HTML requests
-          if (event.request.headers.get('accept').includes('text/html')) {
-            return caches.match('/index.html');
-          }
         });
       })
-  );
-});
-
-// Background Sync for Orders
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'sync-orders') {
-    event.waitUntil(syncOrders());
-  }
-});
-
-async function syncOrders() {
-  // Sync pending orders when back online
-  console.log('[SW] Syncing orders...');
-}
-
-// Push Notifications
-self.addEventListener('push', (event) => {
-  const options = {
-    body: event.data ? event.data.text() : 'إشعار جديد من Tiger Jeans',
-    icon: '/images/icon-192.png',
-    badge: '/images/icon-72.png',
-    dir: 'rtl',
-    lang: 'ar',
-    vibrate: [100, 50, 100],
-    data: {
-      dateOfArrival: Date.now(),
-      primaryKey: 1,
-      url: '/index.html'
-    },
-    actions: [
-      { action: 'open', title: 'فتح التطبيق' },
-      { action: 'close', title: 'إغلاق' }
-    ]
-  };
-
-  event.waitUntil(
-    self.registration.showNotification('Tiger Jeans', options)
-  );
-});
-
-// Notification Click
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-
-  if (event.action === 'open' || !event.action) {
-    event.waitUntil(
-      clients.openWindow(event.notification.data.url || '/')
+    );
+  } else {
+    // استراتيجية Network First لباقي الطلبات (مثل Firestore)
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(event.request))
     );
   }
 });
