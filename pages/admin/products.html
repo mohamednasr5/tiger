@@ -17,7 +17,7 @@
     .admin-sidebar::-webkit-scrollbar { width: 4px; }
     .admin-sidebar::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
     .sidebar-logo { padding: 24px 28px; border-bottom: 1px solid #1f1f1f; display: flex; align-items: center; gap: 12px; }
-    .sidebar-logo .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #ff6b00, #ffa040); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; color: #fff; }
+    .sidebar-logo .logo-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: transform .3s ease; } .sidebar-logo:hover .logo-icon { transform: scale(1.1) rotate(-4deg); } .sidebar-logo .logo-icon svg { width: 100%; height: 100%; }
     .sidebar-logo .logo-text { font-size: 22px; font-weight: 800; letter-spacing: 3px; background: linear-gradient(135deg, #ff6b00, #ffa040); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .sidebar-logo .logo-sub { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-top: -2px; }
     .sidebar-nav { flex: 1; padding: 16px 0; }
@@ -250,7 +250,7 @@
   <!-- Sidebar -->
   <aside class="admin-sidebar" id="adminSidebar">
     <div class="sidebar-logo">
-      <div class="logo-icon">T</div>
+      <div class="logo-icon"><svg class="tiger-logo-icon" viewBox="0 0 100 100" width="30" height="30" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="tigerGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff5e3a"/><stop offset="100%" stop-color="#ff0066"/></linearGradient></defs><path class="tiger-ear tiger-ear-left" d="M20 30 L8 6 L36 22 Z" fill="url(#tigerGrad)"/><path class="tiger-ear tiger-ear-right" d="M80 30 L92 6 L64 22 Z" fill="url(#tigerGrad)"/><ellipse cx="50" cy="55" rx="35" ry="30" fill="url(#tigerGrad)"/><path class="tiger-stripe" d="M27 30 Q34 40 25 47" stroke="#1a1a2e" stroke-width="3" fill="none" stroke-linecap="round"/><path class="tiger-stripe" d="M73 30 Q66 40 75 47" stroke="#1a1a2e" stroke-width="3" fill="none" stroke-linecap="round"/><path class="tiger-stripe" d="M50 25 L50 35" stroke="#1a1a2e" stroke-width="3" fill="none" stroke-linecap="round"/><circle class="tiger-eye" cx="37" cy="53" r="4.5" fill="#1a1a2e"/><circle class="tiger-eye" cx="63" cy="53" r="4.5" fill="#1a1a2e"/><ellipse cx="50" cy="67" rx="15" ry="10" fill="#fff"/><path d="M46 62 L54 62 L50 67 Z" fill="#1a1a2e"/><path d="M50 67 L50 71" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round"/><path d="M45 73 Q50 77 55 73" stroke="#1a1a2e" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
       <div>
         <div class="logo-text">TIGER</div>
         <div class="logo-sub">Admin Panel</div>

@@ -1024,6 +1024,151 @@
    26. REDUCED MOTION SUPPORT
    ───────────────────────────────────────────── */
 
+/* ============================================================
+   TIGER Logo Icon — animated mark shown beside the wordmark
+   ============================================================ */
+.tiger-logo-icon {
+  display: inline-block;
+  vertical-align: middle;
+  margin-inline-end: 8px;
+  transform-origin: 50% 60%;
+  animation: tigerIdleBreathe 4s ease-in-out infinite;
+}
+
+@keyframes tigerIdleBreathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.05); }
+}
+
+.tiger-ear {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.logo:hover .tiger-logo-icon,
+.lc-logo:hover .tiger-logo-icon,
+.sidebar-logo:hover .tiger-logo-icon {
+  animation: tigerPounce 0.6s ease;
+}
+
+@keyframes tigerPounce {
+  0%   { transform: scale(1) rotate(0deg); }
+  30%  { transform: scale(1.18) rotate(-6deg); }
+  60%  { transform: scale(0.96) rotate(4deg); }
+  100% { transform: scale(1.05) rotate(0deg); }
+}
+
+.logo:hover .tiger-ear-left,
+.lc-logo:hover .tiger-ear-left,
+.sidebar-logo:hover .tiger-ear-left {
+  transform: rotate(-14deg);
+}
+
+.logo:hover .tiger-ear-right,
+.lc-logo:hover .tiger-ear-right,
+.sidebar-logo:hover .tiger-ear-right {
+  transform: rotate(14deg);
+}
+
+.tiger-eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: tigerBlink 5s ease-in-out infinite;
+}
+
+@keyframes tigerBlink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95%           { transform: scaleY(0.12); }
+}
+
+.tiger-stripe {
+  stroke-dasharray: 24;
+  stroke-dashoffset: 0;
+  animation: tigerStripeShimmer 3.2s ease-in-out infinite;
+}
+
+@keyframes tigerStripeShimmer {
+  0%, 100% { opacity: 0.85; }
+  50%      { opacity: 1; }
+}
+
+/* ============================================================
+   Professional icon micro-interactions used across the store
+   (category icons, action buttons, cart/wishlist icons, etc.)
+   ============================================================ */
+.lc-category-icon,
+.product-action-btn,
+.lc-action-btn {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+
+.lc-category-card:hover .lc-category-icon {
+  transform: scale(1.12) rotate(-6deg);
+}
+
+.product-action-btn:hover,
+.lc-action-btn:hover {
+  transform: translateY(-3px) scale(1.08);
+}
+
+.lc-wishlist-btn i,
+.product-action-btn[data-wishlist-btn] svg {
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.lc-wishlist-btn:hover i,
+.product-action-btn[data-wishlist-btn]:hover svg {
+  transform: scale(1.25);
+}
+
+.lc-wishlist-btn.active i,
+.lc-wishlist-btn.wishlisted i {
+  color: #ff0066;
+  animation: heartPop 0.4s ease;
+}
+
+@keyframes heartPop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+
+.lc-add-cart-btn,
+.btn-gold,
+.lc-cart-checkout-btn {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.lc-add-cart-btn:hover,
+.lc-cart-checkout-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(255, 94, 58, 0.35);
+}
+
+.lc-add-cart-btn i {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.lc-add-cart-btn:hover i {
+  transform: translateY(-2px) scale(1.15);
+}
+
+/* Cart badge pulse when items are added */
+.cart-count.pulse,
+.lc-cart-count.pulse {
+  animation: cartBadgePulse 0.5s ease;
+}
+
+@keyframes cartBadgePulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -1068,5 +1213,13 @@
 
   .page-loader {
     display: none;
+  }
+
+  .tiger-logo-icon,
+  .tiger-ear,
+  .tiger-eye,
+  .tiger-stripe {
+    animation: none !important;
+    transition: none !important;
   }
 }

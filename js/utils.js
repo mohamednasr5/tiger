@@ -55,7 +55,7 @@ const Utils = {
 
   // Validate phone (Egyptian)
   isValidPhone(phone) {
-    return /^(01|+201|00201)[0-9]{9}$/.test(phone.replace(/\s/g, ''));
+    return /^(01|\+201|00201)[0-9]{9}$/.test(phone.replace(/\s/g, ''));
   },
 
   // Show toast notification

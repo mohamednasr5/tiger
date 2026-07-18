@@ -175,8 +175,14 @@ const Cart = {
   updateUI() {
     const count = this.getCount();
     document.querySelectorAll('.cart-count').forEach(el => {
+      const changed = el.textContent !== String(count);
       el.textContent = count;
       el.style.display = count > 0 ? 'flex' : 'none';
+      if (changed && count > 0) {
+        el.classList.remove('pulse');
+        void el.offsetWidth; // restart animation
+        el.classList.add('pulse');
+      }
     });
     document.querySelectorAll('.cart-total-display').forEach(el => {
       el.textContent = Utils.formatPrice(this.getSubtotal());

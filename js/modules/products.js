@@ -1,5 +1,5 @@
 import { db } from '../firebase-config.js';
-import { ref, get, push, set, update, remove, query, orderByChild, equalTo, limitToFirst, limitToLast, startAt, endAt } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
+import { ref, get, push, set, update, remove, query, orderByChild, equalTo, limitToFirst, limitToLast, startAt, endAt, onValue } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js";
 import { getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-storage.js";
 import Utils from '../utils.js';
 
@@ -17,7 +17,7 @@ const Products = {
       if (snapshot.exists()) {
         snapshot.forEach(child => {
           const product = { id: child.key, ...child.val() };
-          if (product.status === 'published' || product.status === undefined) {
+          if (product.status === 'published' || product.status === 'active' || product.status === undefined) {
             this.allProducts.push(product);
           }
         });
@@ -212,6 +212,28 @@ const Products = {
       reviewCount: allReviews.length
     });
     return reviewData;
+  },
+
+  // Subscribe to live product changes (real-time sync with admin dashboard)
+  // callback receives the full published product list on every change.
+  // Returns an unsubscribe function.
+  subscribeAll(callback) {
+    const productsRef = ref(db, 'products');
+    const handler = (snapshot) => {
+      this.allProducts = [];
+      if (snapshot.exists()) {
+        snapshot.forEach(child => {
+          const product = { id: child.key, ...child.val() };
+          if (product.status === 'published' || product.status === 'active' || product.status === undefined) {
+            this.allProducts.push(product);
+          }
+        });
+      }
+      this.notify();
+      callback(this.allProducts);
+    };
+    onValue(productsRef, handler, (error) => console.error('Live products sync error:', error));
+    return () => { try { onValue(productsRef, handler); } catch {} };
   },
 
   onUpdate(callback) {

@@ -290,14 +290,98 @@ const App = {
 
   // ==================== HOMEPAGE ====================
   async initHomepage() {
-    Utils.showSkeleton(document.getElementById('featuredGrid'), 4);
-    Utils.showSkeleton(document.getElementById('bestSellersGrid'), 4);
-    Utils.showSkeleton(document.getElementById('newArrivalsGrid'), 4);
-    await Products.fetchAll();
-    this.renderGrid('featuredGrid', Products.getFeatured());
-    this.renderGrid('bestSellersGrid', Products.getBestSellers());
-    this.renderGrid('newArrivalsGrid', Products.getNewArrivals());
+    const wrapper = document.getElementById('featuredProductsWrapper');
+    if (!wrapper) return;
+    wrapper.innerHTML = Array.from({ length: 4 }).map(() => '<div class="swiper-slide"><div class="lc-product lc-skeleton" style="height:340px;border-radius:14px;"></div></div>').join('');
+
+    // Live sync: re-render automatically whenever admin adds/edits/deletes a product
+    Products.subscribeAll((products) => {
+      const featured = products.filter(p => p.featured);
+      const list = (featured.length ? featured : products).slice(0, 12);
+      this.renderFeaturedSwiper(list);
+
+      const bestGrid = document.getElementById('bestSellersGrid');
+      if (bestGrid) {
+        const bestSellers = products.filter(p => p.bestSeller);
+        const bestList = (bestSellers.length ? bestSellers : products).slice(0, 4);
+        bestGrid.innerHTML = bestList.length
+          ? bestList.map((p, i) => this.createLcProductCard(p, i)).join('')
+          : '<p class="text-center text-muted" style="grid-column:1/-1;padding:40px 0;">لا توجد منتجات متاحة حالياً</p>';
+        this.attachProductListeners();
+      }
+    });
+  },
+
+  renderFeaturedSwiper(products) {
+    const wrapper = document.getElementById('featuredProductsWrapper');
+    if (!wrapper) return;
+
+    if (!products.length) {
+      wrapper.innerHTML = '<div class="swiper-slide"><p class="text-center text-muted" style="padding:40px 0;">لا توجد منتجات متاحة حالياً</p></div>';
+    } else {
+      wrapper.innerHTML = products.map((p, i) => this.createLcProductSlide(p, i)).join('');
+    }
+
     this.attachProductListeners();
+
+    // (Re)initialize the Swiper instance now that real slides exist
+    if (this._featuredSwiper && typeof this._featuredSwiper.destroy === 'function') {
+      this._featuredSwiper.destroy(true, true);
+      this._featuredSwiper = null;
+    }
+    if (window.Swiper && document.querySelector('.featuredSwiper')) {
+      this._featuredSwiper = new window.Swiper('.featuredSwiper', {
+        slidesPerView: 'auto',
+        spaceBetween: 20,
+        grabCursor: true,
+        pagination: { el: '.featuredSwiper .swiper-pagination', clickable: true },
+        breakpoints: {
+          0: { slidesPerView: 2, spaceBetween: 12 },
+          640: { slidesPerView: 3, spaceBetween: 16 },
+          1024: { slidesPerView: 4, spaceBetween: 20 }
+        }
+      });
+    }
+  },
+
+  // Product card markup matching the homepage's "lc-" design system
+  createLcProductCard(product, index = 0) {
+    const original = product.originalPrice ?? product.price ?? 0;
+    const hasDiscount = product.salePrice && product.salePrice < original;
+    const discount = hasDiscount ? Utils.calcDiscount(original, product.salePrice) : 0;
+    const mainImage = (typeof product.images?.[0] === 'string' ? product.images[0] : (product.images?.[0]?.medium || product.images?.[0]?.url)) || 'https://placehold.co/400x500/f0f0f0/ff5e3a?text=TIGER';
+    const name = Utils.sanitize(product.name || 'منتج');
+    const badge = hasDiscount ? `<span class="lc-badge-sale">خصم ${discount}%</span>` : (product.newArrival ? '<span class="lc-badge-new">جديد</span>' : (product.bestSeller ? '<span class="lc-badge-sale">الأكثر مبيعاً</span>' : ''));
+    const price = hasDiscount
+      ? `<span class="lc-price-current">${Utils.formatPrice(product.salePrice)}</span><span class="lc-price-old">${Utils.formatPrice(original)}</span>`
+      : `<span class="lc-price-current">${Utils.formatPrice(original)}</span>`;
+    const rating = this.getStarHTML(product.avgRating || 0);
+    const cartPayload = encodeURIComponent(JSON.stringify({ id: product.id, name: product.name, price: product.salePrice || original, image: mainImage, quantity: 1 }));
+
+    return `<div class="lc-product" data-product-id="${product.id}">
+        <div class="lc-product-top">
+          <a href="pages/product.html?id=${product.id}"><img src="${mainImage}" alt="${name}" loading="lazy"></a>
+          <div class="lc-product-actions">
+            <button class="lc-action-btn lc-wishlist-btn" data-wishlist-btn="${product.id}" aria-label="المفضلة"><i class="bx bxs-heart"></i></button>
+            <a href="pages/product.html?id=${product.id}" class="lc-action-btn" aria-label="عرض سريع"><i class="bx bx-show"></i></a>
+          </div>
+          ${badge}
+        </div>
+        <div class="lc-product-bottom">
+          <h4><a href="pages/product.html?id=${product.id}">${name}</a></h4>
+          <div class="lc-product-meta">
+            <div class="lc-price">${price}</div>
+            <div class="lc-rating">${rating}${product.reviewCount ? `<span>(${product.reviewCount})</span>` : ''}</div>
+          </div>
+          <button class="lc-add-cart-btn" data-add-cart="${cartPayload}">
+            <i class="bx bx-cart-add"></i> أضف للسلة
+          </button>
+        </div>
+      </div>`;
+  },
+
+  createLcProductSlide(product, index = 0) {
+    return `<div class="swiper-slide">${this.createLcProductCard(product, index)}</div>`;
   },
 
   renderGrid(gridId, products) {
@@ -314,6 +398,15 @@ const App = {
     document.querySelectorAll('[data-share-btn]').forEach(btn => {
       btn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); Utils.shareProduct({ title: btn.dataset.shareBtn, url: window.location.href }); });
     });
+    document.querySelectorAll('[data-add-cart]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault(); e.stopPropagation();
+        try {
+          const item = JSON.parse(decodeURIComponent(btn.dataset.addCart));
+          Cart.addItem(item);
+        } catch (err) { console.error('Add to cart failed:', err); }
+      });
+    });
   },
 
   // ==================== SHOP PAGE ====================
@@ -321,11 +414,11 @@ const App = {
     const grid = document.getElementById('shopGrid');
     if (!grid) return;
     Utils.showSkeleton(grid, 8);
-    await Products.fetchAll();
     await Products.fetchCategories();
     this.renderCategoryNav();
     this.initShopControls();
-    this.applyFilters();
+    // Live sync: re-apply filters automatically whenever admin adds/edits/deletes a product
+    Products.subscribeAll(() => this.applyFilters());
   },
 
   renderCategoryNav() {
