@@ -11,7 +11,7 @@ import { ref, get, set, update, remove, push, onValue, orderByChild, equalTo, qu
 // ═══════════════════════════════════════════════════════════════════
 
 const WORKER_URL = 'https://tiger-upload.studegy10.workers.dev';
-const ADMIN_SECRET = '521988'; // Must match Worker env var
+const ADMIN_SECRET = 'tiger-admin-2024-secure-key'; // Must match Worker env var
 
 const Admin = {
   init() {
