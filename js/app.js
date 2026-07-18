@@ -41,7 +41,7 @@ const App = {
 
     setTimeout(() => {
       const loader = document.getElementById('pageLoader');
-      if (loader) { loader.classList.add('loaded'); setTimeout(() => loader.style.display = 'none', 500); }
+      if (loader) { loader.classList.add('is-hidden'); setTimeout(() => loader.style.display = 'none', 500); }
     }, 800);
   },
 
@@ -600,5 +600,9 @@ const App = {
   }
 };
 
-document.addEventListener('DOMContentLoaded', () => App.init());
+document.addEventListener('DOMContentLoaded', async () => {
+    const hideLoader = () => { const l = document.getElementById('pageLoader'); if (l) { l.classList.add('is-hidden'); setTimeout(() => l.style.display = 'none', 500); } };
+    try { await App.init(); } catch(e) { console.error('App init error:', e); } finally { hideLoader(); }
+  });
+export default App;
 export default App;
