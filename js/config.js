@@ -1,12 +1,13 @@
 // ====== إعدادات المتجر ======
 const firebaseConfig = {
-  apiKey: "ضع-API-KEY-هنا",
-  authDomain: "ضع-PROJECT-ID.firebaseapp.com",
-  databaseURL: "https://ضع-PROJECT-ID-default-rtdb.firebaseio.com",
-  projectId: "ضع-PROJECT-ID",
-  storageBucket: "ضع-PROJECT-ID.appspot.com",
-  messagingSenderId: "ضع-SENDER-ID",
-  appId: "ضع-APP-ID"
+  apiKey: "AIzaSyCzkn2CQrhgtuqxy1t-lUWgbzUmmQhznN8",
+  authDomain: "tiger-d1433.firebaseapp.com",
+  databaseURL: "https://tiger-d1433-default-rtdb.firebaseio.com",
+  projectId: "tiger-d1433",
+  storageBucket: "tiger-d1433.firebasestorage.app",
+  messagingSenderId: "421931992267",
+  appId: "1:421931992267:web:a2262dbb2984b3b158074e",
+  measurementId: "G-6ESN039VQC"
 };
 
 const UPLOAD_WORKER_URL = "https://tiger-upload.studegy10.workers.dev";
