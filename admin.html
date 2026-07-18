@@ -10,15 +10,8 @@
 </head>
 <body>
 
-<!-- ====== واجهة مموّهة عادية لحين تفعيل الدخول السري ====== -->
-<div id="decoyPage" style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem">
-  <div class="brand" id="secretLogo" style="font-size:2rem;cursor:default;user-select:none"><i class='bx bxs-t-shirt tiger-mark'></i> Tiger <span style="color:var(--gold)">Jeans</span></div>
-  <p style="color:var(--text-dim)">هذه الصفحة غير متاحة للعامة</p>
-  <a href="index.html" class="btn outline">العودة للمتجر</a>
-</div>
-
 <!-- ====== شاشة تسجيل دخول المالك ====== -->
-<div class="admin-lock" id="lockScreen" style="display:none">
+<div class="admin-lock" id="lockScreen" style="display:flex">
   <div class="card">
     <div class="brand" style="margin-bottom:1.5rem;justify-content:center;display:flex"><i class='bx bxs-t-shirt tiger-mark'></i> لوحة تحكم Tiger Jeans</div>
     <div class="field"><label>البريد الإلكتروني</label><input id="loginEmail" type="email" placeholder="admin@tiger-jeans.com" /></div>
@@ -209,22 +202,8 @@
 <script src="js/config.js"></script>
 <script src="js/upload.js"></script>
 <script>
-/* ====== دخول سري: اضغط مطولاً على الشعار 5 مرات لإظهار شاشة الدخول ====== */
-let pressCount = 0, pressTimer = null;
-document.getElementById("secretLogo").addEventListener("click", () => {
-  pressCount++;
-  clearTimeout(pressTimer);
-  pressTimer = setTimeout(() => (pressCount = 0), 1500);
-  if (pressCount >= 5) {
-    pressCount = 0;
-    document.getElementById("decoyPage").style.display = "none";
-    document.getElementById("lockScreen").style.display = "flex";
-  }
-});
-
 auth.onAuthStateChanged((user) => {
   if (user) {
-    document.getElementById("decoyPage").style.display = "none";
     document.getElementById("lockScreen").style.display = "none";
     document.getElementById("adminWrap").style.display = "grid";
     initDashboard();
