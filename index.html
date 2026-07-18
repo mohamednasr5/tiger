@@ -326,7 +326,10 @@
   <!-- Search Box -->
   <div class="search-dropdown" id="searchDropdown">
     <div class="container">
-      <input type="text" id="searchInput" placeholder="ابحث عن منتج..." oninput="filterProducts()" />
+      <div class="search-input-wrap">
+        <input type="text" id="searchInput" placeholder="ابحث عن منتج..." oninput="liveSearch()" onkeydown="if(event.key==='Escape')closeLiveSearch()" autocomplete="off" />
+        <div class="search-results-panel" id="searchResultsPanel"></div>
+      </div>
     </div>
   </div>
 </header>
@@ -529,7 +532,11 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <p>جميع الحقوق محفوظة © Tiger Jeans 2026 | تطوير <span class="credit">المهندس محمد حماد</span></p>
+      <p>جميع الحقوق محفوظة © Tiger Jeans 2026 | تطوير
+        <a href="https://www.facebook.com/en.mohamed.nasr" target="_blank" rel="noopener" class="credit-link">
+          <i class='bx bxs-code-alt'></i> المهندس محمد حماد
+        </a>
+      </p>
     </div>
   </div>
 </footer>
@@ -1130,8 +1137,62 @@ function scrollToTop() {
 
 // ====== UI Functions ======
 function toggleSearch() {
-  document.getElementById("searchDropdown").classList.toggle("show");
+  const dropdown = document.getElementById("searchDropdown");
+  const opening = !dropdown.classList.contains("show");
+  dropdown.classList.toggle("show");
+  if (opening) {
+    setTimeout(() => document.getElementById("searchInput")?.focus(), 150);
+  } else {
+    closeLiveSearch();
+    document.getElementById("searchInput").value = "";
+  }
 }
+
+// ====== Live Search (results appear as soon as you type) ======
+function liveSearch() {
+  const q = (document.getElementById("searchInput")?.value || "").trim().toLowerCase();
+  const panel = document.getElementById("searchResultsPanel");
+  if (!panel) return;
+
+  // Keep the main products grid in sync too.
+  filterProducts();
+
+  if (!q) { closeLiveSearch(); return; }
+
+  const matches = (typeof ALL_PRODUCTS !== "undefined" ? ALL_PRODUCTS : [])
+    .filter((p) => (p.name || "").toLowerCase().includes(q) || (p.category || "").toLowerCase().includes(q))
+    .slice(0, 6);
+
+  if (!matches.length) {
+    panel.innerHTML = `<div class="search-result-empty">لا توجد نتائج لـ "${q}"</div>`;
+  } else {
+    panel.innerHTML = matches
+      .map((p) => {
+        const img = (p.images && p.images[0]) || "images/product-1.png";
+        return `
+        <a class="search-result-item" href="product.html?id=${p.id}">
+          <img src="${img}" alt="${p.name || ""}" loading="lazy" />
+          <div class="search-result-info">
+            <div class="search-result-name">${p.name || ""}</div>
+            <div class="search-result-price">${fmtPrice(p.price)}</div>
+          </div>
+        </a>`;
+      })
+      .join("");
+  }
+  panel.classList.add("show");
+}
+
+function closeLiveSearch() {
+  const panel = document.getElementById("searchResultsPanel");
+  if (panel) { panel.classList.remove("show"); panel.innerHTML = ""; }
+}
+
+// Close the live search panel when clicking elsewhere on the page
+document.addEventListener("click", (e) => {
+  const wrap = document.querySelector(".search-input-wrap");
+  if (wrap && !wrap.contains(e.target)) closeLiveSearch();
+});
 
 function toggleMobileNav() {
   document.getElementById("mainNav").classList.toggle("show");
