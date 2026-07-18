@@ -520,7 +520,8 @@ const App = {
   initPaymentMethods() {
     document.querySelectorAll('input[name="paymentMethod"]').forEach(r => r.addEventListener('change', () => {
       document.querySelectorAll('.payment-details').forEach(d => d.style.display = 'none');
-      document.getElementById('payment-'+r.value)?.style.display = 'block';
+      const paymentDetailsEl = document.getElementById('payment-'+r.value);
+      if (paymentDetailsEl) paymentDetailsEl.style.display = 'block';
     }));
     document.querySelectorAll('.receipt-upload-area').forEach(area => {
       const input = area.querySelector('input[type="file"]'), preview = area.querySelector('.receipt-preview');
@@ -571,7 +572,8 @@ const App = {
     document.querySelectorAll('.account-nav-item').forEach(i => i.classList.remove('active'));
     document.querySelector('[data-tab="'+tab+'"]')?.classList.add('active');
     document.querySelectorAll('.account-tab-content').forEach(t => t.style.display = 'none');
-    document.getElementById('tab-'+tab)?.style.display = 'block';
+    const tabEl = document.getElementById('tab-'+tab);
+    if (tabEl) tabEl.style.display = 'block';
     document.querySelector('[data-account-name]') && (document.querySelector('[data-account-name]').textContent = Auth.currentUser.displayName || 'User');
     document.querySelector('[data-account-email]') && (document.querySelector('[data-account-email]').textContent = Auth.currentUser.email || '');
 
