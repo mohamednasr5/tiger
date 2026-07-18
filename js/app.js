@@ -1,3 +1,4 @@
+// js/app.js
 import { auth, db, provider, signInWithPopup, onAuthStateChanged, collection, getDocs } from './firebase-config.js';
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -9,36 +10,31 @@ function initApp() {
     setupScrollAnimations();
     setupNavbarEffect();
     handleAuthentication();
-    fetchFeaturedProducts();
+    // جلب المنتجات سواء في الرئيسية أو المتجر
+    fetchProducts();
 }
 
-// 1. تسجيل الـ Service Worker لتمكين PWA
+// 1. تسجيل الـ Service Worker
 function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js')
-                .then(registration => console.log('SW مسجل بنجاح:', registration.scope))
-                .catch(err => console.log('فشل تسجيل SW:', err));
-        });
+        navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW Error:', err));
     }
 }
 
-// 2. الحركات البصرية (Animations) عند التمرير
+// 2. الحركات البصرية (Scroll Animations)
 function setupScrollAnimations() {
-    const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
-    const observer = new IntersectionObserver((entries, observer) => {
+    const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('show');
-                observer.unobserve(entry.target);
             }
         });
-    }, observerOptions);
+    }, { threshold: 0.1 });
 
     document.querySelectorAll('.hidden').forEach((el) => observer.observe(el));
 }
 
-// 3. تأثير تظليل شريط التنقل (Sticky Navbar)
+// 3. تأثير الـ Navbar
 function setupNavbarEffect() {
     const navbar = document.querySelector('.navbar');
     window.addEventListener('scroll', () => {
@@ -52,87 +48,60 @@ function setupNavbarEffect() {
     });
 }
 
-// 4. نظام المصادقة (Firebase Auth)
+// 4. نظام المصادقة (Auth)
 function handleAuthentication() {
     const authBtn = document.getElementById('authBtn');
     const profileLink = document.getElementById('profileLink');
 
-    // الاستماع لحالة المستخدم
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            // مستخدم مسجل الدخول
             authBtn.innerHTML = `👤 ${user.displayName.split(' ')[0]}`;
-            profileLink.style.display = 'inline-block';
+            if (profileLink) profileLink.style.display = 'inline-block';
             authBtn.onclick = () => window.location.href = 'profile.html';
         } else {
-            // غير مسجل
             authBtn.innerHTML = `👤 دخول`;
-            profileLink.style.display = 'none';
-            authBtn.onclick = () => {
-                signInWithPopup(auth, provider).catch(error => {
-                    console.error("فشل تسجيل الدخول:", error);
-                    alert("تعذر تسجيل الدخول، يرجى المحاولة لاحقاً.");
-                });
-            };
+            if (profileLink) profileLink.style.display = 'none';
+            authBtn.onclick = () => signInWithPopup(auth, provider);
         }
     });
 }
 
-// 5. جلب المنتجات من Firestore وعرضها ديناميكياً
-async function fetchFeaturedProducts() {
-    const container = document.getElementById('productsContainer');
+// 5. جلب المنتجات (تعمل على الصفحة الرئيسية وصفحة المتجر)
+async function fetchProducts() {
+    const container = document.getElementById('productsContainer') || document.getElementById('allProductsContainer');
+    if (!container) return;
     
     try {
-        // سيقوم هذا الكود بجلب البيانات من مجموعة 'Products'
         const querySnapshot = await getDocs(collection(db, "Products"));
-        container.innerHTML = ''; // تفريغ الـ Spinner
+        container.innerHTML = '';
         
-        if (querySnapshot.empty) {
-            container.innerHTML = '<p style="text-align:center; grid-column:1/-1;">لا توجد منتجات حالياً.</p>';
-            return;
-        }
-
         querySnapshot.forEach((doc) => {
-            const product = doc.data();
-            const card = createProductCard(doc.id, product);
-            container.innerHTML += card;
+            container.innerHTML += createProductCard(doc.id, doc.data());
         });
-
     } catch (error) {
-        console.error("خطأ في جلب المنتجات:", error);
-        container.innerHTML = '<p style="text-align:center; grid-column:1/-1; color:red;">حدث خطأ في تحميل المنتجات.</p>';
+        container.innerHTML = '<p style="text-align:center; color:red;">خطأ في تحميل المنتجات.</p>';
     }
 }
 
-// 6. قالب بطاقة المنتج (HTML Generator)
+// 6. قالب بطاقة المنتج (Product Card Template)
 function createProductCard(id, product) {
-    // إنشاء خيارات المقاسات
-    const sizesHtml = product.sizes ? product.sizes.map(size => `<span>${size}</span>`).join('') : '';
-    
-    // حساب السعر القديم إن وجد
+    const sizesHtml = product.sizes ? product.sizes.map(s => `<span>${s}</span>`).join('') : '';
     const oldPriceHtml = product.oldPrice ? `<span class="old">${product.oldPrice.toFixed(2)} ج.م</span>` : '';
 
     return `
         <div class="product-card">
             <div class="product-image">
-                <!-- الرابط هنا سيكون من Cloudflare R2 -->
-                <img src="${product.imageUrl || 'https://via.placeholder.com/400x500/222/fff?text=صورة+المنتج'}" alt="${product.name}" loading="lazy">
+                <img src="${product.imageUrl}" alt="${product.name}" loading="lazy">
                 <div class="hover-actions">
                     <button class="btn-add-cart" onclick="addToCart('${id}', '${product.name}', ${product.price}, '${product.imageUrl}')">
                         🛒 أضف للسلة
                     </button>
-                    <button class="btn-icon" aria-label="إضافة للمفضلة">🤍</button>
-                    <button class="btn-icon" aria-label="عرض سريع">👁️</button>
+                    <button class="btn-icon">🤍</button>
                 </div>
             </div>
             <div class="product-info">
                 <h3>${product.name}</h3>
-                <div class="sizes">
-                    المقاسات:
-                    <div class="size-options">
-                        ${sizesHtml || '<span>متوفر بمقاسات مختلفة</span>'}
-                    </div>
-                </div>
+                <div class="size-options">${sizesHtml}</div>
                 <div class="price">
                     <span class="current">${product.price.toFixed(2)} ج.م</span>
                     ${oldPriceHtml}
@@ -142,31 +111,27 @@ function createProductCard(id, product) {
     `;
 }
 
-// 7. دالة إضافة المنتج للسلة (مؤقتة باستخدام LocalStorage لسرعة الأداء)
+// 7. إدارة سلة المشتريات (Cart Logic)
 window.addToCart = function(id, name, price, image) {
     let cart = JSON.parse(localStorage.getItem('tiger_cart')) || [];
+    const itemIndex = cart.findIndex(i => i.id === id);
     
-    const existingItem = cart.find(item => item.id === id);
-    if (existingItem) {
-        existingItem.quantity += 1;
+    if (itemIndex > -1) {
+        cart[itemIndex].quantity += 1;
     } else {
         cart.push({ id, name, price, image, quantity: 1 });
     }
     
     localStorage.setItem('tiger_cart', JSON.stringify(cart));
     updateCartCount();
-    
-    // أنيميشن صغير للتأكيد
-    const cartBtn = document.getElementById('cartBtn');
-    cartBtn.style.transform = 'scale(1.2)';
-    setTimeout(() => cartBtn.style.transform = 'scale(1)', 200);
+    alert("تمت الإضافة للسلة!");
 }
 
 function updateCartCount() {
     let cart = JSON.parse(localStorage.getItem('tiger_cart')) || [];
-    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-    document.getElementById('cartCount').innerText = totalItems;
+    const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const badge = document.getElementById('cartCount');
+    if (badge) badge.innerText = count;
 }
 
-// تحديث العداد عند تحميل الصفحة
 updateCartCount();
