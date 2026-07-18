@@ -4,6 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>تفاصيل المنتج | Tiger Jeans</title>
+<meta name="description" content="تصفح تفاصيل المنتج، المقاسات، الألوان والأسعار على متجر تايجر جينز - أفضل بناطيل الجينز والملابس العصرية في مصر." />
+<meta name="robots" content="index, follow" />
 <link rel="shortcut icon" href="images/favicon-32x32.png" type="image/png" />
 <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="css/style.css" />
@@ -248,10 +250,77 @@ if (!pid) {
     selColorImage = (PRODUCT.colors && PRODUCT.colors.length) ? colorImage(PRODUCT.colors[0]) : "";
     
     document.getElementById("crumbName").textContent = PRODUCT.name || "منتج";
-    document.title = (PRODUCT.name || "منتج") + " | Tiger Jeans";
+    document.title = (PRODUCT.name || "منتج") + " | تايجر جينز";
+    applyProductSeo(PRODUCT, pid);
     
     render();
   });
+}
+
+// Fills in per-product SEO: meta description, canonical URL, Open Graph tags,
+// and a Product structured-data block so Google/Bing can show rich results
+// (price, availability, image) for this specific product page.
+function applyProductSeo(p, id) {
+  const name = p.name || "منتج";
+  const desc = (p.description && p.description.trim())
+    ? p.description.trim().slice(0, 160)
+    : `${name} من تايجر جينز - جودة عالية وأسعار منافسة، شحن سريع لجميع محافظات مصر.`;
+  const url = `https://tiger-jeans.com/product.html?id=${id}`;
+  const img = (p.images && p.images[0]) ? `https://tiger-jeans.com/${p.images[0]}` : "https://tiger-jeans.com/images/icon-512.png";
+
+  const setMeta = (selector, attr, value) => {
+    const el = document.querySelector(selector);
+    if (el) el.setAttribute(attr, value);
+  };
+
+  let descTag = document.querySelector('meta[name="description"]');
+  if (descTag) descTag.setAttribute("content", desc);
+
+  let canonical = document.querySelector('link[rel="canonical"]');
+  if (!canonical) {
+    canonical = document.createElement("link");
+    canonical.rel = "canonical";
+    document.head.appendChild(canonical);
+  }
+  canonical.href = url;
+
+  const ogTags = {
+    "og:type": "product",
+    "og:title": `${name} | تايجر جينز`,
+    "og:description": desc,
+    "og:url": url,
+    "og:image": img
+  };
+  Object.entries(ogTags).forEach(([prop, content]) => {
+    let tag = document.querySelector(`meta[property="${prop}"]`);
+    if (!tag) {
+      tag = document.createElement("meta");
+      tag.setAttribute("property", prop);
+      document.head.appendChild(tag);
+    }
+    tag.setAttribute("content", content);
+  });
+
+  const ld = document.createElement("script");
+  ld.type = "application/ld+json";
+  ld.textContent = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": name,
+    "image": img,
+    "description": desc,
+    "sku": id,
+    "brand": { "@type": "Brand", "name": "Tiger Jeans" },
+    "offers": {
+      "@type": "Offer",
+      "url": url,
+      "priceCurrency": "EGP",
+      "price": p.price || 0,
+      "availability": p.active !== false ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      "itemCondition": "https://schema.org/NewCondition"
+    }
+  });
+  document.head.appendChild(ld);
 }
 
 function render() {
