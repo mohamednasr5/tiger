@@ -3387,7 +3387,7 @@
    21. LOADING SCREEN
    ───────────────────────────────────────────── */
 
-.page-loader {
+.page-loader {   animation: hideLoader 0s 4s forwards;
   position: fixed;
   inset: 0;
   z-index: 9999;
@@ -3516,4 +3516,8 @@
   font-weight: var(--weight-bold);
   border-radius: var(--radius-full);
   padding: 0 4px;
+}
+
+@keyframes hideLoader {
+  to { opacity: 0; visibility: hidden; pointer-events: none; }
 }
