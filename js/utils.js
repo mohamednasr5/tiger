@@ -5,7 +5,7 @@
 const Utils = {
   // Format currency
   formatPrice(price) {
-    return 'EGP ' + Number(price).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    return Number(price).toLocaleString('ar-EG', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) + ' ج.م';
   },
 
   // Calculate discount percentage
