@@ -605,4 +605,3 @@ document.addEventListener('DOMContentLoaded', async () => {
     try { await App.init(); } catch(e) { console.error('App init error:', e); } finally { hideLoader(); }
   });
 export default App;
-export default App;
