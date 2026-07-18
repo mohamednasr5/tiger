@@ -216,6 +216,17 @@ let selSize = "", selColor = "", selColorImage = "", qty = 1;
 function colorName(c) { return typeof c === "string" ? c : (c.name || ""); }
 function colorImage(c) { return typeof c === "string" ? "" : (c.image || ""); }
 
+// Guesses which size-guide tab fits this product based on its name/category text
+function guessSizeGuideCategory() {
+  const text = ((PRODUCT.category || "") + " " + (PRODUCT.name || "")).toLowerCase();
+  if (text.includes("تيشرت") || text.includes("تي شيرت") || text.includes("t-shirt") || text.includes("tshirt")) return "tshirt1";
+  if (text.includes("سليم") || text.includes("slim")) return "slimfit";
+  if (text.includes("جينز") && (text.includes("طويل") || text.includes("أطوال") || text.includes("طول خاص"))) return "jeansTall";
+  if (text.includes("جينز") || text.includes("jeans")) return "jeans";
+  if (text.includes("قميص") || text.includes("قمصان") || text.includes("shirt")) return "shirts";
+  return "shirts";
+}
+
 if (!pid) {
   document.getElementById("pdDetail").innerHTML = '<div class="empty-state"><i class="bx bx-error-circle"></i><p>المنتج غير موجود</p></div>';
 } else {
@@ -272,7 +283,10 @@ function render() {
       
       ${PRODUCT.sizes && PRODUCT.sizes.length ? `
       <div class="option-group">
-        <label>المقاس</label>
+        <label style="display:flex;align-items:center;justify-content:space-between;gap:.6rem">
+          <span>المقاس</span>
+          <a href="size-guide.html?cat=${guessSizeGuideCategory()}" target="_blank" style="font-size:.8rem;font-weight:600;color:var(--gold);display:flex;align-items:center;gap:.3rem"><i class='bx bx-ruler'></i> مش عارف مقاسك؟ اضغط هنا</a>
+        </label>
         <div class="option-list" id="sizeList">
           ${PRODUCT.sizes.map(s => `<button class="option-btn ${s === selSize ? 'active' : ''}" onclick="pickSize('${s}', this)">${s}</button>`).join("")}
         </div>

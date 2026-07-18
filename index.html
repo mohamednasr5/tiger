@@ -798,6 +798,17 @@ function renderDeals() {
 // Colors can be plain strings (legacy products) or {name, image} objects (new products with optional per-color image)
 function colorName(c) { return typeof c === "string" ? c : (c && c.name) || ""; }
 
+// Guesses which size-guide tab fits a product based on its name/category text
+function guessSizeGuideCategory(p) {
+  const text = ((p.category || "") + " " + (p.name || "")).toLowerCase();
+  if (text.includes("تيشرت") || text.includes("تي شيرت") || text.includes("t-shirt") || text.includes("tshirt")) return "tshirt1";
+  if (text.includes("سليم") || text.includes("slim")) return "slimfit";
+  if (text.includes("جينز") && (text.includes("طويل") || text.includes("أطوال") || text.includes("طول خاص"))) return "jeansTall";
+  if (text.includes("جينز") || text.includes("jeans")) return "jeans";
+  if (text.includes("قميص") || text.includes("قمصان") || text.includes("shirt")) return "shirts";
+  return "shirts";
+}
+
 function quickAdd(id, btnEl, evt) {
   const p = ALL_PRODUCTS.find((x) => x.id === id);
   if (!p) return;
@@ -883,7 +894,7 @@ function openQuickView(id) {
         ${p.oldPrice ? `<span class="old-price">${fmtPrice(p.oldPrice)}</span>` : ""}
       </div>
       <p class="qv-desc">${p.description || "منتج مميز من تشكيلة Tiger Jeans، خامة عالية الجودة وتصميم عصري يناسب جميع الأذواق."}</p>
-      ${p.sizes && p.sizes.length ? `<div class="qv-desc"><strong>المقاسات المتاحة:</strong> ${p.sizes.join(" · ")}</div>` : ""}
+      ${p.sizes && p.sizes.length ? `<div class="qv-desc"><strong>المقاسات المتاحة:</strong> ${p.sizes.join(" · ")} &nbsp;•&nbsp; <a href="size-guide.html?cat=${guessSizeGuideCategory(p)}" target="_blank" style="color:var(--gold);font-weight:600"><i class='bx bx-ruler'></i> مش عارف مقاسك؟</a></div>` : ""}
       <div class="qv-actions">
         <button class="btn-primary" style="flex:1;justify-content:center" onclick="quickAdd('${p.id}', this, event); closeQuickView()"><i class='bx bx-cart-add'></i> أضف إلى السلة</button>
         <a href="product.html?id=${p.id}" class="btn-secondary">التفاصيل الكاملة</a>
