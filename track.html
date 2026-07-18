@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>تتبع الطلب | Tiger Jeans</title>
+<link rel="shortcut icon" href="images/favicon-32x32.png" type="image/png" />
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+<style>
+.track-wrap{max-width:640px;margin:0 auto;padding:3rem 0}
+.search-card{display:flex;gap:.8rem;margin-bottom:2rem}
+.search-card input{flex:1}
+.order-card{margin-bottom:1rem}
+.order-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem}
+.order-head b{font-family:'Cairo',sans-serif;color:var(--gold)}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="container nav">
+    <a href="index.html" class="brand"><i class='bx bxs-t-shirt tiger-mark'></i> Tiger <span style="color:var(--gold)">Jeans</span></a>
+    <nav class="nav-links" id="navLinks"><a href="index.html">الرئيسية</a><a href="index.html#shop">المتجر</a><a href="track.html" class="active">تتبع الطلب</a></nav>
+    <div class="nav-actions"><a href="cart.html" class="icon-btn"><i class='bx bx-cart'></i><span class="badge cart-badge" style="display:none">0</span></a></div>
+  </div>
+</header>
+
+<div class="page-hero">
+  <div class="container">
+    <h1>تتبع طلبك</h1>
+    <div class="breadcrumb"><a href="index.html">الرئيسية</a> / تتبع الطلب</div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="track-wrap">
+    <div class="search-card">
+      <input id="trackInput" placeholder="أدخل رقم الطلب (مثال: TJ-123456) أو رقم الموبايل" />
+      <button class="btn" onclick="doTrack()">بحث</button>
+    </div>
+    <div id="trackResults"></div>
+  </div>
+</div>
+
+<footer class="site">
+  <div class="container foot-bottom">جميع الحقوق محفوظة © Tiger Jeans 2026 &nbsp;|&nbsp; تطوير <span class="credit">المهندس محمد حماد</span></div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="js/config.js"></script>
+<script>
+const STATUS_LABELS = {
+  pending: "بانتظار مراجعة الدفع",
+  confirmed: "تم تأكيد الطلب",
+  shipping: "جاري الشحن",
+  delivered: "تم التسليم",
+  cancelled: "ملغي"
+};
+const STATUS_ORDER = ["pending", "confirmed", "shipping", "delivered"];
+
+async function doTrack() {
+  const q = document.getElementById("trackInput").value.trim();
+  const results = document.getElementById("trackResults");
+  if (!q) { showToast("اكتب رقم الطلب أو رقم الموبايل"); return; }
+  results.innerHTML = '<div class="empty-note">جاري البحث...</div>';
+
+  const snap = await db.ref("orders").once("value");
+  const all = snap.val() || {};
+  const matches = Object.entries(all).filter(([id, o]) =>
+    o.code === q || (o.customer && o.customer.phone === q)
+  );
+
+  if (!matches.length) {
+    results.innerHTML = '<div class="empty-state"><i class="bx bx-search-alt"></i><p>لم يتم العثور على أي طلب بهذه البيانات</p></div>';
+    return;
+  }
+
+  results.innerHTML = matches
+    .map(([id, o]) => {
+      const cls = o.status === "cancelled" ? "cancelled" : o.status;
+      return `
+      <div class="card order-card">
+        <div class="order-head">
+          <div>رقم الطلب: <b>${o.code}</b></div>
+          <span class="status-badge status-${cls}">${STATUS_LABELS[o.status] || o.status}</span>
+        </div>
+        <div style="color:var(--text-dim);font-size:.85rem;margin-bottom:1rem">
+          ${new Date(o.createdAt).toLocaleDateString("ar-EG")} — الإجمالي: ${fmtPrice(o.total)}
+        </div>
+        ${o.status === "cancelled" ? "" : renderTimeline(o)}
+      </div>`;
+    })
+    .join("");
+}
+
+function renderTimeline(o) {
+  const currentIdx = STATUS_ORDER.indexOf(o.status);
+  return `<div class="timeline">
+    ${STATUS_ORDER.map((s, i) => `
+      <div class="tl-item ${i <= currentIdx ? "done" : ""}">
+        <b>${STATUS_LABELS[s]}</b>
+        ${i === currentIdx && o.statusHistory && o.statusHistory.length ? `<div style="color:var(--text-dim);font-size:.85rem;margin-top:.3rem">${o.statusHistory[o.statusHistory.length - 1].note || ""}</div>` : ""}
+      </div>`).join("")}
+  </div>`;
+}
+
+document.getElementById("trackInput").addEventListener("keydown", (e) => { if (e.key === "Enter") doTrack(); });
+</script>
+</body>
+</html>

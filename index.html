@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tiger Jeans | متجر الأزياء الأول</title>
+<meta name="description" content="Tiger Jeans - متجر أزياء عصري، أحدث صيحات الموضة بأفضل الأسعار" />
+<link rel="shortcut icon" href="images/favicon-32x32.png" type="image/png" />
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<header class="site">
+  <div class="container nav">
+    <div class="brand"><i class='bx bxs-t-shirt tiger-mark'></i> Tiger <span style="color:var(--gold)">Jeans</span></div>
+    <nav class="nav-links" id="navLinks">
+      <a href="index.html" class="active">الرئيسية</a>
+      <a href="index.html#shop">المتجر</a>
+      <a href="index.html#about">من نحن</a>
+      <a href="track.html">تتبع الطلب</a>
+    </nav>
+    <div class="nav-actions">
+      <div class="icon-btn" onclick="document.getElementById('searchBox').classList.toggle('show')"><i class='bx bx-search'></i></div>
+      <a href="cart.html" class="icon-btn">
+        <i class='bx bx-cart'></i>
+        <span class="badge cart-badge" style="display:none">0</span>
+      </a>
+      <div class="burger" onclick="document.getElementById('navLinks').classList.toggle('show')"><i class='bx bx-menu'></i></div>
+    </div>
+  </div>
+  <div id="searchBox" style="display:none">
+    <div class="container" style="padding:0 0 1rem">
+      <input type="text" id="searchInput" placeholder="ابحث عن منتج..." oninput="filterProducts()" />
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="stripes"><span style="top:20%;right:-30%"></span><span style="top:55%;right:-10%"></span><span style="top:80%;right:-40%"></span></div>
+  <div class="container hero-inner">
+    <div>
+      <span class="eyebrow" id="heroEyebrow">تشكيلة الموسم</span>
+      <h1 id="heroTitle">ستايلك <span>يبان من بعيد</span></h1>
+      <p id="heroSubtitle">أحدث موديلات الجينز والأزياء العصرية، جودة عالية وأسعار تناسب الجميع. اطلب دلوقتي واستلم بسهولة.</p>
+      <a href="#shop" class="btn" id="heroBtn">تسوق الآن <i class='bx bx-left-arrow-alt'></i></a>
+    </div>
+    <div class="hero-img">
+      <img id="heroImg" src="images/poster-1.png" alt="Tiger Jeans" />
+    </div>
+  </div>
+</section>
+
+<section class="section" id="shop">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="eyebrow">التشكيلة</span>
+        <h2>أحدث المنتجات</h2>
+      </div>
+    </div>
+    <div class="cats" id="catFilters">
+      <div class="cat-chip active" data-cat="all">الكل</div>
+    </div>
+    <div class="grid" id="productsGrid">
+      <div class="empty-note">جاري تحميل المنتجات...</div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="section-head">
+      <div><span class="eyebrow">وصل حديثاً</span><h2>عروض مختارة لك</h2></div>
+    </div>
+    <div class="posters" id="postersRow">
+      <div class="poster"><img src="images/poster-1.png" alt=""><div class="cap"><span>تخفيضات</span><h3>تشكيلة الجينز الجديدة</h3></div></div>
+      <div class="poster"><img src="images/poster-2.png" alt=""><div class="cap"><span>الأكثر مبيعاً</span><h3>قمصان الموسم</h3></div></div>
+      <div class="poster"><img src="images/poster-3.png" alt=""><div class="cap"><span>اكتشف المزيد</span><h3>إكسسوارات مميزة</h3></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--bg-alt)" id="about">
+  <div class="container">
+    <div class="section-head"><div><span class="eyebrow">ليه تختارنا</span><h2>مميزاتنا</h2></div></div>
+    <div class="stats-grid">
+      <div class="stat"><i class='bx bx-check-shield'></i><h3>جودة مضمونة</h3><p>خامات مختارة بعناية لراحة ومتانة أطول</p></div>
+      <div class="stat"><i class='bx bx-package'></i><h3>توصيل سريع</h3><p>نوصلك طلبك لحد باب البيت في أسرع وقت</p></div>
+      <div class="stat"><i class='bx bx-credit-card'></i><h3>دفع آمن وسهل</h3><p>فودافون كاش وانستاباي مع تأكيد فوري</p></div>
+      <div class="stat"><i class='bx bx-support'></i><h3>دعم دائم</h3><p>فريقنا جاهز يساعدك في أي وقت</p></div>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="container">
+    <div class="foot-grid">
+      <div>
+        <div class="brand" style="margin-bottom:1rem"><i class='bx bxs-t-shirt tiger-mark'></i> Tiger Jeans</div>
+        <p>وجهتك الأولى للأزياء العصرية بأفضل جودة وأسعار تنافسية.</p>
+        <div class="foot-social">
+          <div class="icon-btn"><i class='bx bxl-facebook'></i></div>
+          <div class="icon-btn"><i class='bx bxl-instagram'></i></div>
+          <div class="icon-btn"><i class='bx bxl-whatsapp'></i></div>
+        </div>
+      </div>
+      <div>
+        <h4>روابط سريعة</h4>
+        <a href="index.html">الرئيسية</a>
+        <a href="index.html#shop">المتجر</a>
+        <a href="cart.html">السلة</a>
+        <a href="track.html">تتبع الطلب</a>
+      </div>
+      <div>
+        <h4>حسابي</h4>
+        <a href="track.html">تتبع طلبي</a>
+        <a href="checkout.html">إتمام الشراء</a>
+      </div>
+      <div>
+        <h4>تواصل معنا</h4>
+        <p><i class='bx bxs-map'></i> جمهورية مصر العربية</p>
+        <p><i class='bx bxs-envelope'></i> info@tiger-jeans.com</p>
+        <p><i class='bx bxs-phone'></i> tiger-jeans.com</p>
+      </div>
+    </div>
+    <div class="stitch"></div>
+    <div class="foot-bottom">جميع الحقوق محفوظة © Tiger Jeans 2026 &nbsp;|&nbsp; تطوير <span class="credit">المهندس محمد حماد</span></div>
+  </div>
+</footer>
+
+<div class="overlay" id="overlay"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="js/config.js"></script>
+<script>
+let ALL_PRODUCTS = [];
+let ACTIVE_CAT = "all";
+
+db.ref("products").on("value", (snap) => {
+  const val = snap.val() || {};
+  ALL_PRODUCTS = Object.entries(val)
+    .map(([id, p]) => ({ id, ...p }))
+    .filter((p) => p.active !== false);
+  buildCategoryFilters();
+  renderProducts();
+});
+
+db.ref("banners/hero").on("value", (snap) => {
+  const b = snap.val();
+  if (!b) return;
+  if (b.eyebrow) document.getElementById("heroEyebrow").textContent = b.eyebrow;
+  if (b.title) document.getElementById("heroTitle").innerHTML = b.title;
+  if (b.subtitle) document.getElementById("heroSubtitle").textContent = b.subtitle;
+  if (b.buttonText) document.getElementById("heroBtn").innerHTML = b.buttonText + " <i class='bx bx-left-arrow-alt'></i>";
+  if (b.image) document.getElementById("heroImg").src = b.image;
+});
+
+db.ref("banners/posters").on("value", (snap) => {
+  const p = snap.val();
+  if (!p) return;
+  const keys = ["p1", "p2", "p3"];
+  const row = document.getElementById("postersRow");
+  const posters = row.querySelectorAll(".poster");
+  keys.forEach((k, i) => {
+    if (p[k] && posters[i]) {
+      if (p[k].image) posters[i].querySelector("img").src = p[k].image;
+      if (p[k].tag) posters[i].querySelector(".cap span").textContent = p[k].tag;
+      if (p[k].title) posters[i].querySelector(".cap h3").textContent = p[k].title;
+    }
+  });
+});
+
+function buildCategoryFilters() {
+  const cats = ["all", ...new Set(ALL_PRODUCTS.map((p) => p.category).filter(Boolean))];
+  const wrap = document.getElementById("catFilters");
+  wrap.innerHTML = cats
+    .map(
+      (c) =>
+        `<div class="cat-chip ${c === ACTIVE_CAT ? "active" : ""}" data-cat="${c}" onclick="setCat('${c}')">${c === "all" ? "الكل" : c}</div>`
+    )
+    .join("");
+}
+
+function setCat(c) {
+  ACTIVE_CAT = c;
+  buildCategoryFilters();
+  renderProducts();
+}
+
+function filterProducts() {
+  renderProducts();
+}
+
+function renderProducts() {
+  const q = (document.getElementById("searchInput")?.value || "").trim().toLowerCase();
+  let list = ALL_PRODUCTS;
+  if (ACTIVE_CAT !== "all") list = list.filter((p) => p.category === ACTIVE_CAT);
+  if (q) list = list.filter((p) => (p.name || "").toLowerCase().includes(q));
+
+  const grid = document.getElementById("productsGrid");
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty-note">لا توجد منتجات متاحة حالياً</div>';
+    return;
+  }
+  grid.innerHTML = list
+    .map((p) => {
+      const img = (p.images && p.images[0]) || "images/product-1.png";
+      return `
+      <div class="pcard">
+        <a href="product.html?id=${p.id}">
+          <div class="thumb">
+            <img src="${img}" alt="${p.name || ""}" loading="lazy" />
+            ${p.featured ? '<span class="tag">مميز</span>' : ""}
+          </div>
+        </a>
+        <div class="body">
+          <a href="product.html?id=${p.id}"><h4>${p.name || ""}</h4></a>
+          <div class="prices">
+            <span class="price">${fmtPrice(p.price)}</span>
+            ${p.oldPrice ? `<span class="old-price">${fmtPrice(p.oldPrice)}</span>` : ""}
+          </div>
+          <button class="btn add" onclick="quickAdd('${p.id}')">أضف للسلة</button>
+        </div>
+      </div>`;
+    })
+    .join("");
+}
+
+function quickAdd(id) {
+  const p = ALL_PRODUCTS.find((x) => x.id === id);
+  if (!p) return;
+  addToCart({
+    id: p.id,
+    name: p.name,
+    price: p.price,
+    image: (p.images && p.images[0]) || "",
+    size: (p.sizes && p.sizes[0]) || "",
+    color: (p.colors && p.colors[0]) || "",
+    qty: 1
+  });
+}
+</script>
+</body>
+</html>

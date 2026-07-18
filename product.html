@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>تفاصيل المنتج | Tiger Jeans</title>
+<link rel="shortcut icon" href="images/favicon-32x32.png" type="image/png" />
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+<style>
+.pd-wrap{display:grid;grid-template-columns:.9fr 1fr;gap:2.5rem;padding:3rem 0}
+.pd-gallery .main-img{aspect-ratio:3/4;border-radius:16px;overflow:hidden;background:var(--surface);margin-bottom:.8rem}
+.pd-gallery .main-img img{width:100%;height:100%;object-fit:cover}
+.pd-thumbs{display:flex;gap:.6rem}
+.pd-thumbs img{width:70px;height:80px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid transparent;opacity:.6}
+.pd-thumbs img.active{border-color:var(--gold);opacity:1}
+.pd-info h1{font-size:1.7rem;font-weight:800;margin-bottom:.6rem}
+.pd-price{display:flex;align-items:center;gap:.8rem;margin-bottom:1.2rem}
+.pd-price .price{font-size:1.6rem;color:var(--gold);font-weight:800;font-family:'Cairo',sans-serif}
+.pd-desc{color:var(--text-dim);margin-bottom:1.6rem;line-height:1.9}
+.opt-group{margin-bottom:1.4rem}
+.opt-group label{display:block;font-weight:700;margin-bottom:.6rem}
+.opt-list{display:flex;gap:.6rem;flex-wrap:wrap}
+.opt-btn{padding:.55rem 1.1rem;border:1.5px solid var(--line);border-radius:8px;font-weight:600;font-size:.88rem}
+.opt-btn.active{border-color:var(--gold);background:rgba(212,175,55,.1);color:var(--gold)}
+.qty-row{display:flex;align-items:center;gap:1rem;margin-bottom:1.6rem}
+.qty-box{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.qty-box button{width:38px;height:38px;background:var(--surface)}
+.qty-box span{width:44px;text-align:center;font-weight:700}
+.pd-actions{display:flex;gap:1rem}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="container nav">
+    <a href="index.html" class="brand"><i class='bx bxs-t-shirt tiger-mark'></i> Tiger <span style="color:var(--gold)">Jeans</span></a>
+    <nav class="nav-links" id="navLinks">
+      <a href="index.html">الرئيسية</a>
+      <a href="index.html#shop">المتجر</a>
+      <a href="track.html">تتبع الطلب</a>
+    </nav>
+    <div class="nav-actions">
+      <a href="cart.html" class="icon-btn"><i class='bx bx-cart'></i><span class="badge cart-badge" style="display:none">0</span></a>
+      <div class="burger" onclick="document.getElementById('navLinks').classList.toggle('show')"><i class='bx bx-menu'></i></div>
+    </div>
+  </div>
+</header>
+
+<div class="page-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="index.html">الرئيسية</a> / <span id="crumbName">منتج</span></div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="pd-wrap" id="pdWrap">
+    <div class="empty-note">جاري التحميل...</div>
+  </div>
+</div>
+
+<footer class="site">
+  <div class="container foot-bottom">جميع الحقوق محفوظة © Tiger Jeans 2026 &nbsp;|&nbsp; تطوير <span class="credit">المهندس محمد حماد</span></div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="js/config.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const pid = params.get("id");
+let PRODUCT = null;
+let selSize = "", selColor = "", qty = 1;
+
+if (!pid) {
+  document.getElementById("pdWrap").innerHTML = '<div class="empty-note">المنتج غير موجود</div>';
+} else {
+  db.ref("products/" + pid).once("value").then((snap) => {
+    PRODUCT = snap.val();
+    if (!PRODUCT) {
+      document.getElementById("pdWrap").innerHTML = '<div class="empty-note">المنتج غير موجود</div>';
+      return;
+    }
+    selSize = (PRODUCT.sizes && PRODUCT.sizes[0]) || "";
+    selColor = (PRODUCT.colors && PRODUCT.colors[0]) || "";
+    document.getElementById("crumbName").textContent = PRODUCT.name || "";
+    document.title = (PRODUCT.name || "منتج") + " | Tiger Jeans";
+    render();
+  });
+}
+
+function render() {
+  const images = PRODUCT.images && PRODUCT.images.length ? PRODUCT.images : ["images/product-1.png"];
+  document.getElementById("pdWrap").innerHTML = `
+    <div class="pd-gallery">
+      <div class="main-img"><img id="mainImg" src="${images[0]}" /></div>
+      <div class="pd-thumbs">
+        ${images.map((img, i) => `<img src="${img}" class="${i === 0 ? "active" : ""}" onclick="switchImg('${img}', this)" />`).join("")}
+      </div>
+    </div>
+    <div class="pd-info">
+      <h1>${PRODUCT.name || ""}</h1>
+      <div class="pd-price">
+        <span class="price">${fmtPrice(PRODUCT.price)}</span>
+        ${PRODUCT.oldPrice ? `<span class="old-price" style="font-size:1rem">${fmtPrice(PRODUCT.oldPrice)}</span>` : ""}
+      </div>
+      <p class="pd-desc">${PRODUCT.description || ""}</p>
+      ${PRODUCT.sizes && PRODUCT.sizes.length ? `
+      <div class="opt-group">
+        <label>المقاس</label>
+        <div class="opt-list" id="sizeList">
+          ${PRODUCT.sizes.map((s) => `<div class="opt-btn ${s === selSize ? "active" : ""}" onclick="pickSize('${s}', this)">${s}</div>`).join("")}
+        </div>
+      </div>` : ""}
+      ${PRODUCT.colors && PRODUCT.colors.length ? `
+      <div class="opt-group">
+        <label>اللون</label>
+        <div class="opt-list" id="colorList">
+          ${PRODUCT.colors.map((c) => `<div class="opt-btn ${c === selColor ? "active" : ""}" onclick="pickColor('${c}', this)">${c}</div>`).join("")}
+        </div>
+      </div>` : ""}
+      <div class="qty-row">
+        <label style="font-weight:700">الكمية</label>
+        <div class="qty-box">
+          <button onclick="changeQty(-1)">-</button>
+          <span id="qtyVal">1</span>
+          <button onclick="changeQty(1)">+</button>
+        </div>
+      </div>
+      <div class="pd-actions">
+        <button class="btn" style="flex:1" onclick="addThis()"><i class='bx bx-cart-add'></i> أضف إلى السلة</button>
+        <a href="cart.html" class="btn outline">السلة</a>
+      </div>
+    </div>
+  `;
+}
+
+function switchImg(src, el) {
+  document.getElementById("mainImg").src = src;
+  document.querySelectorAll(".pd-thumbs img").forEach((i) => i.classList.remove("active"));
+  el.classList.add("active");
+}
+function pickSize(s, el) {
+  selSize = s;
+  document.querySelectorAll("#sizeList .opt-btn").forEach((b) => b.classList.remove("active"));
+  el.classList.add("active");
+}
+function pickColor(c, el) {
+  selColor = c;
+  document.querySelectorAll("#colorList .opt-btn").forEach((b) => b.classList.remove("active"));
+  el.classList.add("active");
+}
+function changeQty(d) {
+  qty = Math.max(1, qty + d);
+  document.getElementById("qtyVal").textContent = qty;
+}
+function addThis() {
+  addToCart({
+    id: pid,
+    name: PRODUCT.name,
+    price: PRODUCT.price,
+    image: (PRODUCT.images && PRODUCT.images[0]) || "",
+    size: selSize,
+    color: selColor,
+    qty
+  });
+}
+</script>
+</body>
+</html>
