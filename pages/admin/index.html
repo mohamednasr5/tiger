@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TIGER E-Commerce Admin Dashboard">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admin Dashboard — TIGER E-Commerce</title>
+  <link rel="stylesheet" href="../../css/main.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/responsive.css">
+  <link rel="stylesheet" href="../../css/animations.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #f0f2f5;
+      color: #1a1a1a;
+      display: flex;
+      min-height: 100vh;
+    }
+    /* ── Sidebar ── */
+    .admin-sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: 260px;
+      height: 100vh;
+      background: #0a0a0a;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+    .admin-sidebar::-webkit-scrollbar { width: 4px; }
+    .admin-sidebar::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+    .sidebar-logo {
+      padding: 24px 28px;
+      border-bottom: 1px solid #1f1f1f;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .sidebar-logo .logo-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: transform .3s ease; }
+    .sidebar-logo:hover .logo-icon { transform: scale(1.1) rotate(-4deg); }
+    .sidebar-logo .logo-icon svg { width: 100%; height: 100%; }
+    .sidebar-logo .logo-text {
+      font-size: 22px; font-weight: 800; letter-spacing: 3px;
+      background: linear-gradient(135deg, #ff6b00, #ffa040);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .sidebar-logo .logo-sub { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-top: -2px; }
+    .sidebar-nav { flex: 1; padding: 16px 0; }
+    .sidebar-section-label {
+      padding: 8px 28px; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 2px; color: #555; margin-top: 8px;
+    }
+    .admin-nav-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 28px; color: #aaa; text-decoration: none;
+      font-size: 14px; font-weight: 500;
+      transition: all 0.2s ease; border-left: 3px solid transparent;
+    }
+    .admin-nav-item:hover { color: #fff; background: #141414; }
+    .admin-nav-item.active {
+      color: #fff; background: #141414;
+      border-left-color: #ff6b00;
+    }
+    .admin-nav-item .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+    .admin-nav-item.active .nav-icon { color: #ff6b00; }
+    .sidebar-footer {
+      padding: 16px 28px; border-top: 1px solid #1f1f1f;
+    }
+    .btn-logout {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 16px; background: #1f1f1f; border: 1px solid #333;
+      border-radius: 8px; color: #ff4444; font-size: 13px;
+      cursor: pointer; width: 100%; transition: all 0.2s;
+      font-weight: 500;
+    }
+    .btn-logout:hover { background: #2a1a1a; border-color: #ff4444; }
+
+    /* ── Main Content ── */
+    .admin-main {
+      margin-left: 260px;
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .admin-topbar {
+      background: #fff;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e5e7eb;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .admin-topbar h1 { font-size: 22px; font-weight: 700; }
+    .admin-topbar-right { display: flex; align-items: center; gap: 16px; }
+    .admin-search {
+      padding: 10px 16px; border: 1px solid #e5e7eb; border-radius: 8px;
+      font-size: 14px; width: 280px; outline: none; transition: border-color 0.2s;
+      background: #f9fafb;
+    }
+    .admin-search:focus { border-color: #ff6b00; background: #fff; }
+    .admin-user { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; }
+    .admin-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, #ff6b00, #ffa040);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 700; font-size: 14px;
+    }
+    .admin-content { padding: 32px; flex: 1; }
+
+    /* ── Stats Cards ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 24px;
+      border: 1px solid #e5e7eb;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .stat-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.06); transform: translateY(-2px); }
+    .stat-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .stat-card-label { font-size: 13px; color: #6b7280; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-card-icon {
+      width: 42px; height: 42px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; font-size: 20px;
+    }
+    .stat-card-value { font-size: 28px; font-weight: 800; }
+    .stat-card-change { font-size: 12px; margin-top: 6px; font-weight: 500; }
+    .stat-card-change.positive { color: #10b981; }
+    .stat-card-change.negative { color: #ef4444; }
+    .icon-revenue { background: #fef3c7; color: #d97706; }
+    .icon-orders { background: #dbeafe; color: #3b82f6; }
+    .icon-products { background: #d1fae5; color: #059669; }
+    .icon-customers { background: #ede9fe; color: #7c3aed; }
+
+    /* ── Tables ── */
+    .admin-card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      margin-bottom: 32px;
+      overflow: hidden;
+    }
+    .admin-card-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .admin-card-header h2 { font-size: 16px; font-weight: 700; }
+    .admin-card-body { padding: 0; }
+    .admin-table { width: 100%; border-collapse: collapse; }
+    .admin-table thead { background: #f9fafb; }
+    .admin-table th {
+      padding: 12px 20px; text-align: left;
+      font-size: 12px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.5px; color: #6b7280; border-bottom: 1px solid #e5e7eb;
+    }
+    .admin-table td {
+      padding: 14px 20px; font-size: 14px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .admin-table tbody tr { transition: background 0.15s; }
+    .admin-table tbody tr:hover { background: #f9fafb; }
+    .admin-table tbody tr:last-child td { border-bottom: none; }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-flex; align-items: center; padding: 4px 10px;
+      border-radius: 20px; font-size: 12px; font-weight: 600;
+    }
+    .badge-pending { background: #fef3c7; color: #92400e; }
+    .badge-confirmed { background: #dbeafe; color: #1e40af; }
+    .badge-shipped { background: #e0e7ff; color: #3730a3; }
+    .badge-delivered { background: #d1fae5; color: #065f46; }
+    .badge-cancelled { background: #fee2e2; color: #991b1b; }
+    .badge-active { background: #d1fae5; color: #065f46; }
+    .badge-draft { background: #f3f4f6; color: #374151; }
+
+    /* ── Action Buttons ── */
+    .btn-action {
+      padding: 6px 10px; border: 1px solid #e5e7eb; border-radius: 6px;
+      background: #fff; cursor: pointer; font-size: 12px; font-weight: 500;
+      transition: all 0.2s; margin-right: 4px;
+    }
+    .btn-action:hover { border-color: #ff6b00; color: #ff6b00; }
+    .btn-action.danger:hover { border-color: #ef4444; color: #ef4444; }
+    .btn-sm {
+      padding: 8px 16px; border-radius: 8px; font-size: 13px;
+      font-weight: 600; cursor: pointer; border: none; transition: all 0.2s;
+    }
+    .btn-primary { background: #ff6b00; color: #fff; }
+    .btn-primary:hover { background: #e5600a; }
+    .btn-secondary { background: #f3f4f6; color: #374151; }
+    .btn-secondary:hover { background: #e5e7eb; }
+    .btn-outline {
+      padding: 8px 16px; border-radius: 8px; font-size: 13px;
+      font-weight: 600; cursor: pointer; background: #fff;
+      border: 1px solid #e5e7eb; transition: all 0.2s;
+    }
+    .btn-outline:hover { border-color: #ff6b00; color: #ff6b00; }
+
+    /* ── Quick Actions ── */
+    .quick-actions-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 24px;
+    }
+    .quick-action-card {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 24px 16px; border-radius: 12px; border: 1px solid #e5e7eb;
+      background: #fafafa; cursor: pointer; transition: all 0.2s; text-decoration: none; color: inherit;
+    }
+    .quick-action-card:hover { border-color: #ff6b00; background: #fff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+    .quick-action-icon { font-size: 28px; margin-bottom: 10px; }
+    .quick-action-label { font-size: 13px; font-weight: 600; }
+
+    /* ── Responsive ── */
+    @media (max-width: 1200px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .quick-actions-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .admin-sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+      .admin-sidebar.open { transform: translateX(0); }
+      .admin-main { margin-left: 0; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .quick-actions-grid { grid-template-columns: repeat(2, 1fr); }
+      .admin-search { width: 160px; }
+      .admin-content { padding: 16px; }
+      .mobile-toggle {
+        display: flex !important; align-items: center; justify-content: center;
+        width: 40px; height: 40px; border-radius: 8px; border: 1px solid #e5e7eb;
+        background: #fff; cursor: pointer; font-size: 20px;
+      }
+    }
+    .mobile-toggle { display: none; }
+    .sidebar-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+    .sidebar-overlay.show { display: block; }
+  </style>
+</head>
+<body data-page="admin">
+
+  <!-- Sidebar Overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar" id="adminSidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon"><svg class="tiger-logo-icon" viewBox="0 0 100 100" width="30" height="30" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="tigerGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff5e3a"/><stop offset="100%" stop-color="#ff0066"/></linearGradient></defs><path class="tiger-ear tiger-ear-left" d="M20 30 L8 6 L36 22 Z" fill="url(#tigerGrad)"/><path class="tiger-ear tiger-ear-right" d="M80 30 L92 6 L64 22 Z" fill="url(#tigerGrad)"/><ellipse cx="50" cy="55" rx="35" ry="30" fill="url(#tigerGrad)"/><path class="tiger-stripe" d="M27 30 Q34 40 25 47" stroke="#1a1a2e" stroke-width="3" fill="none" stroke-linecap="round"/><path class="tiger-stripe" d="M73 30 Q66 40 75 47" stroke="#1a1a2e" stroke-width="3" fill="none" stroke-linecap="round"/><path class="tiger-stripe" d="M50 25 L50 35" stroke="#1a1a2e" stroke-width="3" fill="none" stroke-linecap="round"/><circle class="tiger-eye" cx="37" cy="53" r="4.5" fill="#1a1a2e"/><circle class="tiger-eye" cx="63" cy="53" r="4.5" fill="#1a1a2e"/><ellipse cx="50" cy="67" rx="15" ry="10" fill="#fff"/><path d="M46 62 L54 62 L50 67 Z" fill="#1a1a2e"/><path d="M50 67 L50 71" stroke="#1a1a2e" stroke-width="2" stroke-linecap="round"/><path d="M45 73 Q50 77 55 73" stroke="#1a1a2e" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+      <div>
+        <div class="logo-text">TIGER</div>
+        <div class="logo-sub">Admin Panel</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="sidebar-section-label">Main</div>
+      <a href="index.html" class="admin-nav-item active">
+        <span class="nav-icon">&#9632;</span> Dashboard
+      </a>
+      <a href="products.html" class="admin-nav-item">
+        <span class="nav-icon">&#9744;</span> Products
+      </a>
+      <a href="categories.html" class="admin-nav-item">
+        <span class="nav-icon">&#9776;</span> Categories
+      </a>
+      <a href="orders.html" class="admin-nav-item">
+        <span class="nav-icon">&#9993;</span> Orders
+      </a>
+      <a href="customers.html" class="admin-nav-item">
+        <span class="nav-icon">&#9786;</span> Customers
+      </a>
+
+      <div class="sidebar-section-label">Content</div>
+      <a href="reviews.html" class="admin-nav-item">
+        <span class="nav-icon">&#9733;</span> Reviews
+      </a>
+      <a href="banners.html" class="admin-nav-item">
+        <span class="nav-icon">&#9634;</span> Banners
+      </a>
+      <a href="coupons.html" class="admin-nav-item">
+        <span class="nav-icon">&#9733;</span> Coupons
+      </a>
+
+      <div class="sidebar-section-label">System</div>
+      <a href="settings.html" class="admin-nav-item">
+        <span class="nav-icon">&#9881;</span> Settings
+      </a>
+      <a href="analytics.html" class="admin-nav-item">
+        <span class="nav-icon">&#9702;</span> Analytics
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="handleLogout()">
+        <span>&#9211;</span> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="admin-main">
+    <!-- Top Bar -->
+    <header class="admin-topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="mobile-toggle" onclick="toggleSidebar()">&#9776;</button>
+        <h1>Dashboard</h1>
+      </div>
+      <div class="admin-topbar-right">
+        <input type="text" class="admin-search" placeholder="Search orders, products, customers...">
+        <div class="admin-user">
+          <div class="admin-avatar">A</div>
+          <span>Admin</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div class="admin-content">
+
+      <!-- Stats Row -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-card-label">Total Revenue</span>
+            <div class="stat-card-icon icon-revenue">$</div>
+          </div>
+          <div class="stat-card-value">$48,290</div>
+          <div class="stat-card-change positive">&#9650; 12.5% from last month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-card-label">Total Orders</span>
+            <div class="stat-card-icon icon-orders">&#9993;</div>
+          </div>
+          <div class="stat-card-value">1,247</div>
+          <div class="stat-card-change positive">&#9650; 8.2% from last month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-card-label">Total Products</span>
+            <div class="stat-card-icon icon-products">&#9744;</div>
+          </div>
+          <div class="stat-card-value">386</div>
+          <div class="stat-card-change negative">&#9660; 2 new this week</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <span class="stat-card-label">Total Customers</span>
+            <div class="stat-card-icon icon-customers">&#9786;</div>
+          </div>
+          <div class="stat-card-value">5,832</div>
+          <div class="stat-card-change positive">&#9650; 15.3% from last month</div>
+        </div>
+      </div>
+
+      <!-- Recent Orders -->
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h2>Recent Orders</h2>
+          <a href="orders.html" class="btn-outline">View All Orders</a>
+        </div>
+        <div class="admin-card-body">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>#TIG-1001</strong></td>
+                <td>Ahmed Hassan</td>
+                <td>3 items</td>
+                <td><strong>$189.00</strong></td>
+                <td><span class="badge badge-pending">Pending</span></td>
+                <td>Jan 15, 2025</td>
+                <td>
+                  <button class="btn-action">View</button>
+                  <button class="btn-action">Edit</button>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>#TIG-1000</strong></td>
+                <td>Sara Mohamed</td>
+                <td>1 item</td>
+                <td><strong>$65.00</strong></td>
+                <td><span class="badge badge-confirmed">Confirmed</span></td>
+                <td>Jan 14, 2025</td>
+                <td>
+                  <button class="btn-action">View</button>
+                  <button class="btn-action">Edit</button>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>#TIG-0999</strong></td>
+                <td>Omar Khalil</td>
+                <td>2 items</td>
+                <td><strong>$245.00</strong></td>
+                <td><span class="badge badge-shipped">Shipped</span></td>
+                <td>Jan 14, 2025</td>
+                <td>
+                  <button class="btn-action">View</button>
+                  <button class="btn-action">Edit</button>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>#TIG-0998</strong></td>
+                <td>Nour El-Din</td>
+                <td>4 items</td>
+                <td><strong>$420.00</strong></td>
+                <td><span class="badge badge-delivered">Delivered</span></td>
+                <td>Jan 13, 2025</td>
+                <td>
+                  <button class="btn-action">View</button>
+                  <button class="btn-action">Edit</button>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>#TIG-0997</strong></td>
+                <td>Youssef Ali</td>
+                <td>2 items</td>
+                <td><strong>$130.00</strong></td>
+                <td><span class="badge badge-cancelled">Cancelled</span></td>
+                <td>Jan 12, 2025</td>
+                <td>
+                  <button class="btn-action">View</button>
+                  <button class="btn-action">Edit</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h2>Quick Actions</h2>
+        </div>
+        <div class="quick-actions-grid">
+          <a href="products.html" class="quick-action-card">
+            <span class="quick-action-icon">&#10010;</span>
+            <span class="quick-action-label">Add Product</span>
+          </a>
+          <a href="orders.html" class="quick-action-card">
+            <span class="quick-action-icon">&#9993;</span>
+            <span class="quick-action-label">View Orders</span>
+          </a>
+          <a href="coupons.html" class="quick-action-card">
+            <span class="quick-action-icon">&#9733;</span>
+            <span class="quick-action-label">Create Coupon</span>
+          </a>
+          <a href="settings.html" class="quick-action-card">
+            <span class="quick-action-icon">&#9881;</span>
+            <span class="quick-action-label">Store Settings</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    function toggleSidebar() {
+      document.getElementById('adminSidebar').classList.toggle('open');
+      document.getElementById('sidebarOverlay').classList.toggle('show');
+    }
+    function handleLogout() {
+      if (confirm('Are you sure you want to logout?')) {
+        window.location.href = '../../index.html';
+      }
+    }
+  </script>
+  <script type="module" src="../../js/app.js"></script>
+  <script type="module" src="../../js/admin/admin.js"></script>
+</body>
+</html>
