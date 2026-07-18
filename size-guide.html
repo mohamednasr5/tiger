@@ -398,15 +398,17 @@ function buildPanels() {
       <div class="sg-card">
         <h3>${chart.title}</h3>
         <p class="sg-sub">${chart.sub}</p>
-        <table class="sg-table">
-          <thead><tr>${chart.cols.map(c => `<th>${c}</th>`).join("")}</tr></thead>
-          <tbody>
-            ${chart.rows.map((r, i) => `
-              <tr data-size="${r.size}" style="animation-delay:${i * 45}ms">
-                ${rowCells(chart, r).map(v => `<td>${v}</td>`).join("")}
-              </tr>`).join("")}
-          </tbody>
-        </table>
+        <div class="sg-table-scroll">
+          <table class="sg-table">
+            <thead><tr>${chart.cols.map(c => `<th>${c}</th>`).join("")}</tr></thead>
+            <tbody>
+              ${chart.rows.map((r, i) => `
+                <tr data-size="${r.size}" style="animation-delay:${i * 45}ms">
+                  ${rowCells(chart, r).map(v => `<td>${v}</td>`).join("")}
+                </tr>`).join("")}
+            </tbody>
+          </table>
+        </div>
         <div class="sg-note">
           <i class='bx bx-info-circle'></i>
           <span>${chart.type === "weight"

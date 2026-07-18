@@ -333,7 +333,7 @@
 
 <!-- ====== Marquee Banner ====== -->
 <div class="marquee-bar">
-  <div class="marquee-content">
+  <div class="marquee-content" id="marqueeContent">
     <span class="marquee-item">⭐ نقدم 5 توصيل من أجلنا من أكثر 10,000 عملي</span>
     <span class="marquee-sep">✦</span>
     <span class="marquee-item">🎁 خصم خاص لمحدود وقت</span>
@@ -661,6 +661,29 @@ db.ref("products").on("value", (snap) => {
   buildCategoryFilters();
   renderProducts();
   renderDeals();
+});
+
+// Default marquee messages (used until/unless the admin sets custom ones)
+const DEFAULT_MARQUEE = [
+  "⭐ نقدم 5 توصيل من أجلنا من أكثر 10,000 عملي",
+  "🎁 خصم خاص لمحدود وقت",
+  "📢 مجددة خصوصية دجين وصلت حديثاً - تشكيل الربيع",
+  "🔥 التوصيل مجاني للطلبات فوق 500 جنيه"
+];
+
+function renderMarquee(messages) {
+  const list = (messages && messages.length) ? messages : DEFAULT_MARQUEE;
+  const el = document.getElementById("marqueeContent");
+  if (!el) return;
+  // Duplicated twice so the CSS animation (0 -> -50%) loops seamlessly
+  const build = () => list.map(m => `<span class="marquee-item">${m}</span><span class="marquee-sep">✦</span>`).join("");
+  el.innerHTML = build() + build();
+}
+
+// Load marquee (moving announcement strip) from admin settings
+db.ref("banners/marquee").on("value", (snap) => {
+  const val = snap.val();
+  renderMarquee(Array.isArray(val) ? val : (val ? Object.values(val) : null));
 });
 
 // Load banners

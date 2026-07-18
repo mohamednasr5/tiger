@@ -36,7 +36,7 @@
 }
 
 /* Admin Layout */
-.admin-layout{display:none;min-height:100vh;grid-template-columns:260px 1fr}
+.admin-layout{display:none;min-height:100vh}
 .admin-sidebar{
   background:var(--bg-alt);
   border-left:1px solid var(--line);
@@ -493,6 +493,19 @@
           </div>
         </div>
         
+        <h3 style="margin:2rem 0 1.5rem">الشريط المتحرك (الإعلانات المتحركة)</h3>
+        <p style="color:var(--text-dim);font-size:.85rem;margin-top:-1rem;margin-bottom:1rem">الرسائل اللي بتظهر متحركة أعلى الصفحة الرئيسية فوق البانر مباشرة.</p>
+
+        <div class="field">
+          <label>إضافة رسالة جديدة</label>
+          <div style="display:flex;gap:.6rem">
+            <input id="marqueeInput" style="flex:1" placeholder="مثلاً: 🔥 التوصيل مجاني للطلبات فوق 500 جنيه" onkeydown="if(event.key==='Enter'){event.preventDefault();addMarqueeMessage();}" />
+            <button type="button" class="btn-secondary" onclick="addMarqueeMessage()" style="white-space:nowrap"><i class='bx bx-plus'></i> إضافة</button>
+          </div>
+        </div>
+
+        <div id="marqueeList" style="display:flex;flex-direction:column;gap:.5rem;margin-top:1rem"></div>
+
         <button class="btn-primary" onclick="saveSettings()" style="margin-top:1.5rem">حفظ الإعدادات</button>
       </div>
     </div>
@@ -661,7 +674,7 @@ function doAdminLogin() {
   
   auth.signInWithEmailAndPassword(email, pass).then(() => {
     document.getElementById("loginScreen").style.display = "none";
-    document.getElementById("adminLayout").style.display = "grid";
+    document.getElementById("adminLayout").style.display = "block";
     loadDashboardData();
     initOrdersRealtime();
   }).catch(e => {
@@ -1321,6 +1334,50 @@ function deletePromoCode(id) {
 }
 
 // ====== Settings ======
+const DEFAULT_MARQUEE = [
+  "⭐ نقدم 5 توصيل من أجلنا من أكثر 10,000 عملي",
+  "🎁 خصم خاص لمحدود وقت",
+  "📢 مجددة خصوصية دجين وصلت حديثاً - تشكيل الربيع",
+  "🔥 التوصيل مجاني للطلبات فوق 500 جنيه"
+];
+let marqueeMessages = [];
+
+function renderMarqueeList() {
+  const wrap = document.getElementById("marqueeList");
+  if (!marqueeMessages.length) {
+    wrap.innerHTML = `<p style="color:var(--text-dim);font-size:.85rem">لا توجد رسائل بعد — أضف رسالة من الأعلى.</p>`;
+    return;
+  }
+  wrap.innerHTML = marqueeMessages.map((m, i) => `
+    <div style="display:flex;align-items:center;gap:.5rem;background:var(--bg-alt);border:1px solid var(--line);border-radius:8px;padding:.6rem .8rem">
+      <span style="flex:1;font-size:.88rem">${m}</span>
+      <button type="button" class="chip-img-btn" title="تحريك لأعلى" onclick="moveMarqueeMessage(${i},-1)" ${i===0?'disabled style="opacity:.3"':''}><i class='bx bx-chevron-up'></i></button>
+      <button type="button" class="chip-img-btn" title="تحريك لأسفل" onclick="moveMarqueeMessage(${i},1)" ${i===marqueeMessages.length-1?'disabled style="opacity:.3"':''}><i class='bx bx-chevron-down'></i></button>
+      <button type="button" onclick="removeMarqueeMessage(${i})" style="color:var(--danger);font-size:1rem"><i class='bx bx-trash'></i></button>
+    </div>`).join("");
+}
+
+function addMarqueeMessage() {
+  const input = document.getElementById("marqueeInput");
+  const val = input.value.trim();
+  if (!val) return;
+  marqueeMessages.push(val);
+  input.value = "";
+  renderMarqueeList();
+}
+
+function removeMarqueeMessage(i) {
+  marqueeMessages.splice(i, 1);
+  renderMarqueeList();
+}
+
+function moveMarqueeMessage(i, dir) {
+  const j = i + dir;
+  if (j < 0 || j >= marqueeMessages.length) return;
+  [marqueeMessages[i], marqueeMessages[j]] = [marqueeMessages[j], marqueeMessages[i]];
+  renderMarqueeList();
+}
+
 function loadSettings() {
   db.ref("settings/payment").once("value").then(snap => {
     const s = snap.val() || {};
@@ -1332,6 +1389,12 @@ function loadSettings() {
     const b = snap.val() || {};
     document.getElementById("heroTitle").value = b.title || "";
     document.getElementById("heroSubtitle").value = b.subtitle || "";
+  });
+
+  db.ref("banners/marquee").once("value").then(snap => {
+    const val = snap.val();
+    marqueeMessages = Array.isArray(val) ? val.slice() : (val ? Object.values(val) : DEFAULT_MARQUEE.slice());
+    renderMarqueeList();
   });
 }
 
@@ -1347,7 +1410,8 @@ function saveSettings() {
   
   Promise.all([
     db.ref("settings/payment").set(payment),
-    db.ref("banners/hero").set(hero)
+    db.ref("banners/hero").set(hero),
+    db.ref("banners/marquee").set(marqueeMessages)
   ]).then(() => showToast("تم حفظ الإعدادات")).catch(() => showToast("حدث خطأ"));
 }
 
