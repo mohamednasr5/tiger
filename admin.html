@@ -506,6 +506,30 @@
 
         <div id="marqueeList" style="display:flex;flex-direction:column;gap:.5rem;margin-top:1rem"></div>
 
+        <h3 style="margin:2rem 0 1.5rem">روابط التواصل الاجتماعي</h3>
+        <p style="color:var(--text-dim);font-size:.85rem;margin-top:-1rem;margin-bottom:1rem">هتظهر في فوتر الصفحة الرئيسية. سيب الحقل فاضي لو عايز تخفي الأيقونة دي خالص.</p>
+
+        <div class="row2">
+          <div class="field">
+            <label><i class='bx bxl-facebook'></i> فيسبوك</label>
+            <input id="settingFacebook" placeholder="https://facebook.com/yourpage" />
+          </div>
+          <div class="field">
+            <label><i class='bx bxl-instagram'></i> انستجرام</label>
+            <input id="settingInstagram" placeholder="https://instagram.com/yourpage" />
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label><i class='bx bxl-whatsapp'></i> واتساب</label>
+            <input id="settingSocialWhatsapp" placeholder="https://wa.me/201012345678" />
+          </div>
+          <div class="field">
+            <label><i class='bx bxl-tiktok'></i> تيك توك</label>
+            <input id="settingTiktok" placeholder="https://tiktok.com/@yourpage" />
+          </div>
+        </div>
+
         <button class="btn-primary" onclick="saveSettings()" style="margin-top:1.5rem">حفظ الإعدادات</button>
       </div>
     </div>
@@ -1396,6 +1420,14 @@ function loadSettings() {
     marqueeMessages = Array.isArray(val) ? val.slice() : (val ? Object.values(val) : DEFAULT_MARQUEE.slice());
     renderMarqueeList();
   });
+
+  db.ref("settings/social").once("value").then(snap => {
+    const s = snap.val() || {};
+    document.getElementById("settingFacebook").value = s.facebook || "";
+    document.getElementById("settingInstagram").value = s.instagram || "";
+    document.getElementById("settingSocialWhatsapp").value = s.whatsapp || "";
+    document.getElementById("settingTiktok").value = s.tiktok || "";
+  });
 }
 
 function saveSettings() {
@@ -1407,11 +1439,18 @@ function saveSettings() {
     title: document.getElementById("heroTitle").value.trim(),
     subtitle: document.getElementById("heroSubtitle").value.trim()
   };
-  
+  const social = {
+    facebook: document.getElementById("settingFacebook").value.trim(),
+    instagram: document.getElementById("settingInstagram").value.trim(),
+    whatsapp: document.getElementById("settingSocialWhatsapp").value.trim(),
+    tiktok: document.getElementById("settingTiktok").value.trim()
+  };
+
   Promise.all([
     db.ref("settings/payment").set(payment),
     db.ref("banners/hero").set(hero),
-    db.ref("banners/marquee").set(marqueeMessages)
+    db.ref("banners/marquee").set(marqueeMessages),
+    db.ref("settings/social").set(social)
   ]).then(() => showToast("تم حفظ الإعدادات")).catch(() => showToast("حدث خطأ"));
 }
 

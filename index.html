@@ -502,10 +502,10 @@
         </div>
         <p>وجهتك الأولى للأزياء العصرية بأفضل جودة وأسعار تنافسية.</p>
         <div class="social-links">
-          <a href="#"><i class='bx bxl-facebook'></i></a>
-          <a href="#"><i class='bx bxl-instagram'></i></a>
-          <a href="#"><i class='bx bxl-whatsapp'></i></a>
-          <a href="#"><i class='bx bxl-tiktok'></i></a>
+          <a href="#" id="socialFacebook" target="_blank" rel="noopener"><i class='bx bxl-facebook'></i></a>
+          <a href="#" id="socialInstagram" target="_blank" rel="noopener"><i class='bx bxl-instagram'></i></a>
+          <a href="#" id="socialWhatsapp" target="_blank" rel="noopener"><i class='bx bxl-whatsapp'></i></a>
+          <a href="#" id="socialTiktok" target="_blank" rel="noopener"><i class='bx bxl-tiktok'></i></a>
         </div>
       </div>
       <div class="footer-col">
@@ -722,6 +722,28 @@ db.ref("banners/hero").on("value", (snap) => {
   if (!b) return;
   if (b.title) startHeroTypewriter(b.title);
   if (b.subtitle) document.querySelector(".hero-desc").textContent = b.subtitle;
+});
+
+// Load social media links (footer) from admin settings.
+// A link with no URL saved stays hidden instead of pointing to "#".
+db.ref("settings/social").on("value", (snap) => {
+  const s = snap.val() || {};
+  const map = {
+    socialFacebook: s.facebook,
+    socialInstagram: s.instagram,
+    socialWhatsapp: s.whatsapp,
+    socialTiktok: s.tiktok
+  };
+  Object.entries(map).forEach(([id, url]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (url) {
+      el.href = url;
+      el.style.display = "";
+    } else {
+      el.style.display = "none";
+    }
+  });
 });
 
 // ====== Hero Title Typewriter Effect (types then erases in a loop) ======
