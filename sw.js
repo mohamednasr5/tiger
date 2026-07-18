@@ -1,19 +1,19 @@
 // Tiger Jeans Service Worker - PWA
 const CACHE_NAME = 'tiger-jeans-v1';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/cart.html',
-  '/checkout.html',
-  '/product.html',
-  '/track.html',
-  '/admin.html',
-  '/css/style.css',
-  '/js/config.js',
-  '/js/upload.js',
-  '/images/favicon-32x32.png',
-  '/images/icon-192.png',
-  '/images/icon-512.png'
+  './',
+  './index.html',
+  './cart.html',
+  './checkout.html',
+  './product.html',
+  './track.html',
+  './admin.html',
+  './css/style.css',
+  './js/config.js',
+  './js/upload.js',
+  './images/favicon-32x32.png',
+  './images/icon-192.png',
+  './images/icon-512.png'
 ];
 
 // Install - Cache Assets
@@ -79,7 +79,7 @@ self.addEventListener('fetch', (event) => {
           }
           // Return offline page for HTML requests
           if (event.request.headers.get('accept').includes('text/html')) {
-            return caches.match('/index.html');
+            return caches.match('./index.html');
           }
         });
       })
@@ -102,15 +102,15 @@ async function syncOrders() {
 self.addEventListener('push', (event) => {
   const options = {
     body: event.data ? event.data.text() : 'إشعار جديد من Tiger Jeans',
-    icon: '/images/icon-192.png',
-    badge: '/images/icon-72.png',
+    icon: './images/icon-192.png',
+    badge: './images/icon-72.png',
     dir: 'rtl',
     lang: 'ar',
     vibrate: [100, 50, 100],
     data: {
       dateOfArrival: Date.now(),
       primaryKey: 1,
-      url: '/index.html'
+      url: './index.html'
     },
     actions: [
       { action: 'open', title: 'فتح التطبيق' },
@@ -129,7 +129,7 @@ self.addEventListener('notificationclick', (event) => {
 
   if (event.action === 'open' || !event.action) {
     event.waitUntil(
-      clients.openWindow(event.notification.data.url || '/')
+      clients.openWindow(event.notification.data.url || './')
     );
   }
 });

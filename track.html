@@ -106,7 +106,7 @@
   <div class="container">
     <div class="header-main">
       <a href="index.html" class="logo">
-        <span class="logo-icon">Z</span>
+        <img src="images/logo-icon.png" class="logo-icon" alt="Tiger Jeans" />
         <div class="logo-text"><strong>TIGER JEANS</strong><small>متجر فخم</small></div>
       </a>
       <nav class="main-nav">
@@ -167,7 +167,7 @@ async function doTrack() {
   
   if (!q) { showToast("اكتب رقم الطلب أو رقم الموبايل"); return; }
   
-  results.innerHTML = '<div class="loading-state"><i class='bx bx-loader-alt bx-spin' style="font-size:2rem"></i><p style="margin-top:1rem">جاري البحث...</p></div>';
+  results.innerHTML = `<div class="loading-state"><i class='bx bx-loader-alt bx-spin' style="font-size:2rem"></i><p style="margin-top:1rem">جاري البحث...</p></div>`;
 
   try {
     const snap = await db.ref("orders").once("value");

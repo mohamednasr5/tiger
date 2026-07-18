@@ -28,6 +28,72 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const auth = firebase.auth();
 
+// ====== إدارة حالة تسجيل الدخول (تبقى فعّالة بعد الدخول وبعد تحديث الصفحة) ======
+let currentUser = null;
+
+auth.onAuthStateChanged((user) => {
+  currentUser = user;
+  updateAuthUI(user);
+});
+
+function updateAuthUI(user) {
+  const topAccountLink = document.getElementById("topAccountLink");
+  const topLoginLink = document.getElementById("topLoginLink");
+  const headerAccountBtn = document.getElementById("headerAccountBtn");
+  const displayName = user ? (user.displayName || user.email || "حسابي") : null;
+
+  if (topAccountLink) {
+    topAccountLink.innerHTML = user
+      ? `<i class='bx bx-user-check'></i> ${displayName}`
+      : `<i class='bx bx-user'></i> حسابي`;
+    topAccountLink.onclick = (e) => {
+      e.preventDefault();
+      user ? openAccountMenu() : (typeof openAuthModal === "function" && openAuthModal());
+    };
+  }
+
+  if (topLoginLink) {
+    topLoginLink.textContent = user ? "تسجيل الخروج" : "سجل دخولك";
+    topLoginLink.onclick = (e) => {
+      e.preventDefault();
+      if (user) {
+        doLogout();
+      } else if (typeof openAuthModal === "function") {
+        openAuthModal();
+      }
+    };
+  }
+
+  if (headerAccountBtn) {
+    headerAccountBtn.title = user ? `مسجل دخول: ${displayName}` : "تسجيل الدخول";
+    headerAccountBtn.classList.toggle("logged-in", !!user);
+    headerAccountBtn.onclick = (e) => {
+      e.preventDefault();
+      user ? openAccountMenu() : (typeof openAuthModal === "function" && openAuthModal());
+    };
+  }
+}
+
+// نافذة بسيطة لإدارة الحساب بعد تسجيل الدخول (تسجيل الخروج)
+function openAccountMenu() {
+  if (!currentUser) {
+    if (typeof openAuthModal === "function") openAuthModal();
+    return;
+  }
+  const name = currentUser.displayName || currentUser.email || "";
+  const wantsLogout = confirm(`مسجل دخول باسم: ${name}\n\nهل تريد تسجيل الخروج؟`);
+  if (wantsLogout) doLogout();
+}
+
+function doLogout() {
+  auth.signOut().then(() => {
+    showToast("تم تسجيل الخروج بنجاح");
+  }).catch((err) => {
+    showToast("حدث خطأ أثناء تسجيل الخروج");
+    console.log("Logout error:", err);
+  });
+}
+
 // ====== أدوات مساعدة عامة ======
 function fmtPrice(n) {
   return Number(n || 0).toLocaleString("ar-EG") + " ج.م";

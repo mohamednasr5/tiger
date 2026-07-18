@@ -58,14 +58,10 @@
 .install-icon {
   width: 50px;
   height: 50px;
-  background: linear-gradient(135deg, #d4af37, #b8942e);
-  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
-  color: #000;
-  font-weight: 900;
+  object-fit: contain;
   font-family: 'Cairo', sans-serif;
   flex-shrink: 0;
 }
@@ -248,7 +244,7 @@
 <div class="install-banner" id="installBanner">
   <div class="install-content">
     <div class="install-info">
-      <div class="install-icon">Z</div>
+      <img src="images/logo-icon.png" class="install-icon" alt="Tiger Jeans" />
       <div class="install-text">
         <h4>ثبّت Tiger Jeans</h4>
         <p>تسوق أسرع وأفضل بدون متصفح</p>
@@ -279,8 +275,8 @@
         <a href="https://wa.me/201012345678" target="_blank"><i class='bx bxl-whatsapp'></i> الواتساب: 01012345678</a>
       </div>
       <div class="top-right">
-        <a href="#" onclick="openAuthModal()"><i class='bx bx-user'></i> حسابي</a>
-        <a href="#" onclick="openAuthModal()">سجل دخولك</a>
+        <a href="#" id="topAccountLink" onclick="openAuthModal()"><i class='bx bx-user'></i> حسابي</a>
+        <a href="#" id="topLoginLink" onclick="openAuthModal()">سجل دخولك</a>
       </div>
     </div>
   </div>
@@ -292,7 +288,7 @@
     <div class="header-main">
       <!-- Logo -->
       <a href="index.html" class="logo">
-        <span class="logo-icon">Z</span>
+        <img src="images/logo-icon.png" class="logo-icon" alt="Tiger Jeans" />
         <div class="logo-text">
           <strong>TIGER JEANS</strong>
           <small>متجر فخم</small>
@@ -311,7 +307,7 @@
       <!-- Actions -->
       <div class="header-actions">
         <button class="action-btn" onclick="toggleSearch()"><i class='bx bx-search'></i></button>
-        <button class="action-btn" onclick="openAuthModal()"><i class='bx bx-user'></i></button>
+        <button class="action-btn" id="headerAccountBtn" onclick="openAuthModal()"><i class='bx bx-user'></i></button>
         <a href="wishlist.html" class="action-btn wishlist-btn-header">
           <i class='bx bx-heart'></i>
           <span class="wishlist-badge" style="display:none">0</span>
@@ -469,7 +465,7 @@
     <div class="footer-grid">
       <div class="footer-col">
         <div class="footer-brand">
-          <span class="logo-icon">Z</span>
+          <img src="images/logo-icon.png" class="logo-icon" alt="Tiger Jeans" />
           <strong>TIGER JEANS</strong>
         </div>
         <p>وجهتك الأولى للأزياء العصرية بأفضل جودة وأسعار تنافسية.</p>
@@ -644,7 +640,7 @@ if (isIOS() && !window.navigator.standalone) {
 // Register Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker.register('./sw.js')
       .then(reg => console.log('[PWA] Service Worker registered'))
       .catch(err => console.log('[PWA] SW registration failed:', err));
   });
@@ -952,6 +948,13 @@ function toggleSearch() {
 function toggleMobileNav() {
   document.getElementById("mainNav").classList.toggle("show");
 }
+
+// إغلاق قائمة الموبايل تلقائياً عند الضغط على أي رابط بداخلها
+document.querySelectorAll(".main-nav a").forEach((link) => {
+  link.addEventListener("click", () => {
+    document.getElementById("mainNav").classList.remove("show");
+  });
+});
 
 function openAuthModal() {
   document.getElementById("authModal").classList.add("show");

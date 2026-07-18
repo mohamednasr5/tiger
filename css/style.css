@@ -106,15 +106,10 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
 }
 .logo-icon{
   width:44px;height:44px;
-  background:linear-gradient(135deg,var(--gold),var(--gold-deep));
-  color:#000;
-  font-weight:900;
-  font-size:1.4rem;
   display:flex;
   align-items:center;
   justify-content:center;
-  border-radius:10px;
-  font-family:'Cairo',sans-serif;
+  object-fit:contain;
 }
 .logo-text strong{
   font-size:1.35rem;
