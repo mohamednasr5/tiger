@@ -1265,8 +1265,17 @@ html {
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   padding: var(--space-6);
-  animation: fadeIn var(--transition-fast) ease forwards;
   opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity var(--transition-fast) ease, visibility var(--transition-fast) ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  animation: fadeIn var(--transition-fast) ease forwards;
 }
 
 .modal-overlay.is-closing {
