@@ -312,6 +312,10 @@
       <div class="header-actions">
         <button class="action-btn" onclick="toggleSearch()"><i class='bx bx-search'></i></button>
         <button class="action-btn" onclick="openAuthModal()"><i class='bx bx-user'></i></button>
+        <a href="wishlist.html" class="action-btn wishlist-btn-header">
+          <i class='bx bx-heart'></i>
+          <span class="wishlist-badge" style="display:none">0</span>
+        </a>
         <a href="cart.html" class="action-btn cart-btn">
           <i class='bx bx-cart-alt'></i>
           <span class="cart-badge" style="display:none">0</span>
@@ -352,6 +356,8 @@
 
 <!-- ====== Hero Section ====== -->
 <section class="hero-section">
+  <div class="hero-blob b1"></div>
+  <div class="hero-blob b2"></div>
   <div class="container">
     <div class="hero-badge">✨ مجددة خصوصية دجين</div>
     <h1 class="hero-title">اكتشِف أناقة<br><span class="gold-text">تليق بك</span></h1>
@@ -521,6 +527,17 @@
     </div>
   </div>
 </footer>
+
+<!-- ====== Quick View Modal ====== -->
+<div class="modal-overlay" id="quickViewModal">
+  <div class="qv-modal">
+    <button class="close-modal" onclick="closeQuickView()">&times;</button>
+    <div id="qvBody" style="display:contents"></div>
+  </div>
+</div>
+
+<!-- ====== Scroll to Top ====== -->
+<button class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()" title="للأعلى"><i class='bx bx-up-arrow-alt'></i></button>
 
 <!-- ====== Auth Modal ====== -->
 <div class="modal-overlay" id="authModal">
@@ -711,57 +728,49 @@ function renderProducts() {
   }
   
   grid.innerHTML = list
-    .map((p) => {
+    .map((p, idx) => {
       const img = (p.images && p.images[0]) || "images/product-1.png";
       const img2 = (p.images && p.images[1]) || img;
       const sizes = (p.sizes && p.sizes.join(" ")) || "";
-      
+      const wished = isWishlisted(p.id);
+
       return `
-      <div class="product-card-wrapper">
-        <div class="product-card-inner">
-          <!-- Front of Card -->
-          <div class="product-front">
-            <div class="product-card">
-              <a href="product.html?id=${p.id}">
-                <div class="product-image">
-                  <img src="${img}" alt="${p.name || ""}" loading="lazy" />
-                  <div class="product-overlay">
-                    <button class="overlay-btn" title="معاينة"><i class='bx bx-show'></i></button>
-                    <button class="overlay-btn" title="المفضلة"><i class='bx bx-heart'></i></button>
-                    <button class="overlay-btn add-cart-btn" onclick="event.preventDefault();quickAdd('${p.id}')"><i class='bx bx-cart-add'></i> أضف للسلة</button>
-                  </div>
-                </div>
-              </a>
-              <div class="product-body">
-                <h3 class="product-name"><a href="product.html?id=${p.id}">${p.name || ""}</a></h3>
-                <div class="product-meta">
-                  <span class="meta-label">المقاس:</span>
-                  <span class="meta-value">${sizes}</span>
-                </div>
-                <div class="product-pricing">
-                  <span class="current-price">${fmtPrice(p.price)}</span>
-                  ${p.oldPrice ? `<span class="old-price">${fmtPrice(p.oldPrice)}</span>` : ""}
-                </div>
-              </div>
+      <div class="product-card-wrapper reveal" style="transition-delay:${(idx % 8) * 0.05}s">
+        <div class="product-card v2">
+          <div class="product-image v2">
+            ${p.oldPrice && p.oldPrice > p.price ? `<span class="product-badge-tag sale">خصم</span>` : (p.isNew ? `<span class="product-badge-tag">جديد</span>` : "")}
+            <button class="corner-heart wishlist-btn ${wished ? "active" : ""}" data-id="${p.id}" onclick="event.preventDefault();toggleWishlistBtn('${p.id}', this)" title="أضف للمفضلة">
+              <i class='${wished ? "bx bxs-heart" : "bx bx-heart"}'></i>
+            </button>
+            <a href="product.html?id=${p.id}">
+              <img class="img-primary" src="${img}" alt="${p.name || ""}" loading="lazy" />
+              <img class="img-secondary" src="${img2}" alt="${p.name || ""}" loading="lazy" />
+            </a>
+            <div class="product-overlay v2">
+              <button class="overlay-btn eye-btn" style="--d:0" title="معاينة سريعة" onclick="event.preventDefault();openQuickView('${p.id}')"><i class='bx bx-show'></i></button>
+              <button class="overlay-btn add-cart-btn" style="--d:1" onclick="event.preventDefault();quickAdd('${p.id}', this, event)"><i class='bx bx-cart-add'></i> أضف للسلة</button>
             </div>
           </div>
-          
-          <!-- Back of Card (shows on hover) -->
-          <div class="product-back">
-            <div class="back-icon">👕</div>
-            <div class="back-text">${p.name || "منتج مميز"}</div>
-            <div class="back-price">${fmtPrice(p.price)}</div>
-            <a href="product.html?id=${p.id}" class="btn-primary" style="padding: 0.7rem 1.5rem; font-size: 0.85rem;">
-              عرض التفاصيل
-            </a>
+          <div class="product-body">
+            <h3 class="product-name"><a href="product.html?id=${p.id}">${p.name || ""}</a></h3>
+            <div class="product-meta">
+              <span class="meta-label">المقاس:</span>
+              <span class="meta-value">${sizes}</span>
+            </div>
+            <div class="product-pricing">
+              <span class="current-price">${fmtPrice(p.price)}</span>
+              ${p.oldPrice ? `<span class="old-price">${fmtPrice(p.oldPrice)}</span>` : ""}
+            </div>
           </div>
         </div>
       </div>`;
     })
     .join("");
+
+  observeReveals();
 }
 
-function quickAdd(id) {
+function quickAdd(id, btnEl, evt) {
   const p = ALL_PRODUCTS.find((x) => x.id === id);
   if (!p) return;
   addToCart({
@@ -773,6 +782,127 @@ function quickAdd(id) {
     color: (p.colors && p.colors[0]) || "",
     qty: 1
   });
+  if (btnEl) {
+    btnEl.classList.add("added");
+    const originalHTML = btnEl.innerHTML;
+    btnEl.innerHTML = "<i class='bx bx-check'></i> أُضيف";
+    setTimeout(() => {
+      btnEl.classList.remove("added");
+      btnEl.innerHTML = originalHTML;
+    }, 1400);
+  }
+  flyToCart(evt);
+}
+
+// ====== Fly-to-cart animation ======
+function flyToCart(evt) {
+  const cartBtn = document.querySelector(".cart-btn");
+  if (!cartBtn) return;
+  const startEl = evt && evt.target ? evt.target.closest(".product-image") : null;
+  const startRect = startEl ? startEl.getBoundingClientRect() : { left: window.innerWidth / 2, top: window.innerHeight / 2, width: 40, height: 40 };
+  const endRect = cartBtn.getBoundingClientRect();
+
+  const fly = document.createElement("div");
+  fly.className = "fly-icon";
+  fly.innerHTML = "<i class='bx bx-shopping-bag'></i>";
+  fly.style.left = (startRect.left + startRect.width / 2 - 13) + "px";
+  fly.style.top = (startRect.top + startRect.height / 2 - 13) + "px";
+  document.body.appendChild(fly);
+
+  requestAnimationFrame(() => {
+    fly.style.left = (endRect.left + endRect.width / 2 - 13) + "px";
+    fly.style.top = (endRect.top + endRect.height / 2 - 13) + "px";
+    fly.style.transform = "scale(.3)";
+    fly.style.opacity = "0.3";
+  });
+
+  setTimeout(() => fly.remove(), 750);
+}
+
+// ====== Wishlist toggle ======
+function toggleWishlistBtn(id, btn) {
+  const p = ALL_PRODUCTS.find((x) => x.id === id);
+  if (!p) return;
+  const added = toggleWishlistItem({
+    id: p.id,
+    name: p.name,
+    price: p.price,
+    image: (p.images && p.images[0]) || ""
+  });
+  document.querySelectorAll(`.wishlist-btn[data-id="${id}"]`).forEach((b) => {
+    b.classList.toggle("active", added);
+    const icon = b.querySelector("i");
+    if (icon) icon.className = added ? "bx bxs-heart" : "bx bx-heart";
+  });
+  showToast(added ? "تمت الإضافة إلى المفضلة ♥" : "تمت الإزالة من المفضلة");
+}
+
+// ====== Quick View Modal ======
+let qvSelSize = "", qvSelColor = "";
+function openQuickView(id) {
+  const p = ALL_PRODUCTS.find((x) => x.id === id);
+  if (!p) return;
+  qvSelSize = (p.sizes && p.sizes[0]) || "";
+  qvSelColor = (p.colors && p.colors[0]) || "";
+  const img = (p.images && p.images[0]) || "images/product-1.png";
+  const modal = document.getElementById("quickViewModal");
+  document.getElementById("qvBody").innerHTML = `
+    <div class="qv-image"><img src="${img}" alt="${p.name || ""}" /></div>
+    <div class="qv-info">
+      <h2>${p.name || ""}</h2>
+      <div class="qv-price">
+        <span>${fmtPrice(p.price)}</span>
+        ${p.oldPrice ? `<span class="old-price">${fmtPrice(p.oldPrice)}</span>` : ""}
+      </div>
+      <p class="qv-desc">${p.description || "منتج مميز من تشكيلة Tiger Jeans، خامة عالية الجودة وتصميم عصري يناسب جميع الأذواق."}</p>
+      ${p.sizes && p.sizes.length ? `<div class="qv-desc"><strong>المقاسات المتاحة:</strong> ${p.sizes.join(" · ")}</div>` : ""}
+      <div class="qv-actions">
+        <button class="btn-primary" style="flex:1;justify-content:center" onclick="quickAdd('${p.id}', this, event); closeQuickView()"><i class='bx bx-cart-add'></i> أضف إلى السلة</button>
+        <a href="product.html?id=${p.id}" class="btn-secondary">التفاصيل الكاملة</a>
+      </div>
+    </div>`;
+  modal.classList.add("show");
+  document.body.style.overflow = "hidden";
+}
+function closeQuickView() {
+  document.getElementById("quickViewModal").classList.remove("show");
+  document.body.style.overflow = "";
+}
+document.getElementById("quickViewModal").addEventListener("click", (e) => {
+  if (e.target.id === "quickViewModal") closeQuickView();
+});
+
+// ====== Scroll reveal (IntersectionObserver) ======
+let revealObserver;
+function observeReveals() {
+  if (!revealObserver) {
+    revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("in");
+            revealObserver.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+  }
+  document.querySelectorAll(".reveal:not(.in), .reveal-scale:not(.in)").forEach((el) => revealObserver.observe(el));
+}
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".stat-item, .feature-card, .deal-card, section > .container > h2, .section-header").forEach((el) => el.classList.add("reveal"));
+  observeReveals();
+});
+
+// ====== Scroll to top button ======
+window.addEventListener("scroll", () => {
+  const btn = document.getElementById("scrollTopBtn");
+  if (!btn) return;
+  btn.classList.toggle("show", window.scrollY > 500);
+});
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 // ====== UI Functions ======

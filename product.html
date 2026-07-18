@@ -175,6 +175,7 @@
         <a href="track.html">تتبع الطلب</a>
       </nav>
       <div class="header-actions">
+        <a href="wishlist.html" class="action-btn wishlist-btn-header"><i class='bx bx-heart'></i><span class="wishlist-badge" style="display:none">0</span></a>
         <a href="cart.html" class="action-btn cart-btn"><i class='bx bx-cart-alt'></i><span class="cart-badge" style="display:none">0</span></a>
       </div>
     </div>
@@ -293,6 +294,9 @@ function render() {
         <button class="btn-primary" style="flex:1;justify-content:center;padding:1rem" onclick="addToCartNow()">
           <i class='bx bx-cart-add'></i> أضف إلى السلة
         </button>
+        <button class="btn-secondary wishlist-btn" data-id="${pid}" style="padding:1rem 1.2rem" onclick="toggleWishlistDetail()" id="pdWishlistBtn">
+          <i class='${isWishlisted(pid) ? "bx bxs-heart" : "bx bx-heart"}'></i>
+        </button>
         <a href="cart.html" class="btn-secondary" style="padding:1rem 1.5rem">السلة</a>
       </div>
     </div>
@@ -332,6 +336,22 @@ function addToCartNow() {
     color: selColor,
     qty
   });
+}
+
+function toggleWishlistDetail() {
+  if (!PRODUCT) return;
+  const added = toggleWishlistItem({
+    id: pid,
+    name: PRODUCT.name,
+    price: PRODUCT.price,
+    image: (PRODUCT.images && PRODUCT.images[0]) || ""
+  });
+  const btn = document.getElementById("pdWishlistBtn");
+  if (btn) {
+    btn.querySelector("i").className = added ? "bx bxs-heart" : "bx bx-heart";
+    btn.classList.toggle("active", added);
+  }
+  showToast(added ? "تمت الإضافة إلى المفضلة ♥" : "تمت الإزالة من المفضلة");
 }
 </script>
 </body>

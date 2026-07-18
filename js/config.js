@@ -101,7 +101,75 @@ function updateCartBadge() {
     const c = cartCount();
     b.textContent = c;
     b.style.display = c > 0 ? "flex" : "none";
+    b.classList.remove("bump");
+    void b.offsetWidth;
+    b.classList.add("bump");
   });
 }
 
-document.addEventListener("DOMContentLoaded", updateCartBadge);
+// ====== إدارة المفضلة (localStorage) ======
+const WISHLIST_KEY = "tj_wishlist";
+
+function getWishlist() {
+  try {
+    return JSON.parse(localStorage.getItem(WISHLIST_KEY)) || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveWishlist(list) {
+  localStorage.setItem(WISHLIST_KEY, JSON.stringify(list));
+  updateWishlistBadge();
+}
+
+function isWishlisted(id) {
+  return getWishlist().some((w) => w.id === id);
+}
+
+function toggleWishlistItem(item) {
+  const list = getWishlist();
+  const idx = list.findIndex((w) => w.id === item.id);
+  let added;
+  if (idx > -1) {
+    list.splice(idx, 1);
+    added = false;
+  } else {
+    list.push(item);
+    added = true;
+  }
+  saveWishlist(list);
+  return added;
+}
+
+function removeFromWishlist(id) {
+  saveWishlist(getWishlist().filter((w) => w.id !== id));
+}
+
+function wishlistCount() {
+  return getWishlist().length;
+}
+
+function updateWishlistBadge() {
+  document.querySelectorAll(".wishlist-badge").forEach((b) => {
+    const c = wishlistCount();
+    b.textContent = c;
+    b.style.display = c > 0 ? "flex" : "none";
+    b.classList.remove("bump");
+    void b.offsetWidth;
+    b.classList.add("bump");
+  });
+  document.querySelectorAll(".wishlist-btn").forEach((btn) => {
+    const id = btn.dataset.id;
+    if (!id) return;
+    const active = isWishlisted(id);
+    btn.classList.toggle("active", active);
+    const icon = btn.querySelector("i");
+    if (icon) icon.className = active ? "bx bxs-heart" : "bx bx-heart";
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  updateCartBadge();
+  updateWishlistBadge();
+});

@@ -185,8 +185,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
   background:var(--surface-2);
   color:var(--gold);
 }
-.cart-btn{position:relative}
-.cart-badge{
+.cart-btn,.wishlist-btn-header{position:relative}
+.cart-badge,.wishlist-badge{
   position:absolute;
   top:-4px;left:-4px;
   background:var(--gold);
@@ -972,4 +972,233 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
   .products-grid{grid-template-columns:1fr}
   .footer-grid{grid-template-columns:1fr}
   .btn-primary,.btn-secondary{padding:.8rem 1.4rem;font-size:.9rem}
+}
+
+/* ==========================================================
+   ====== TIGER JEANS v2 — Animations & New Interactions =====
+   ========================================================== */
+
+/* ---- Badge bump animation (cart & wishlist) ---- */
+@keyframes badgeBump{
+  0%{transform:scale(1)}
+  35%{transform:scale(1.45)}
+  60%{transform:scale(.9)}
+  100%{transform:scale(1)}
+}
+.cart-badge.bump,.wishlist-badge.bump{animation:badgeBump .45s cubic-bezier(.34,1.56,.64,1)}
+
+/* ---- Scroll reveal ---- */
+.reveal{
+  opacity:0;
+  transform:translateY(28px);
+  transition:opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1);
+  will-change:transform,opacity;
+}
+.reveal.in{opacity:1;transform:translateY(0)}
+.reveal-scale{opacity:0;transform:scale(.92);transition:opacity .6s ease,transform .6s cubic-bezier(.16,1,.3,1)}
+.reveal-scale.in{opacity:1;transform:scale(1)}
+
+/* ---- Redesigned Product Card (v2) ---- */
+.product-card-wrapper{perspective:none}
+.product-card-inner{transform:none !important;transition:none !important}
+.product-front{position:relative !important;inset:auto !important;backface-visibility:visible !important}
+.product-back{display:none !important}
+
+.product-card.v2{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  overflow:hidden;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  transition:transform .45s cubic-bezier(.16,1,.3,1), box-shadow .45s ease, border-color .3s ease;
+}
+.product-card.v2:hover{
+  transform:translateY(-8px);
+  border-color:var(--gold-deep);
+  box-shadow:0 25px 50px -20px rgba(0,0,0,.6), 0 0 0 1px rgba(212,175,55,.15);
+}
+.product-image.v2{position:relative;aspect-ratio:3/4;overflow:hidden;background:var(--surface-2)}
+.product-image.v2 img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  transition:opacity .5s ease, transform .7s cubic-bezier(.16,1,.3,1);
+}
+.product-image.v2 .img-primary{opacity:1;transform:scale(1)}
+.product-image.v2 .img-secondary{opacity:0}
+.product-card.v2:hover .img-primary{opacity:0;transform:scale(1.1)}
+.product-card.v2:hover .img-secondary{opacity:1;transform:scale(1.1)}
+
+.corner-heart{
+  position:absolute;
+  top:.7rem;left:.7rem;
+  width:38px;height:38px;
+  border-radius:50%;
+  background:rgba(10,10,12,.55);
+  backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:1.05rem;
+  z-index:3;
+  opacity:0;
+  transform:translateY(-10px);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1), background .25s, color .25s, opacity .3s ease;
+  border:1px solid rgba(255,255,255,.12);
+}
+.product-card.v2:hover .corner-heart{opacity:1;transform:translateY(0)}
+.corner-heart.active{opacity:1;transform:translateY(0)}
+.corner-heart:hover{transform:scale(1.12)}
+@media(max-width:768px){
+  .corner-heart{opacity:1;transform:translateY(0)}
+  .product-overlay.v2 .overlay-btn{opacity:1;transform:translateY(0)}
+}
+.corner-heart.active{
+  background:var(--gold);
+  color:#000;
+  border-color:var(--gold);
+  animation:heartPop .45s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes heartPop{
+  0%{transform:scale(1)}
+  40%{transform:scale(1.35) rotate(-8deg)}
+  70%{transform:scale(.92) rotate(4deg)}
+  100%{transform:scale(1) rotate(0)}
+}
+
+.product-badge-tag{
+  position:absolute;top:.7rem;right:.7rem;
+  z-index:3;
+  padding:.3rem .7rem;
+  border-radius:20px;
+  font-size:.7rem;
+  font-weight:800;
+  font-family:'Cairo',sans-serif;
+  background:linear-gradient(135deg,var(--gold),var(--gold-soft));
+  color:#000;
+  box-shadow:0 4px 14px rgba(212,175,55,.4);
+}
+.product-badge-tag.sale{background:linear-gradient(135deg,var(--danger),#c9403a);color:#fff;box-shadow:0 4px 14px rgba(224,85,75,.4)}
+
+.product-overlay.v2{
+  position:absolute;inset:auto 0 0 0;
+  display:flex;
+  gap:.5rem;
+  padding:.8rem;
+  background:linear-gradient(0deg,rgba(0,0,0,.75) 0%,rgba(0,0,0,0) 100%);
+  z-index:2;
+}
+.product-overlay.v2 .overlay-btn{
+  opacity:0;
+  transform:translateY(16px);
+  transition:opacity .35s ease, transform .35s cubic-bezier(.34,1.2,.64,1), background .2s, color .2s;
+  transition-delay:calc(var(--d,0) * .07s);
+}
+.product-card.v2:hover .product-overlay.v2 .overlay-btn{
+  opacity:1;
+  transform:translateY(0);
+}
+.product-overlay.v2 .overlay-btn.eye-btn{
+  width:42px;flex-shrink:0;
+}
+.product-overlay.v2 .add-cart-btn{flex:1;justify-content:center}
+.add-cart-btn.added{background:var(--success) !important;color:#000 !important}
+
+/* ---- Fly to cart flying icon ---- */
+.fly-icon{
+  position:fixed;
+  z-index:9999;
+  width:26px;height:26px;
+  border-radius:50%;
+  background:var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  color:#000;font-size:.9rem;
+  pointer-events:none;
+  transition:transform .7s cubic-bezier(.2,.8,.2,1), opacity .7s ease, left .7s cubic-bezier(.2,.8,.2,1), top .7s cubic-bezier(.2,.8,.2,1);
+  box-shadow:0 4px 14px rgba(212,175,55,.5);
+}
+
+/* ---- Quick View Modal ---- */
+.qv-modal{
+  background:var(--bg-alt);
+  border:1px solid var(--line);
+  border-radius:18px;
+  width:820px;max-width:100%;
+  max-height:88vh;
+  overflow:auto;
+  position:relative;
+  animation:modalIn .35s cubic-bezier(.16,1,.3,1);
+  display:grid;
+  grid-template-columns:1fr 1fr;
+}
+.qv-modal .qv-image{aspect-ratio:3/4;background:var(--surface);overflow:hidden}
+.qv-modal .qv-image img{width:100%;height:100%;object-fit:cover}
+.qv-modal .qv-info{padding:2rem}
+.qv-modal .qv-info h2{font-size:1.4rem;margin-bottom:.6rem}
+.qv-modal .qv-price{font-size:1.6rem;color:var(--gold);font-weight:900;font-family:'Cairo',sans-serif;margin-bottom:1rem;display:flex;align-items:center;gap:.7rem}
+.qv-modal .qv-price .old-price{font-size:1rem;color:var(--text-dim);text-decoration:line-through;font-weight:600}
+.qv-modal .qv-desc{color:var(--text-dim);font-size:.92rem;margin-bottom:1.2rem;line-height:1.8}
+.qv-modal .qv-actions{display:flex;gap:.7rem;margin-top:1.4rem}
+@media(max-width:700px){
+  .qv-modal{grid-template-columns:1fr}
+  .qv-modal .qv-image{aspect-ratio:4/3}
+}
+
+/* ---- Scroll to top button ---- */
+.scroll-top-btn{
+  position:fixed;
+  bottom:1.6rem;right:1.6rem;
+  width:48px;height:48px;
+  border-radius:50%;
+  background:var(--gold);
+  color:#000;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;
+  z-index:400;
+  opacity:0;
+  visibility:hidden;
+  transform:translateY(20px);
+  transition:opacity .3s ease, transform .3s ease, visibility .3s;
+  box-shadow:0 8px 24px rgba(212,175,55,.4);
+}
+.scroll-top-btn.show{opacity:1;visibility:visible;transform:translateY(0)}
+.scroll-top-btn:hover{transform:translateY(-4px) scale(1.05)}
+
+/* ---- Hero floating ambient shapes ---- */
+.hero-section{position:relative;overflow:hidden}
+.hero-blob{
+  position:absolute;
+  border-radius:50%;
+  filter:blur(70px);
+  opacity:.25;
+  pointer-events:none;
+  z-index:0;
+}
+.hero-blob.b1{width:340px;height:340px;background:var(--gold);top:-100px;right:-60px;animation:floatBlob 9s ease-in-out infinite}
+.hero-blob.b2{width:260px;height:260px;background:var(--denim);bottom:-80px;left:-40px;animation:floatBlob 11s ease-in-out infinite reverse}
+@keyframes floatBlob{
+  0%,100%{transform:translate(0,0) scale(1)}
+  50%{transform:translate(20px,-25px) scale(1.08)}
+}
+.hero-section .container{position:relative;z-index:1}
+
+/* ---- Image skeleton shimmer (while loading) ---- */
+.img-skeleton{
+  background:linear-gradient(110deg,var(--surface) 30%,var(--surface-2) 50%,var(--surface) 70%);
+  background-size:200% 100%;
+  animation:shimmer 1.4s infinite;
+}
+@keyframes shimmer{
+  0%{background-position:200% 0}
+  100%{background-position:-200% 0}
+}
+
+/* ---- Generic button micro-interaction ---- */
+.btn-primary,.btn-secondary{transition:transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s ease, background .25s ease}
+.btn-primary:active,.btn-secondary:active{transform:scale(.96)}
+
+/* ---- Nav link underline extra shine already exists; add cat-chip motion ---- */
+.cat-chip{transition:transform .2s cubic-bezier(.34,1.56,.64,1), background .2s, color .2s, border-color .2s}
+.cat-chip:hover{transform:translateY(-2px)}
+
+@media(max-width:768px){
+  .corner-heart{width:34px;height:34px;font-size:.95rem}
 }
