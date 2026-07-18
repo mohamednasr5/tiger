@@ -959,22 +959,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
 }
 @media(max-width:768px){
   .top-bar{display:none}
-  .main-nav{
-    position:fixed;
-    top:0;
-    left:-100%;
-    width:80%;
-    height:100%;
-    background:var(--bg-alt);
-    flex-direction:column;
-    padding:6rem 2rem 2rem;
-    transition:.3s;
-    z-index:150;
-    align-items:flex-start;
-    gap:1.5rem;
-  }
-  .main-nav.show{left:0}
-  .burger{display:flex}
+  .main-nav{display:none !important}
+  .burger{display:none !important}
   .hero-title{font-size:2.6rem}
   .stats-grid{grid-template-columns:repeat(3,1fr);gap:1rem}
   .stat-number{font-size:1.8rem}
@@ -1330,7 +1316,12 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
 /* ---- Store frontend: reserve scroll space so content isn't hidden ---- */
 @media (max-width:991px){
   body{padding-bottom:96px}
-  .site-header .burger{display:none}
+  .site-header .burger{display:none !important}
+  .main-nav{display:none !important}
+  .container{padding:0 1rem}
+}
+@media (max-width:480px){
+  .container{padding:0 .85rem}
 }
 
 /* ---- Admin: sidebar becomes a bottom nav below 992px ---- */
@@ -1342,3 +1333,41 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
 @media (min-width:992px){
   .admin-bottom-nav{display:none !important}
 }
+
+/* ---- Quick Categories Sheet (opens from bottom-nav "الأقسام") ---- */
+.cat-sheet{
+  position:fixed;
+  left:50%;
+  bottom:calc(88px + env(safe-area-inset-bottom));
+  transform:translateX(-50%) translateY(12px);
+  width:calc(100% - 22px);
+  max-width:480px;
+  max-height:0;
+  overflow:hidden;
+  opacity:0;
+  pointer-events:none;
+  z-index:399;
+  background:color-mix(in srgb, var(--surface) 92%, transparent);
+  -webkit-backdrop-filter:blur(22px) saturate(180%);
+  backdrop-filter:blur(22px) saturate(180%);
+  border:1px solid var(--line);
+  border-radius:20px;
+  box-shadow:0 12px 34px rgba(0,0,0,.35);
+  transition:max-height .3s cubic-bezier(.34,1.56,.64,1), opacity .25s ease, transform .25s ease;
+}
+.cat-sheet.show{
+  max-height:220px;
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+  pointer-events:auto;
+}
+.cat-sheet-inner{
+  padding:.9rem;
+  display:flex;
+  flex-wrap:wrap;
+  gap:.5rem;
+  overflow-y:auto;
+  max-height:220px;
+}
+.cat-sheet-inner .cat-chip{flex:0 0 auto}
+@media (min-width:992px){ .cat-sheet{display:none} }

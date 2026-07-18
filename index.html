@@ -1087,10 +1087,32 @@ function showCopySuccess(btn) {
   <div class="bottom-nav-inner">
     <a href="index.html" data-nav="home" class="active"><i class='bx bx-home-alt'></i><span>الرئيسية</span></a>
     <a href="index.html#products" data-nav="search" class="" onclick="if(window.location.pathname.endsWith('index.html')){event.preventDefault();toggleSearch();}"><i class='bx bx-search'></i><span>بحث</span></a>
-    <a href="index.html#products" data-nav="categories" class=""><i class='bx bx-category'></i><span>الأقسام</span></a>
+    <a href="#" data-nav="categories" class="" onclick="event.preventDefault();toggleCatSheet();"><i class='bx bx-category'></i><span>الأقسام</span></a>
     <a href="cart.html" data-nav="cart" class=""><i class='bx bx-cart-alt'></i><span>السلة</span><span class="bn-badge cart-badge" style="display:none">0</span></a>
     <a href="#" id="bottomAccountLink" data-nav="account" class="" onclick="event.preventDefault(); if(typeof openAuthModal==='function'){openAuthModal();} else if(typeof openAccountMenu==='function' && currentUser){openAccountMenu();} else {window.location.href='index.html';}"><i class='bx bx-user'></i><span>حسابي</span></a>
   </div>
 </nav>
+
+<!-- Quick Categories Sheet (opens above bottom nav on tap) -->
+<div class="cat-sheet" id="catSheet">
+  <div class="cat-sheet-inner" id="catSheetInner"></div>
+</div>
+
+<script>
+function toggleCatSheet() {
+  const sheet = document.getElementById("catSheet");
+  const navBtn = document.querySelector('.bottom-nav a[data-nav="categories"]');
+  const opening = !sheet.classList.contains("show");
+  if (opening) {
+    const inner = document.getElementById("catSheetInner");
+    const cats = ["all", ...new Set((typeof ALL_PRODUCTS !== "undefined" ? ALL_PRODUCTS : []).map((p) => p.category).filter(Boolean))];
+    inner.innerHTML = cats.map((c) =>
+      `<button class="cat-chip ${c === ACTIVE_CAT ? "active" : ""}" onclick="setCat('${c}');toggleCatSheet();document.getElementById('products').scrollIntoView({behavior:'smooth'});">${c === "all" ? "الكل" : c}</button>`
+    ).join("");
+  }
+  sheet.classList.toggle("show", opening);
+  navBtn.classList.toggle("active", opening);
+}
+</script>
 </body>
 </html>

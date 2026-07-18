@@ -270,10 +270,6 @@
 
 /* Responsive */
 @media(max-width:1024px){
-  .admin-layout{grid-template-columns:1fr}
-  .admin-sidebar{position:fixed;right:-260px;transition:.3s;z-index:250}
-  .admin-sidebar.show{right:0}
-  .admin-main{margin-right:0}
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:600px){.kpi-grid{grid-template-columns:1fr}}
@@ -1381,13 +1377,6 @@ function sendNotification() {
 function closeModal(id) {
   document.getElementById(id).classList.remove("show");
 }
-
-// Mobile sidebar toggle
-document.addEventListener("click", (e) => {
-  if (window.innerWidth <= 1024 && !e.target.closest(".admin-sidebar") && !e.target.closest(".burger")) {
-    document.getElementById("adminSidebar").classList.remove("show");
-  }
-});
 </script>
 </body>
 </html>
