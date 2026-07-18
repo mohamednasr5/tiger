@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المتجر | Tiger Jeans</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- القائمة الرئيسية (نفس القائمة الموجودة في index.html) -->
+    <header class="navbar">
+        <div class="container nav-content">
+            <div class="logo">
+                <h1>TIGER JEANS <span>Z</span></h1>
+            </div>
+            <nav class="nav-links">
+                <a href="index.html">الرئيسية</a>
+                <a href="shop.html" class="active">المتجر</a>
+                <a href="sales.html" class="highlight">التخفيضات 🔥</a>
+            </nav>
+            <div class="nav-icons">
+                <button onclick="window.location.href='cart.html'">🛒</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- قسم عرض المنتجات -->
+    <section class="products-section container" style="padding-top: 50px;">
+        <div class="section-header">
+            <h2>جميع المنتجات</h2>
+            <p>تصفح أحدث تشكيلاتنا من جينز تايجر</p>
+        </div>
+        
+        <!-- هنا سيتم تحميل المنتجات من Firebase -->
+        <div class="products-grid" id="allProductsContainer">
+            <div class="loading-spinner">جاري تحميل المتجر...</div>
+        </div>
+    </section>
+
+    <script type="module" src="js/shop-logic.js"></script>
+</body>
+</html>
