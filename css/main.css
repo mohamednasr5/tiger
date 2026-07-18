@@ -1265,17 +1265,8 @@ html {
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   padding: var(--space-6);
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity var(--transition-fast) ease, visibility var(--transition-fast) ease;
-}
-
-.modal-overlay.active {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
   animation: fadeIn var(--transition-fast) ease forwards;
+  opacity: 0;
 }
 
 .modal-overlay.is-closing {
@@ -2055,4 +2046,99 @@ html {
   .skeleton::after {
     animation: none;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RTL ARABIC SUPPORT
+   ═══════════════════════════════════════════════════════════════════ */
+[dir="rtl"] {
+  font-family: 'Cairo', 'Inter', sans-serif;
+}
+[dir="rtl"] .header-nav {
+  direction: rtl;
+}
+[dir="rtl"] .nav-links {
+  flex-direction: row-reverse;
+}
+[dir="rtl"] .header-actions {
+  flex-direction: row-reverse;
+}
+[dir="rtl"] .product-card {
+  direction: rtl;
+  text-align: right;
+}
+[dir="rtl"] .footer-grid {
+  direction: rtl;
+}
+[dir="rtl"] .form-group input,
+[dir="rtl"] .form-group select,
+[dir="rtl"] .form-group textarea {
+  text-align: right;
+}
+[dir="rtl"] .filter-sidebar {
+  text-align: right;
+}
+[dir="rtl"] .cart-item {
+  text-align: right;
+}
+[dir="rtl"] .checkout-form {
+  text-align: right;
+}
+[dir="rtl"] .testimonial-card {
+  text-align: right;
+}
+[dir="rtl"] .admin-table th,
+[dir="rtl"] .admin-table td {
+  text-align: right;
+}
+
+/* LTR override when English is selected */
+[dir="ltr"] {
+  font-family: 'Inter', 'Playfair Display', sans-serif;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   DEVELOPER SIGNATURE
+   ═══════════════════════════════════════════════════════════════════ */
+.developer-signature {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px;
+  margin-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  font-family: 'Cairo', sans-serif;
+  font-size: 13px;
+  color: #888;
+  flex-wrap: wrap;
+}
+.developer-signature a {
+  color: #ff6b00;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+.developer-signature a:hover {
+  color: #ffa040;
+}
+.dev-heart {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s;
+}
+.dev-heart:hover {
+  transform: scale(1.3);
+}
+.pulse-heart {
+  animation: heartbeat 1.2s ease-in-out infinite;
+  display: inline-block;
+}
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14% { transform: scale(1.2); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.15); }
+  70% { transform: scale(1); }
 }

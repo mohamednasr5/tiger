@@ -9,13 +9,11 @@ import Wishlist from './modules/wishlist.js';
 import Notifications from './modules/notifications.js';
 import Orders from './modules/orders.js';
 import Utils from './utils.js';
-import I18n from './i18n.js';
 
-window.TigerApp = { Auth, Products, Cart, Wishlist, Notifications, Orders, Utils, I18n };
+window.TigerApp = { Auth, Products, Cart, Wishlist, Notifications, Orders, Utils };
 
 const App = {
   async init() {
-    I18n.init();
     this.initPageLoader();
     this.initHeader();
     this.initMobileMenu();
@@ -43,11 +41,20 @@ const App = {
 
     setTimeout(() => {
       const loader = document.getElementById('pageLoader');
-      if (loader) { loader.classList.add('is-hidden'); setTimeout(() => loader.style.display = 'none', 500); }
+      if (loader) { loader.classList.add('loaded'); setTimeout(() => loader.style.display = 'none', 500); }
     }, 800);
   },
 
-  initPageLoader() { window.addEventListener('load', () => document.body.classList.add('loaded')); },
+  initPageLoader() {
+    // Auto-hide after 2s max, or when page loads
+    const hide = () => {
+      const loader = document.getElementById('pageLoader');
+      if (loader) loader.style.display = 'none';
+      document.body.classList.add('loaded');
+    };
+    window.addEventListener('load', hide);
+    setTimeout(hide, 2000);
+  },
 
   initHeader() {
     const header = document.querySelector('.site-header');
@@ -61,7 +68,7 @@ const App = {
       }
       lastScroll = s;
     }, 50));
-    document.querySelectorAll('.nav-item.has-dropdown').forEach(item => {
+    document.querySelectorAll('.nav-item-has-children').forEach(item => {
       let t;
       item.addEventListener('mouseenter', () => { clearTimeout(t); item.classList.add('hover'); });
       item.addEventListener('mouseleave', () => { t = setTimeout(() => item.classList.remove('hover'), 150); });
@@ -69,10 +76,10 @@ const App = {
   },
 
   initMobileMenu() {
-    const hamburger = document.getElementById('hamburgerBtn');
+    const hamburger = document.getElementById('hamburger');
     const menu = document.getElementById('mobileMenu');
-    const overlay = document.getElementById('mobileMenuOverlay');
-    const closeBtn = document.getElementById('mobileMenuClose');
+    const overlay = document.getElementById('mobileOverlay');
+    const closeBtn = document.getElementById('mobileClose');
     if (!hamburger || !menu) return;
     const open = () => { hamburger.classList.add('active'); menu.classList.add('active'); overlay?.classList.add('active'); document.body.style.overflow = 'hidden'; };
     const close = () => { hamburger.classList.remove('active'); menu.classList.remove('active'); overlay?.classList.remove('active'); document.body.style.overflow = ''; };
@@ -86,7 +93,7 @@ const App = {
   },
 
   initSearch() {
-    const searchBtn = document.getElementById('searchToggle');
+    const searchBtn = document.getElementById('searchBtn');
     const overlay = document.getElementById('searchOverlay');
     const input = document.getElementById('searchInput');
     const close = document.getElementById('searchClose');
@@ -182,7 +189,7 @@ const App = {
   },
 
   initCartDrawer() {
-    const cartBtn = document.getElementById('cartToggle');
+    const cartBtn = document.getElementById('cartBtn');
     const drawer = document.getElementById('cartDrawer');
     const overlay = document.getElementById('cartDrawerOverlay');
     const closeBtn = document.getElementById('cartDrawerClose');
@@ -197,19 +204,13 @@ const App = {
 
   renderCartDrawer() {
     const itemsEl = document.getElementById('cartDrawerItems');
-    const subtotalEl = document.querySelector('[data-cart-drawer-total]');
-    const footerEl = document.getElementById('cartDrawerFooter');
-    const emptyEl = document.getElementById('cartDrawerEmpty');
+    const subtotalEl = document.getElementById('cartDrawerSubtotal');
     if (!itemsEl) return;
     if (Cart.items.length === 0) {
-      itemsEl.innerHTML = '';
-      if (emptyEl) emptyEl.style.display = '';
-      if (footerEl) footerEl.style.display = 'none';
-      if (subtotalEl) subtotalEl.textContent = Utils.formatPrice(0);
+      itemsEl.innerHTML = '<div class="cart-drawer-empty"><p>Your cart is empty</p><a href="pages/shop.html" class="btn btn-primary btn-sm">Start Shopping</a></div>';
+      if (subtotalEl) subtotalEl.textContent = 'EGP 0';
       return;
     }
-    if (emptyEl) emptyEl.style.display = 'none';
-    if (footerEl) footerEl.style.display = '';
     itemsEl.innerHTML = Cart.items.map(item => `
       <div class="cart-drawer-item"><div class="cart-drawer-item-img"><img src="${item.image}" alt="${Utils.sanitize(item.name)}" loading="lazy"></div>
       <div class="cart-drawer-item-info"><h4>${Utils.sanitize(item.name)}</h4><p class="cart-drawer-item-variant">${item.size ? 'Size: '+item.size : ''} ${item.color ? '· '+item.color : ''}</p><p class="cart-drawer-item-price">${Utils.formatPrice(item.price)} × ${item.quantity}</p></div>
@@ -219,7 +220,7 @@ const App = {
   },
 
   initLoginModal() {
-    const loginBtns = document.querySelectorAll('.login-btn, [data-login], #loginToggle, #mobileLoginBtn');
+    const loginBtns = document.querySelectorAll('.login-btn, [data-login]');
     const modal = document.getElementById('loginModal');
     if (!modal) return;
     const close = () => modal.classList.remove('active');
@@ -520,8 +521,7 @@ const App = {
   initPaymentMethods() {
     document.querySelectorAll('input[name="paymentMethod"]').forEach(r => r.addEventListener('change', () => {
       document.querySelectorAll('.payment-details').forEach(d => d.style.display = 'none');
-      const paymentDetailsEl = document.getElementById('payment-'+r.value);
-      if (paymentDetailsEl) paymentDetailsEl.style.display = 'block';
+      const payEl = document.getElementById('payment-'+r.value); if (payEl) payEl.style.display = 'block';
     }));
     document.querySelectorAll('.receipt-upload-area').forEach(area => {
       const input = area.querySelector('input[type="file"]'), preview = area.querySelector('.receipt-preview');
@@ -572,8 +572,7 @@ const App = {
     document.querySelectorAll('.account-nav-item').forEach(i => i.classList.remove('active'));
     document.querySelector('[data-tab="'+tab+'"]')?.classList.add('active');
     document.querySelectorAll('.account-tab-content').forEach(t => t.style.display = 'none');
-    const tabEl = document.getElementById('tab-'+tab);
-    if (tabEl) tabEl.style.display = 'block';
+    const tabEl = document.getElementById('tab-'+tab); if (tabEl) tabEl.style.display = 'block';
     document.querySelector('[data-account-name]') && (document.querySelector('[data-account-name]').textContent = Auth.currentUser.displayName || 'User');
     document.querySelector('[data-account-email]') && (document.querySelector('[data-account-email]').textContent = Auth.currentUser.email || '');
 
@@ -610,8 +609,5 @@ const App = {
   }
 };
 
-document.addEventListener('DOMContentLoaded', async () => {
-    const hideLoader = () => { const l = document.getElementById('pageLoader'); if (l) { l.classList.add('is-hidden'); setTimeout(() => l.style.display = 'none', 500); } };
-    try { await App.init(); } catch(e) { console.error('App init error:', e); } finally { hideLoader(); }
-  });
+document.addEventListener('DOMContentLoaded', () => App.init());
 export default App;

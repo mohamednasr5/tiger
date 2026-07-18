@@ -1747,3 +1747,14 @@
 @media (max-width: 576px) {
   .w-full-mobile { width: 100%; }
 }
+
+/* RTL Responsive */
+@media (max-width: 768px) {
+  [dir="rtl"] .mobile-menu {
+    text-align: right;
+  }
+  [dir="rtl"] .developer-signature {
+    font-size: 11px;
+    padding: 15px 10px;
+  }
+}
