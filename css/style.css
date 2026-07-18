@@ -247,6 +247,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
 @keyframes marquee{
   0%{transform:translateX(0)}
   100%{transform:translateX(-50%)}
+}
 
 /* ====== Hero Section ====== */
 .hero-section{
@@ -485,17 +486,45 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
   grid-template-columns:repeat(4,1fr);
   gap:1.5rem;
 }
+
+/* Product Card Wrapper for Flip Animation */
+.product-card-wrapper{
+  perspective:1200px;
+  height:100%;
+}
+.product-card-inner{
+  position:relative;
+  width:100%;
+  height:100%;
+  transition:transform 0.65s cubic-bezier(0.4, 0.2, 0.2, 1);
+  transform-style:preserve-3d;
+}
+.product-card-wrapper:hover .product-card-inner{
+  transform:rotateY(180deg);
+}
+
+/* Front & Back Faces */
+.product-front,.product-back{
+  position:absolute;
+  width:100%;
+  height:100%;
+  backface-visibility:hidden;
+  -webkit-backface-visibility:hidden;
+}
+.product-back{
+  transform:rotateY(180deg);
+}
+
 .product-card{
   background:var(--surface);
   border:1px solid var(--line);
   border-radius:var(--radius);
   overflow:hidden;
-  transition:.3s;
-  position:relative;
+  height:100%;
+  display:flex;
+  flex-direction:column;
 }
 .product-card:hover{
-  transform:translateY(-6px);
-  border-color:var(--gold-deep);
   box-shadow:0 15px 40px -15px rgba(0,0,0,.5);
 }
 .product-image{
@@ -503,6 +532,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
   aspect-ratio:3/4;
   overflow:hidden;
   background:var(--surface-2);
+  flex-shrink:0;
 }
 .product-image img{
   width:100%;height:100%;
@@ -515,13 +545,13 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
 .product-overlay{
   position:absolute;
   inset:0;
-  background:rgba(0,0,0,.5);
+  background:rgba(0,0,0,.55);
   display:flex;
   align-items:center;
   justify-content:center;
   gap:.6rem;
   opacity:0;
-  transition:.3s;
+  transition:.35s;
 }
 .product-card:hover .product-overlay{opacity:1}
 .overlay-btn{
@@ -594,6 +624,43 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
   color:var(--text-dim);
   text-decoration:line-through;
   font-size:.88rem;
+}
+
+/* Product Back Face (Flip Animation) */
+.product-back{
+  background:linear-gradient(145deg,var(--surface),var(--surface-2));
+  border:1px solid var(--gold-deep);
+  border-radius:var(--radius);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:1.5rem;
+  text-align:center;
+}
+.product-back .back-icon{
+  font-size:3.5rem;
+  color:var(--gold);
+  margin-bottom:1rem;
+  animation:pulseIcon 1.5s ease-in-out infinite;
+}
+@keyframes pulseIcon{
+  0%,100%{transform:scale(1) rotate(0deg)}
+  50%{transform:scale(1.15) rotate(5deg)}
+}
+.product-back .back-text{
+  font-size:1.05rem;
+  font-weight:700;
+  margin-bottom:.6rem;
+  font-family:'Cairo',sans-serif;
+  color:var(--text);
+}
+.product-back .back-price{
+  font-size:1.4rem;
+  color:var(--gold);
+  font-weight:900;
+  font-family:'Cairo',sans-serif;
+  margin-bottom:1.3rem;
 }
 
 /* ====== Deals/Featured Grid ====== */
