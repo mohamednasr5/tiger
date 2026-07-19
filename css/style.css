@@ -1002,52 +1002,140 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
   font-size:.85rem;
 }
 
-/* ====== Developer Credit Link (footer) ====== */
-.credit-link{
+/* ====== Developer Credit - Chic Design with Heartbeat ====== */
+.footer-dev-credit{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:.5rem 1rem;
+  margin-bottom:.8rem;
+  font-family:'Cairo',sans-serif;
+}
+
+.credit-text{
+  color:var(--text-dim);
+  font-size:.9rem;
+  font-weight:500;
+}
+
+/* Heartbeat Animation */
+.heartbeat{
+  display:inline-block;
+  font-size:1.1rem;
+  animation:heartbeat 1.2s ease-in-out infinite;
+  filter:drop-shadow(0 0 6px rgba(224,75,85,.6));
+}
+
+@keyframes heartbeat{
+  0%, 100%{ transform:scale(1); }
+  14%{ transform:scale(1.25); }
+  28%{ transform:scale(1); }
+  42%{ transform:scale(1.15); }
+  70%{ transform:scale(1); }
+}
+
+/* Developer Name Link */
+.dev-name{
   position:relative;
   display:inline-flex;
   align-items:center;
-  gap:.35rem;
   font-weight:800;
+  font-size:.95rem;
   text-decoration:none;
-  background:linear-gradient(90deg,var(--gold-deep) 0%,var(--gold) 25%,#fff6d8 50%,var(--gold) 75%,var(--gold-deep) 100%);
+  background:linear-gradient(90deg,var(--gold-deep) 0%,var(--gold) 30%,#fff6d8 50%,var(--gold) 70%,var(--gold-deep) 100%);
   background-size:250% auto;
   background-clip:text;
   -webkit-background-clip:text;
   -webkit-text-fill-color:transparent;
-  animation:creditShine 5s linear infinite;
-  transition:filter .25s ease, transform .25s ease;
+  animation:creditShine 4s linear infinite;
+  transition:all .3s ease;
+  letter-spacing:.5px;
 }
-.credit-link i{
-  color:var(--gold);
-  font-size:1rem;
-  transition:transform .3s ease, color .25s ease;
+.dev-name:hover{
+  filter:drop-shadow(0 0 8px rgba(212,175,55,.7));
+  transform:translateY(-2px);
 }
-.credit-link::after{
+
+/* Developer Social Buttons */
+.dev-social{
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  margin-right:auto; /* Push to left in RTL */
+  margin-left:0;
+}
+
+.dev-social-btn{
+  width:34px;height:34px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.05rem;
+  color:#fff;
+  text-decoration:none;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);
+  position:relative;
+  overflow:hidden;
+}
+
+.dev-social-btn::before{
   content:'';
   position:absolute;
-  right:0;
-  left:100%;
-  bottom:-3px;
-  height:2px;
-  border-radius:2px;
-  background:linear-gradient(90deg,var(--gold),#fff6d8,var(--gold));
-  transition:left .35s ease;
+  inset:0;
+  background:inherit;
+  opacity:0;
+  transition:opacity .3s ease;
 }
-.credit-link:hover{
-  filter:drop-shadow(0 0 6px rgba(212,175,55,.65));
-  transform:translateY(-1px);
+
+.facebook-btn{
+  background:linear-gradient(135deg,#1877f2,#0d65d9);
+  box-shadow:0 3px 10px rgba(24,119,242,.35);
 }
-.credit-link:hover i{
-  transform:rotate(-12deg) scale(1.15);
-  color:#fff6d8;
+.facebook-btn:hover{
+  transform:translateY(-3px) scale(1.1);
+  box-shadow:0 6px 18px rgba(24,119,242,.5);
 }
-.credit-link:hover::after{ left:0 }
+
+.whatsapp-btn{
+  background:linear-gradient(135deg,#25d366,#128c7e);
+  box-shadow:0 3px 10px rgba(37,211,102,.35);
+}
+.whatsapp-btn:hover{
+  transform:translateY(-3px) scale(1.1);
+  box-shadow:0 6px 18px rgba(37,211,102,.5);
+}
+
+/* Copyright Text */
+.copyright-text{
+  font-size:.78rem;
+  opacity:.6;
+  margin-top:.3rem;
+}
+
 @keyframes creditShine{
   to{ background-position:-250% center }
 }
+
+/* Mobile Responsive for Footer Credit */
+@media (max-width:480px){
+  .footer-dev-credit{
+    flex-direction:column;
+    gap:.6rem;
+  }
+  .dev-social{
+    margin-right:0;
+    order:3;
+  }
+  .dev-name{
+    font-size:.9rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce){
-  .credit-link{ animation:none }
+  .heartbeat{ animation:none }
+  .dev-name{ animation:none }
 }
 
 /* ====== Auth Modal ====== */

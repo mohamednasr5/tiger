@@ -361,6 +361,49 @@ db.ref("settings/payment").once("value").then((snap) => {
   updatePayNumber();
 });
 
+// Load payment methods status (enabled/disabled) from admin
+let availablePaymentMethods = ['vodafone', 'instapay', 'cod']; // default all enabled
+db.ref("settings/paymentMethods").once("value").then((snap) => {
+  const methodsStatus = snap.val() || {};
+  
+  // Check each method status
+  const methods = {
+    vodafone: methodsStatus.vodafone !== false,
+    instapay: methodsStatus.instapay !== false,
+    cod: methodsStatus.cod !== false
+  };
+  
+  // Hide disabled payment options
+  Object.keys(methods).forEach(m => {
+    const optionEl = document.querySelector(`.pay-option[data-method="${m}"]`);
+    if (optionEl && !methods[m]) {
+      optionEl.style.display = 'none';
+    }
+  });
+  
+  // Get only enabled methods
+  availablePaymentMethods = Object.keys(methods).filter(m => methods[m]);
+  
+  // If current selected method is disabled, switch to first available
+  if (availablePaymentMethods.indexOf(method) === -1 && availablePaymentMethods.length > 0) {
+    const firstAvailable = document.querySelector(`.pay-option[data-method="${availablePaymentMethods[0]}"]`);
+    if (firstAvailable) {
+      selectPay(availablePaymentMethods[0], firstAvailable);
+    }
+  }
+  
+  // Show warning if no payment methods available
+  if (availablePaymentMethods.length === 0) {
+    document.querySelector('.pay-options').innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--text-dim)">
+        <i class='bx bx-error-circle' style="font-size:2rem;color:var(--danger);margin-bottom:.5rem;display:block"></i>
+        <p>لا توجد طرق دفع متاحة حالياً</p>
+        <p style="font-size:.8rem;margin-top:.3rem">يرجى المحاولة لاحقاً أو التواصل معنا</p>
+      </div>
+    `;
+  }
+});
+
 // Load shipping rates per governorate (managed from admin > الشحن)
 let shippingRates = {}; // { governate: cost } — only active rates included
 db.ref("shippingRates").once("value").then((snap) => {

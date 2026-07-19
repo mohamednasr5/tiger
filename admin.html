@@ -274,6 +274,106 @@
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:600px){.kpi-grid{grid-template-columns:1fr}}
+
+/* ====== Payment Methods Toggle Switch ====== */
+.payment-methods-control{
+  background:var(--bg-alt);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:1.3rem 1.5rem;
+  margin-bottom:1.5rem;
+}
+
+.payment-toggle-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:.8rem .5rem;
+  border-bottom:1px solid var(--line);
+  transition:background .2s ease;
+}
+.payment-toggle-item:last-child{
+  border-bottom:none;
+}
+.payment-toggle-item:hover{
+  background:rgba(212,175,55,.05);
+}
+
+.toggle-info{
+  display:flex;
+  align-items:center;
+  gap:.7rem;
+  font-weight:600;
+  font-size:.95rem;
+  color:var(--text);
+}
+.toggle-info i{
+  font-size:1.25rem;
+}
+
+/* Toggle Switch */
+.toggle-switch{
+  position:relative;
+  display:inline-block;
+  width:52px;
+  height:28px;
+  cursor:pointer;
+}
+.toggle-switch input{
+  opacity:0;
+  width:0;
+  height:0;
+}
+.toggle-slider{
+  position:absolute;
+  inset:0;
+  background:var(--line);
+  border-radius:28px;
+  transition:all .35s cubic-bezier(.4,0,.2,1);
+}
+.toggle-slider::before{
+  content:'';
+  position:absolute;
+  width:22px;height:22px;
+  left:3px;bottom:3px;
+  background:#fff;
+  border-radius:50%;
+  transition:all .35s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 2px 6px rgba(0,0,0,.25);
+}
+.toggle-switch input:checked + .toggle-slider{
+  background:linear-gradient(135deg,var(--gold),var(--gold-soft));
+}
+.toggle-switch input:checked + .toggle-slider::before{
+  transform:translateX(24px);
+}
+.toggle-switch input:not(:checked) + .toggle-slider{
+  background:#444;
+}
+
+/* Status Badge for Toggle */
+.payment-toggle-item.disabled .toggle-info{
+  opacity:.45;
+}
+.payment-toggle-item.active .toggle-info span::after{
+  content:' ✓';
+  color:var(--success);
+  margin-right:.3rem;
+  font-size:.8rem;
+}
+.payment-toggle-item.disabled .toggle-info span::after{
+  content:' ✕';
+  color:var(--danger);
+  margin-right:.3rem;
+  font-size:.8rem;
+}
+
+.payment-divider{
+  border:none;
+  border-top:2px dashed var(--line);
+  margin:1.5rem 0;
+  opacity:.5;
+}
 </style>
 </head>
 <body>
@@ -469,6 +569,52 @@
       
       <div class="card">
         <h3 style="margin-bottom:1.5rem">بيانات الدفع</h3>
+        
+        <!-- Payment Methods Toggle Section -->
+        <div class="payment-methods-control">
+          <h4 style="margin-bottom:1.2rem;font-family:'Cairo',sans-serif;color:var(--text)">
+            <i class='bx bx-toggle-left' style="color:var(--gold)"></i> تحكم في طرق الدفع
+          </h4>
+          <p style="color:var(--text-dim);font-size:.82rem;margin-bottom:1rem">شغل أو أطفِ أي طريقة دفع - الطرق المغلقة هتختفي من الموقع تلقائياً</p>
+          
+          <!-- Vodafone Toggle -->
+          <div class="payment-toggle-item">
+            <div class="toggle-info">
+              <i class='bx bx-mobile-alt' style="color:#e6007e"></i>
+              <span>فودافون كاش</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggleVodafone" checked onchange="togglePaymentMethod('vodafone')" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          
+          <!-- InstaPay Toggle -->
+          <div class="payment-toggle-item">
+            <div class="toggle-info">
+              <i class='bx bx-transfer' style="color:#00a8e8"></i>
+              <span>انستاباي (InstaPay)</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggleInstapay" checked onchange="togglePaymentMethod('instapay')" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          
+          <!-- COD Toggle -->
+          <div class="payment-toggle-item">
+            <div class="toggle-info">
+              <i class='bx bx-money' style="color:#25d366"></i>
+              <span>الدفع عند الاستلام</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggleCod" checked onchange="togglePaymentMethod('cod')" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <hr class="payment-divider" />
         
         <!-- Vodafone Cash Section -->
         <h4 style="margin:1.5rem 0 1rem;color:var(--gold);font-family:'Cairo',sans-serif;font-size:1rem">
@@ -1427,6 +1573,26 @@ function moveMarqueeMessage(i, dir) {
 }
 
 function loadSettings() {
+  // Load payment methods status (toggles)
+  db.ref("settings/paymentMethods").once("value").then(snap => {
+    const methods = snap.val() || {};
+    
+    // Vodafone
+    const vodEnabled = methods.vodafone !== false; // default true
+    document.getElementById("toggleVodafone").checked = vodEnabled;
+    updateToggleUI('vodafone', vodEnabled);
+    
+    // InstaPay
+    const instEnabled = methods.instapay !== false;
+    document.getElementById("toggleInstapay").checked = instEnabled;
+    updateToggleUI('instapay', instEnabled);
+    
+    // COD
+    const codEnabled = methods.cod !== false;
+    document.getElementById("toggleCod").checked = codEnabled;
+    updateToggleUI('cod', codEnabled);
+  });
+  
   db.ref("settings/payment").once("value").then(snap => {
     const s = snap.val() || {};
     document.getElementById("settingVodafone").value = s.vodafone || "";
@@ -1505,6 +1671,41 @@ function sendNotification() {
     document.getElementById("notifMessage").value = "";
   }).catch(() => showToast("حدث خطأ"));
 }
+
+// ====== Payment Methods Toggle Control ======
+function togglePaymentMethod(method) {
+  const checkbox = document.getElementById('toggle' + method.charAt(0).toUpperCase() + method.slice(1));
+  const isEnabled = checkbox.checked;
+  
+  // Update UI immediately
+  updateToggleUI(method, isEnabled);
+  
+  // Save to Firebase
+  db.ref("settings/paymentMethods/" + method).set(isEnabled)
+    .then(() => {
+      const statusText = isEnabled ? 'مفعّل' : 'معطّل';
+      showToast(`طريقة الدفع ${method} - ${statusText}`);
+    })
+    .catch(() => {
+      // Revert on error
+      checkbox.checked = !isEnabled;
+      updateToggleUI(method, !isEnabled);
+      showToast("حدث خطأ في الحفظ");
+    });
+}
+
+function updateToggleUI(method, isEnabled) {
+  const toggleItem = document.querySelector(`#toggle${method.charAt(0).toUpperCase() + method.slice(1)}`).closest('.payment-toggle-item');
+  
+  if (isEnabled) {
+    toggleItem.classList.remove('disabled');
+    toggleItem.classList.add('active');
+  } else {
+    toggleItem.classList.remove('active');
+    toggleItem.classList.add('disabled');
+  }
+}
+
 
 // ====== Utilities ======
 function closeModal(id) {
