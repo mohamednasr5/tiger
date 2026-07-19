@@ -284,13 +284,13 @@ function updateStockDisplay() {
   const stockEl = document.getElementById('stockIndicator');
   if (stockEl) {
     if (currentStockQty <= 0) {
-      stockEl.innerHTML = '<span style="color:#ff4757;font-weight:700"><i class='bx bx-x-circle'></i> غير متوفر حالياً</span>';
+      stockEl.innerHTML = '<span style="color:#ff4757;font-weight:700"><i class="bx bx-x-circle"></i> غير متوفر حالياً</span>';
       stockEl.className = 'stock-indicator out-of-stock';
     } else if (currentStockQty <= 5) {
-      stockEl.innerHTML = `<span style="color:#ffa502;font-weight:700"><i class='bx bx-error'></i> يتبقى ${currentStockQty} قطع فقط!</span>`;
+      stockEl.innerHTML = `<span style="color:#ffa502;font-weight:700"><i class="bx bx-error"></i> يتبقى ${currentStockQty} قطع فقط!</span>`;
       stockEl.className = 'stock-indicator low-stock';
     } else {
-      stockEl.innerHTML = `<span style="color:#2ed573;font-weight:700"><i class='bx bx-check-circle'></i> متوفر (${currentStockQty} قطعة)</span>`;
+      stockEl.innerHTML = `<span style="color:#2ed573;font-weight:700"><i class="bx bx-check-circle"></i> متوفر (${currentStockQty} قطعة)</span>`;
       stockEl.className = 'stock-indicator in-stock';
     }
   }
