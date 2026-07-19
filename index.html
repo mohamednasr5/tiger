@@ -480,8 +480,8 @@
         <a href="index.html" class="active">الرئيسية</a>
         <a href="#products">المنتجات</a>
         <a href="#deals-section">عروض مميزة 🔥</a>
-        <a href="#deals-section">الخصومات</a>
         <a href="size-guide.html">دليل المقاسات</a>
+        <a href="contact.html">تواصل معنا</a>
       </nav>
 
       <!-- Actions -->
@@ -754,12 +754,24 @@
         <a href="#products">المنتجات</a>
         <a href="#featured">العروض</a>
         <a href="track.html">تتبع الطلب</a>
+        <a href="contact.html">تواصل معنا</a>
+        <a href="faq.html">الأسئلة الشائعة</a>
       </div>
       <div class="footer-col">
         <h4>حسابي</h4>
         <a href="track.html">تتبع طلبي</a>
         <a href="cart.html">السلة</a>
         <a href="checkout.html">إتمام الشراء</a>
+        <a href="wishlist.html">المفضلة</a>
+      </div>
+      <div class="footer-col">
+        <h4>معلومات قانونية</h4>
+        <a href="about.html">من نحن</a>
+        <a href="privacy.html">سياسة الخصوصية</a>
+        <a href="terms.html">الشروط والأحكام</a>
+        <a href="cookies.html">سياسة الكوكيز</a>
+        <a href="disclaimer.html">إخلاء مسؤولية</a>
+        <a href="sitemap-page.html">خريطة الموقع</a>
       </div>
       <div class="footer-col">
         <h4>تواصل معنا</h4>
@@ -858,15 +870,14 @@
 <!-- Toast Notification -->
 <div class="toast" id="toast"></div>
 
-<!-- ====== Performance: Deferred JavaScript Loading ====== -->
-<!-- Firebase SDK - loaded with defer -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js" defer></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js" defer></script>
+<!-- ====== Firebase SDK (loaded without defer for proper initialization order) ====== -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
-<!-- App Scripts - loaded with defer -->
-<script src="js/config.js" defer></script>
-<script src="js/admin-enhancements.js" defer></script>
+<!-- App Scripts -->
+<script src="js/config.js"></script>
+<script src="js/admin-enhancements.js"></script>
 
 <!-- Main Application Script with all functionality preserved -->
 <script>
@@ -952,6 +963,37 @@ const SAMPLE_PRODUCTS = [
   { id: 'sample-11', name: 'جينز حريمي أزرق فاتح', category: 'جينز حريمي', price: 330, image: 'images/product-11.png', description: 'جينز حريمي بلون أزرق فاتح أنيق وأنيق', active: true },
   { id: 'sample-12', name: 'جينز شبابي رمادي', category: 'جينز شبابي', price: 310, image: 'images/product-12.png', description: 'جينز شبابي رمادي عصري ومريح', active: true }
 ];
+
+// ====== Fallback Function: Use Sample Data when Firebase is unavailable ======
+function useSampleDataFallback() {
+  if (productsLoadTimeout) {
+    clearTimeout(productsLoadTimeout);
+    productsLoadTimeout = null;
+  }
+  
+  console.log('📦 Loading sample fallback products...');
+  ALL_PRODUCTS = SAMPLE_PRODUCTS.map(p => ({
+    ...p,
+    images: [p.image, p.image],
+    sizes: ['28', '30', '32', '34', '36', '38'],
+    colors: [{ name: 'أزرق', value: 'blue' }]
+  }));
+  
+  usingSampleData = true;
+  buildCategoryFilters();
+  renderProducts();
+  renderDeals();
+  applySearchFromUrl();
+  
+  console.log(`✓ Loaded ${ALL_PRODUCTS.length} sample products`);
+  
+  // Start typewriter effect after products load
+  setTimeout(() => {
+    if (!document.querySelector('.hero-title.typing-cursor')) {
+      startHeroTypewriter();
+    }
+  }, 300);
+}
 
 let ALL_PRODUCTS = [];
 let ACTIVE_CAT = "all";
@@ -1524,6 +1566,9 @@ function toggleMobileNav() {
         <a href="cart.html" onclick="toggleMobileNav()"><i class='bx bx-cart'></i> السلة</a>
         <a href="orders.html" onclick="toggleMobileNav()"><i class='bx bx-receipt'></i> طلباتي</a>
         <a href="wishlist.html" onclick="toggleMobileNav()"><i class='bx bx-heart'></i> المفضلة</a>
+        <a href="contact.html" onclick="toggleMobileNav()"><i class='bx bx-phone'></i> تواصل معنا</a>
+        <a href="faq.html" onclick="toggleMobileNav()"><i class='bx bx-help-circle'></i> الأسئلة الشائعة</a>
+        <a href="track.html" onclick="toggleMobileNav()"><i class='bx bx-map'></i> تتبع الطلب</a>
       </div>
     `;
     document.body.appendChild(mobileNav);
