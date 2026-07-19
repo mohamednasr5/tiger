@@ -476,6 +476,7 @@
       <a href="#" data-tab="notifications" onclick="switchTab('notifications')"><i class='bx bx-bell'></i> الإشعارات</a>
       <a href="#" data-tab="preorders" onclick="switchTab('preorders')"><i class='bx bx-time-five'></i> الطلبات المسبقة <span class="nav-badge" id="navPreordersBadge" style="display:none">0</span></a>
       <a href="#" data-tab="sales-notifications" onclick="switchTab('sales-notifications')"><i class='bx bx-bullseye'></i> إشعارات المبيعات</a>
+      <a href="#" data-tab="finance" onclick="switchTab('finance')"><i class='bx bx-wallet'></i> المالية <span class="nav-badge" id="navStockAlertBadge" style="display:none;background:var(--danger)">!</span></a>
     </nav>
     <div style="margin-top:auto;padding:1rem">
       <button class="btn-secondary full-width" onclick="doLogout()" style="font-size:.85rem"><i class='bx bx-log-out'></i> تسجيل الخروج</button>
@@ -525,6 +526,11 @@
       <a href="#" onclick="closeMoreMenu();switchTab('sales-notifications')" class="more-menu-item">
         <i class='bx bx-bullseye'></i>
         <div><b>إشعارات المبيعات</b><small>نوافذ المبيعات المنبثقة</small></div>
+      </a>
+      <a href="#" onclick="closeMoreMenu();switchTab('finance')" class="more-menu-item">
+        <i class='bx bx-wallet'></i>
+        <div><b>لوحة المالية</b><small>مبيعات، مصاريف، أرباح، مخزون</small></div>
+        <span class="bn-badge" id="navStockAlertBadgeMobile" style="display:none;background:var(--danger)">!</span>
       </a>
     </div>
   </div>
@@ -995,6 +1001,134 @@
       </div>
     </div>
 
+    <!-- Finance Tab - Financial Dashboard -->
+    <div class="tab-content hidden" id="tab-finance">
+      <div class="admin-top">
+        <h2><i class='bx bx-wallet' style='margin-left:.5rem;color:var(--gold)'></i> لوحة المالية</h2>
+        <button class="btn-secondary" onclick="refreshFinanceData()"><i class='bx bx-refresh'></i> تحديث البيانات</button>
+      </div>
+
+      <!-- Low Stock Alerts Section -->
+      <div class="card" style="margin-bottom:1.5rem;border:2px solid var(--danger);background:rgba(255,71,87,.05)">
+        <h3 style="color:var(--danger);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem">
+          <i class='bx bx-error-circle'></i> تنبيهات انخفاض المخزون
+          <span class="nav-badge" id="stockAlertCount" style="display:none;background:var(--danger)">0</span>
+        </h3>
+        <div id="lowStockAlertsList">
+          <p style="color:var(--text-dim);text-align:center;padding:1rem">جاري فحص المخزون...</p>
+        </div>
+      </div>
+
+      <!-- Date Range Selector -->
+      <div style="display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center">
+        <div class="field" style="margin:0;flex:1;min-width:150px">
+          <label style="font-size:.85rem">من تاريخ</label>
+          <input type="date" id="financeDateFrom" onchange="updateFinanceDashboard()" />
+        </div>
+        <div class="field" style="margin:0;flex:1;min-width:150px">
+          <label style="font-size:.85rem">إلى تاريخ</label>
+          <input type="date" id="financeDateTo" onchange="updateFinanceDashboard()" />
+        </div>
+        <button class="btn-secondary" onclick="setTodayRange()" style="height:fit-content;margin-top:auto">اليوم</button>
+        <button class="btn-secondary" onclick="setThisMonthRange()" style="height:fit-content;margin-top:auto">هذا الشهر</button>
+        <button class="btn-secondary" onclick="clearDateRange()" style="height:fit-content;margin-top:auto">الكل</button>
+      </div>
+
+      <!-- Financial KPIs Grid -->
+      <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-bottom:1.5rem">
+        <!-- Daily Sales -->
+        <div class="kpi-card" style="border-right:4px solid #4caf50">
+          <span class="kpi-label"><i class='bx bx-trending-up' style='color:#4caf50'></i> مبيعات اليوم</span>
+          <div class="kpi-value" id="financeDailySales">0 ج.م</div>
+          <small style="color:var(--text-dim)" id="financeDailyOrdersCount">(0 طلب)</small>
+        </div>
+        <!-- Daily Shipping -->
+        <div class="kpi-card" style="border-right:4px solid #ff9800">
+          <span class="kpi-label"><i class='bx bxs-truck' style='color:#ff9800'></i> شحن اليوم</span>
+          <div class="kpi-value" id="financeDailyShipping">0 ج.م</div>
+          <small style="color:var(--text-dim)">(مصاريف مدفوعة)</small>
+        </div>
+        <!-- Daily Profit -->
+        <div class="kpi-card" style="border-right:4px solid var(--gold)">
+          <span class="kpi-label"><i class='bx bx-coin-stack' style='color:var(--gold)'></i> ربح اليوم</span>
+          <div class="kpi-value" id="financeDailyProfit">0 ج.م</div>
+          <small style="color:var(--text-dim)">(صافي بعد المصاريف)</small>
+        </div>
+        <!-- Monthly Sales -->
+        <div class="kpi-card" style="border-right:4px solid #2196f3">
+          <span class="kpi-label"><i class='bx bx-calendar' style='color:#2196f3'></i> مبيعات الشهر</span>
+          <div class="kpi-value" id="financeMonthlySales">0 ج.م</div>
+          <small style="color:var(--text-dim)" id="financeMonthlyOrdersCount">(0 طلب)</small>
+        </div>
+        <!-- Monthly Shipping -->
+        <div class="kpi-card" style="border-right:4px solid #9c27b0">
+          <span class="kpi-label"><i class='bx bxs-truck' style='color:#9c27b0'></i> شحن الشهر</span>
+          <div class="kpi-value" id="financeMonthlyShipping">0 ج.م</div>
+          <small style="color:var(--text-dim)">(إجمالي مصاريف)</small>
+        </div>
+        <!-- Monthly Profit -->
+        <div class="kpi-card" style="border-right:4px solid #00bcd4">
+          <span class="kpi-label"><i class='bx bx-coin-stack' style='color:#00bcd4'></i> ربح الشهر</span>
+          <div class="kpi-value" id="financeMonthlyProfit">0 ج.م</div>
+          <small style="color:var(--text-dim)">(صافي الربح)</small>
+        </div>
+      </div>
+
+      <!-- Detailed Tables Row -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+        <!-- Orders with Profit Details -->
+        <div class="card" style="padding:0;overflow:hidden">
+          <h4 style="padding:1rem;margin:0;border-bottom:1px solid var(--line)">
+            <i class='bx bx-receipt' style='margin-left:.5rem'></i> آخر الطلبات مع تفاصيل الأرباح
+          </h4>
+          <table class="data-table">
+            <thead><tr><th>المنتج</th><th>سعر البيع</th><th>التكلفة</th><th>الربح</th></tr></thead>
+            <tbody id="financeOrdersTable">
+              <tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:1.5rem">جاري التحميل...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Shipping Costs Breakdown -->
+        <div class="card" style="padding:0;overflow:hidden">
+          <h4 style="padding:1rem;margin:0;border-bottom:1px solid var(--line)">
+            <i class='bx bxs-truck' style='margin-left:.5rem'></i> تفاصيل مصاريف الشحن
+          </h4>
+          <table class="data-table">
+            <thead><tr><th>المدينة</th><th>عدد الطلبات</th><th>إجمالي الشحن</th></tr></thead>
+            <tbody id="financeShippingTable">
+              <tr><td colspan="3" style="text-align:center;color:var(--text-dim);padding:1.5rem">جاري التحميل...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Profit Summary -->
+      <div class="card" style="margin-top:1.5rem;background:linear-gradient(135deg,rgba(212,175,55,.1),rgba(212,175,55,.05))">
+        <h4 style="margin-bottom:1rem;display:flex;align-items:center;gap:.5rem">
+          <i class='bx bx-pie-chart-alt' style='color:var(--gold)'></i> ملخص الأرباح
+        </h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;text-align:center">
+          <div style="padding:1rem;background:var(--surface);border-radius:10px">
+            <p style="color:var(--text-dim);font-size:.82rem;margin:0 0 .5rem">إجمالي المبيعات</p>
+            <strong style="font-size:1.3rem;color:#4caf50" id="financeTotalSales">0 ج.م</strong>
+          </div>
+          <div style="padding:1rem;background:var(--surface);border-radius:10px">
+            <p style="color:var(--text-dim);font-size:.82rem;margin:0 0 .5rem">إجمالي تكلفة البضاعة</p>
+            <strong style="font-size:1.3rem;color:#ff5722" id="financeTotalCost">0 ج.م</strong>
+          </div>
+          <div style="padding:1rem;background:var(--surface);border-radius:10px">
+            <p style="color:var(--text-dim);font-size:.82rem;margin:0 0 .5rem">إجمالي الشحن</p>
+            <strong style="font-size:1.3rem;color:#ff9800" id="financeTotalShipping">0 ج.م</strong>
+          </div>
+          <div style="padding:1rem;background:var(--surface);border-radius:10px;border:2px solid var(--gold)">
+            <p style="color:var(--text-dim);font-size:.82rem;margin:0 0 .5rem">صافي الربح الإجمالي</p>
+            <strong style="font-size:1.5rem;color:var(--gold)" id="financeNetProfit">0 ج.م</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -1081,8 +1215,13 @@
     
     <div class="field"><label>اسم المنتج</label><input id="pName" /></div>
     <div class="row2">
-      <div class="field"><label>السعر (ج.م)</label><input id="pPrice" type="number" /></div>
+      <div class="field"><label>سعر البيع (ج.م)</label><input id="pPrice" type="number" /></div>
       <div class="field"><label>السعر القديم (اختياري)</label><input id="pOldPrice" type="number" /></div>
+    </div>
+    <div class="field admin-only-field">
+      <label><i class='bx bx-lock-alt' style='color:var(--gold)'></i> سعر التكلفة الفعلي (ج.م) - <span style='color:var(--danger);font-size:.82rem'>يظهر فقط في لوحة التحكم</span></label>
+      <input id="pCostPrice" type="number" placeholder="سعر الشراء/التكلفة لحساب الأرباح" />
+      <small style='color:var(--text-dim);font-size:.75rem;display:block;margin-top:.3rem'>هذا الحقل لا يظهر للعملاء - يُستخدم فقط لحساب صافي الربح</small>
     </div>
     <div class="field"><label>الوصف</label><textarea id="pDesc" rows="2"></textarea></div>
     <div class="field"><label>الفئة</label><input id="pCategory" placeholder="مثال: جينز، قمصان..." /></div>
@@ -1390,6 +1529,7 @@ function openProductModal(id=null) {
     document.getElementById("pName").value = "";
     document.getElementById("pPrice").value = "";
     document.getElementById("pOldPrice").value = "";
+    document.getElementById("pCostPrice").value = "";
     document.getElementById("pDesc").value = "";
     document.getElementById("pCategory").value = "";
     document.getElementById("pFeatured").checked = false;
@@ -1412,6 +1552,7 @@ function editProduct(id) {
   document.getElementById("pName").value = p.name || "";
   document.getElementById("pPrice").value = p.price || "";
   document.getElementById("pOldPrice").value = p.oldPrice || "";
+  document.getElementById("pCostPrice").value = p.costPrice || "";
   document.getElementById("pDesc").value = p.description || "";
   document.getElementById("pCategory").value = p.category || "";
   document.getElementById("pFeatured").checked = p.featured || false;
@@ -1438,6 +1579,7 @@ async function saveProduct() {
   const name = document.getElementById("pName").value.trim();
   const price = parseFloat(document.getElementById("pPrice").value);
   const oldPrice = parseFloat(document.getElementById("pOldPrice").value) || null;
+  const costPrice = parseFloat(document.getElementById("pCostPrice").value) || null;
   const desc = document.getElementById("pDesc").value.trim();
   const category = document.getElementById("pCategory").value.trim();
   const featured = document.getElementById("pFeatured").checked;
@@ -1463,6 +1605,7 @@ async function saveProduct() {
     name,
     price,
     oldPrice,
+    costPrice, // Hidden from customers, used for profit calculation
     description: desc,
     category,
     sizes: tempSizes,
@@ -2214,6 +2357,409 @@ function testSalesPopup() {
     }
   });
 }
+
+// ============================================================
+// 💰 FINANCE DASHBOARD & LOW STOCK ALERTS
+// ============================================================
+
+let financeData = {
+  orders: [],
+  products: [],
+  shippingRates: {},
+  lowStockItems: []
+};
+
+/**
+ * Initialize Finance Dashboard - called when switching to finance tab
+ */
+function initFinanceDashboard() {
+  console.log('[Finance] Initializing dashboard...');
+  
+  // Set default date range (today)
+  setTodayRange();
+  
+  // Load all data
+  refreshFinanceData();
+}
+
+/**
+ * Refresh all financial data
+ */
+async function refreshFinanceData() {
+  console.log('[Finance] Refreshing data...');
+  
+  try {
+    // Load orders
+    const ordersSnap = await db.ref('orders').once('value');
+    financeData.orders = [];
+    ordersSnap.forEach(child => {
+      financeData.orders.push({id: child.key, ...child.val()});
+    });
+    
+    // Load products (for cost prices)
+    const productsSnap = await db.ref('products').once('value');
+    financeData.products = [];
+    productsSnap.forEach(child => {
+      financeData.products.push({id: child.key, ...child.val()});
+    });
+    
+    // Load shipping rates
+    const shippingSnap = await db.ref('shippingRates').once('value');
+    financeData.shippingRates = shippingSnap.val() || {};
+    
+    // Update all displays
+    updateFinanceDashboard();
+    checkLowStockAlerts();
+    
+    console.log('[Finance] Data loaded successfully');
+  } catch (error) {
+    console.error('[Finance] Error loading data:', error);
+    showToast('خطأ في تحميل البيانات المالية');
+  }
+}
+
+/**
+ * Update finance dashboard with current date range
+ */
+function updateFinanceDashboard() {
+  const dateFrom = document.getElementById('financeDateFrom')?.value;
+  const dateTo = document.getElementById('financeDateTo')?.value;
+  
+  // Filter orders by date range
+  let filteredOrders = financeData.orders;
+  
+  if (dateFrom || dateTo) {
+    filteredOrders = filteredOrders.filter(order => {
+      if (!order.createdAt) return false;
+      const orderDate = new Date(order.createdAt).toISOString().split('T')[0];
+      
+      if (dateFrom && orderDate < dateFrom) return false;
+      if (dateTo && orderDate > dateTo) return false;
+      
+      return true;
+    });
+  }
+  
+  // Calculate daily stats (today)
+  const today = new Date().toISOString().split('T')[0];
+  const todayOrders = financeData.orders.filter(o => {
+    if (!o.createdAt) return false;
+    return new Date(o.createdAt).toISOString().split('T')[0] === today;
+  });
+  
+  // Calculate monthly stats (this month)
+  const thisMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+  const monthOrders = financeData.orders.filter(o => {
+    if (!o.createdAt) return false;
+    return new Date(o.createdAt).toISOString().slice(0, 7) === thisMonth;
+  });
+  
+  // Calculate totals
+  const calcOrderStats = (orders) => {
+    let totalSales = 0;
+    let totalCost = 0;
+    let totalShipping = 0;
+    
+    orders.forEach(order => {
+      totalSales += order.total || 0;
+      totalShipping += order.shippingCost || getShippingCostForCity(order.city);
+      
+      // Calculate cost from items
+      if (order.items) {
+        order.items.forEach(item => {
+          const product = financeData.products.find(p => p.id === item.id || p.name === item.name);
+          if (product && product.costPrice) {
+            totalCost += (product.costPrice * (item.qty || 1));
+          }
+        });
+      }
+    });
+    
+    return { sales: totalSales, cost: totalCost, shipping: totalShipping, profit: totalSales - totalCost - totalShipping };
+  };
+  
+  const todayStats = calcOrderStats(todayOrders);
+  const monthStats = calcOrderStats(monthOrders);
+  const totalStats = calcOrderStats(filteredOrders.length > 0 ? filteredOrders : financeData.orders);
+  
+  // Update KPI cards
+  document.getElementById('financeDailySales').textContent = fmtPrice(todayStats.sales);
+  document.getElementById('financeDailyShipping').textContent = fmtPrice(todayStats.shipping);
+  document.getElementById('financeDailyProfit').textContent = fmtPrice(todayStats.profit);
+  document.getElementById('financeDailyOrdersCount').textContent = `(${todayOrders.length} طلب)`;
+  
+  document.getElementById('financeMonthlySales').textContent = fmtPrice(monthStats.sales);
+  document.getElementById('financeMonthlyShipping').textContent = fmtPrice(monthStats.shipping);
+  document.getElementById('financeMonthlyProfit').textContent = fmtPrice(monthStats.profit);
+  document.getElementById('financeMonthlyOrdersCount').textContent = `(${monthOrders.length} طلب)`;
+  
+  // Update summary
+  document.getElementById('financeTotalSales').textContent = fmtPrice(totalStats.sales);
+  document.getElementById('financeTotalCost').textContent = fmtPrice(totalStats.cost);
+  document.getElementById('financeTotalShipping').textContent = fmtPrice(totalStats.shipping);
+  document.getElementById('financeNetProfit').textContent = fmtPrice(totalStats.profit);
+  
+  // Update orders table with profit details
+  renderFinanceOrdersTable(filteredOrders.slice(-10)); // Last 10 orders
+  
+  // Update shipping breakdown table
+  renderFinanceShippingTable(filteredOrders);
+}
+
+/**
+ * Get shipping cost for a city
+ */
+function getShippingCostForCity(city) {
+  if (!city || !financeData.shippingRates) return 0;
+  
+  // Try exact match first
+  if (financeData.shippingRates[city]) {
+    return parseFloat(financeData.shippingRates[city]) || 0;
+  }
+  
+  // Try partial match
+  for (const [rateCity, cost] of Object.entries(financeData.shippingRates)) {
+    if (city.includes(rateCity) || rateCity.includes(city)) {
+      return parseFloat(cost) || 0;
+    }
+  }
+  
+  return 0; // Default if not found
+}
+
+/**
+ * Render orders table with profit calculation
+ */
+function renderFinanceOrdersTable(orders) {
+  const tbody = document.getElementById('financeOrdersTable');
+  if (!tbody) return;
+  
+  if (!orders || orders.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:1.5rem">لا توجد طلبات</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = orders.map(order => {
+    let itemCost = 0;
+    let itemSale = 0;
+    
+    if (order.items) {
+      order.items.forEach(item => {
+        const product = financeData.products.find(p => p.id === item.id || p.name === item.name);
+        itemSale += (item.price || 0) * (item.qty || 1);
+        if (product && product.costPrice) {
+          itemCost += (product.costPrice * (item.qty || 1));
+        }
+      });
+    }
+    
+    const profit = itemSale - itemCost;
+    const profitColor = profit >= 0 ? '#4caf50' : '#ff5722';
+    const productName = order.items?.[0]?.name || 'منتج متعدد';
+    
+    return `<tr>
+      <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${productName}">${productName}</td>
+      <td style="color:#4caf50;font-weight:600">${fmtPrice(itemSale)}</td>
+      <td style="color:#ff5722">${fmtPrice(itemCost)}</td>
+      <td style="color:${profitColor};font-weight:700">${fmtPrice(profit)}</td>
+    </tr>`;
+  }).join('');
+}
+
+/**
+ * Render shipping costs breakdown by city
+ */
+function renderFinanceShippingTable(orders) {
+  const tbody = document.getElementById('financeShippingTable');
+  if (!tbody) return;
+  
+  if (!orders || orders.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--text-dim);padding:1.5rem">لا توجد بيانات</td></tr>';
+    return;
+  }
+  
+  // Group by city
+  const cityGroups = {};
+  orders.forEach(order => {
+    const city = order.city || 'غير محدد';
+    if (!cityGroups[city]) {
+      cityGroups[city] = { count: 0, shippingTotal: 0 };
+    }
+    cityGroups[city].count++;
+    cityGroups[city].shippingTotal += order.shippingCost || getShippingCostForCity(city);
+  });
+  
+  // Sort by shipping total descending
+  const sortedCities = Object.entries(cityGroups)
+    .sort((a, b) => b[1].shippingTotal - a[1].shippingTotal)
+    .slice(0, 10); // Top 10 cities
+  
+  if (sortedCities.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--text-dim);padding:1.5rem">لا توجد بيانات شحن</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = sortedCities.map(([city, data]) => `
+    <tr>
+      <td>${city}</td>
+      <td style="text-align:center">${data.count}</td>
+      <td style="font-weight:600;color:#ff9800">${fmtPrice(data.shippingTotal)}</td>
+    </tr>
+  `).join('');
+}
+
+/**
+ * Check for low stock items (quantity <= 2)
+ */
+function checkLowStockAlerts() {
+  const alertsContainer = document.getElementById('lowStockAlertsList');
+  const badge = document.getElementById('stockAlertCount');
+  const badgeMobile = document.getElementById('navStockAlertBadgeMobile');
+  
+  if (!alertsContainer) return;
+  
+  const lowStockItems = [];
+  
+  // Check each product's stock
+  financeData.products.forEach(product => {
+    if (!product.stock || product.active === false) return;
+    
+    const stock = product.stock;
+    
+    Object.entries(stock).forEach(([key, qty]) => {
+      if (qty <= 2 && qty >= 0) {
+        const [size, color] = key.split('_');
+        lowStockItems.push({
+          productId: product.id,
+          productName: product.name,
+          size: size,
+          color: color,
+          quantity: qty
+        });
+      }
+    });
+  });
+  
+  financeData.lowStockItems = lowStockItems;
+  
+  // Update badge
+  if (lowStockItems.length > 0) {
+    if (badge) {
+      badge.textContent = lowStockItems.length;
+      badge.style.display = 'inline-flex';
+    }
+    if (badgeMobile) {
+      badgeMobile.textContent = lowStockItems.length;
+      badgeMobile.style.display = 'inline-flex';
+    }
+  } else {
+    if (badge) badge.style.display = 'none';
+    if (badgeMobile) badgeMobile.style.display = 'none';
+  }
+  
+  // Render alerts list
+  if (lowStockItems.length === 0) {
+    alertsContainer.innerHTML = `
+      <div style="text-align:center;padding:1.5rem">
+        <i class='bx bx-check-circle' style='font-size:2.5rem;color:#4caf50;display:block;margin-bottom:.5rem'></i>
+        <p style="color:#4caf50;font-weight:600">جميع المخزون في مستوى آمن ✅</p>
+        <p style="color:var(--text-dim);font-size:.82rem">جميع المقاسات والألوان لديها كمية أكبر من 2</p>
+      </div>
+    `;
+  } else {
+    alertsContainer.innerHTML = `
+      <p style="color:var(--danger);margin-bottom:1rem;font-weight:600">
+        <i class='bx bx-warning'></i> يوجد ${lowStockItems.length} منتج/مقاس يحتاج إعادة تخزين:
+      </p>
+      <div style="display:flex;flex-direction:column;gap:.6rem;max-height:250px;overflow-y:auto">
+        ${lowStockItems.map(item => `
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:.7rem;background:rgba(255,71,87,.08);border-radius:8px;border:1px solid rgba(255,71,87,.2)">
+            <div>
+              <strong style="font-size:.9rem">${item.productName}</strong>
+              <span style="color:var(--text-dim);font-size:.82rem;display:block;margin-top:.2rem">
+                ${item.size}${item.color ? ` / ${item.color}` : ''}
+              </span>
+            </div>
+            <div style="text-align:left">
+              <span style="background:${item.quantity === 0 ? 'var(--danger)' : 'var(--warning)'};color:#fff;padding:.25rem .7rem;border-radius:20px;font-weight:700;font-size:.85rem">
+                ${item.quantity === 0 ? 'نفذ' : `${item.quantity} متبقي`}
+              </span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+}
+
+/**
+ * Format price for display
+ */
+function fmtPrice(price) {
+  if (!price && price !== 0) return '0 ج.م';
+  return Number(price).toLocaleString('ar-EG') + ' ج.م';
+}
+
+/**
+ * Set date range to today only
+ */
+function setTodayRange() {
+  const today = new Date().toISOString().split('T')[0];
+  const fromInput = document.getElementById('financeDateFrom');
+  const toInput = document.getElementById('financeDateTo');
+  if (fromInput) fromInput.value = today;
+  if (toInput) toInput.value = today;
+  updateFinanceDashboard();
+}
+
+/**
+ * Set date range to this month
+ */
+function setThisMonthRange() {
+  const now = new Date();
+  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+  const lastDay = now.toISOString().split('T')[0];
+  const fromInput = document.getElementById('financeDateFrom');
+  const toInput = document.getElementById('financeDateTo');
+  if (fromInput) fromInput.value = firstDay;
+  if (toInput) toInput.value = lastDay;
+  updateFinanceDashboard();
+}
+
+/**
+ * Clear date range (show all data)
+ */
+function clearDateRange() {
+  const fromInput = document.getElementById('financeDateFrom');
+  const toInput = document.getElementById('financeDateTo');
+  if (fromInput) fromInput.value = '';
+  if (toInput) toInput.value = '';
+  updateFinanceDashboard();
+}
+
+// Auto-initialize finance when tab is shown
+const originalSwitchTab = window.switchTab || function(tab) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+  document.querySelectorAll('.sidebar-nav a, .admin-bottom-nav a').forEach(a => a.classList.remove('active'));
+  const target = document.getElementById('tab-' + tab);
+  if (target) target.classList.remove('hidden');
+  document.querySelectorAll(`[data-tab="${tab}"]`).forEach(a => a.classList.add('active'));
+  
+  // Initialize finance tab when opened
+  if (tab === 'finance') {
+    initFinanceDashboard();
+  }
+};
+
+window.switchTab = originalSwitchTab;
+
+// Make functions globally available
+window.refreshFinanceData = refreshFinanceData;
+window.updateFinanceDashboard = updateFinanceDashboard;
+window.initFinanceDashboard = initFinanceDashboard;
+window.setTodayRange = setTodayRange;
+window.setThisMonthRange = setThisMonthRange;
+window.clearDateRange = clearDateRange;
 </script>
 </body>
 </html>
