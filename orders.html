@@ -76,6 +76,22 @@
 .order-actions a{font-size:.82rem;font-weight:700;color:var(--gold)}
 .order-actions a:hover{text-decoration:underline}
 
+/* Tracking Button */
+.tracking-btn{
+  display:inline-flex;align-items:center;gap:.4rem;
+  background:linear-gradient(135deg,#3b82f6,#1d4ed8);
+  color:#fff !important;
+  padding:.5rem 1rem;border-radius:10px;
+  font-size:.82rem;font-weight:700;
+  text-decoration:none;transition:.2s;
+  box-shadow:0 2px 8px rgba(59,130,246,.3);
+}
+.tracking-btn:hover{
+  transform:translateY(-1px);box-shadow:0 4px 12px rgba(59,130,246,.4);
+  text-decoration:none !important;
+}
+.tracking-btn i{font-size:1rem}
+
 .timeline{border-right:2px solid var(--line);margin-right:12px;padding-right:1.8rem;margin-top:1.2rem}
 .timeline-item{position:relative;padding-bottom:1.4rem}
 .timeline-item::before{content:'';position:absolute;right:-1.6rem;top:.25rem;width:14px;height:14px;border-radius:50%;background:var(--line);border:3px solid var(--bg)}
@@ -187,6 +203,32 @@ const STATUS_LABELS = {
 const STATUS_ORDER = ["pending", "confirmed", "shipping", "delivered"];
 
 let myAllOrders = [];
+
+// ====== Tracking URL Helper ======
+function getTrackingUrl(company, trackingNumber) {
+  if (!trackingNumber) return "#";
+  const urls = {
+    bosta: `https://bosta.co/ar-eg/tracking-shipments?shipment-number=${trackingNumber}`,
+    aramex: `https://www.aramex.com/track/details?ShipmentNumber=${trackingNumber}`,
+    smsa: `https://smsaexpress.com/tracking?tracknumbers=${trackingNumber}`,
+    dhl: `https://www.dhl.com/eg-en/tracking.html?tracking-id=${trackingNumber}`,
+    fedex: `https://www.fedex.com/fedextrack/?trknbr=${trackingNumber}`,
+    other: "#"
+  };
+  return urls[company] || urls.bosta;
+}
+
+function getShippingCompanyName(companyKey) {
+  const companies = {
+    bosta: "بوستا (Bosta)",
+    aramex: "أرامكس (Aramex)",
+    smsa: "سمسا (SMSA)",
+    dhl: "DHL",
+    fedex: "FedEx",
+    other: "شركة شحن"
+  };
+  return companies[companyKey] || companyKey;
+}
 let myActiveFilter = "all";
 
 // ====== Entry point: try uid first (if logged in), then saved phone ======
@@ -301,7 +343,11 @@ function renderMyOrders() {
 
       <div class="order-card-footer">
         <div class="order-actions">
-          <a href="track.html">تتبع الطلب بالتفصيل <i class='bx bx-right-arrow-alt'></i></a>
+          ${o.status === 'shipping' && o.trackingNumber ? `
+            <a href="${getTrackingUrl(o.shippingCompany, o.trackingNumber)}" target="_blank" rel="noopener" class="tracking-btn">
+              <i class='bx bx-truck'></i> تتبع طلبك مع ${getShippingCompanyName(o.shippingCompany)} لحظة بلحظة
+            </a>
+          ` : `<a href="track.html">تتبع الطلب بالتفصيل <i class='bx bx-right-arrow-alt'></i></a>`}
         </div>
         <button class="timeline-toggle" onclick="document.getElementById('order-${o.id}').classList.toggle('open')">
           <i class='bx bx-chevron-down'></i> عرض مراحل الطلب

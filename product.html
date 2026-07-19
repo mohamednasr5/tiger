@@ -306,7 +306,7 @@ function updateActionButton() {
   
   if (currentStockQty <= 0) {
     actionDiv.innerHTML = `
-      <button class="btn-primary" style="flex:1;justify-content:center;padding:1rem;background:linear-gradient(135deg,#ff6b81,#ff4757)" onclick="openPreorderModal('${pid}', '${PRODUCT?.name || ''}', '${selSize}', '${selColor}')">
+      <button class="btn-primary" style="flex:1;justify-content:center;padding:1rem;background:linear-gradient(135deg,#ff6b81,#ff4757)" onclick="showPreorderModal('${pid}', '${PRODUCT?.name || ''}', '${selSize}', '${selColor}')">
         <i class='bx bx-time-five'></i> طلب مسبق
       </button>
       <button class="btn-secondary wishlist-btn" data-id="${pid}" style="padding:1rem 1.2rem" onclick="toggleWishlistDetail()" id="pdWishlistBtn">

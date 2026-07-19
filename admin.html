@@ -922,6 +922,42 @@
   </div>
 </div>
 
+<div class="modal-backdrop" id="trackingModal">
+  <div class="modal-box" style="width:460px">
+    <div class="modal-header">
+      <h3><i class='bx bx-package' style="margin-left:.5rem"></i> بيانات الشحن والتتبع</h3>
+      <button class="modal-close" onclick="closeTrackingModal()">&times;</button>
+    </div>
+    
+    <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:1.2rem">أدخل بيانات الشحن ليتمكن العميل من تتبع طلبه لحظة بلحظة</p>
+    
+    <div class="field">
+      <label>شركة الشحن</label>
+      <select id="shippingCompanySelect" style="width:100%">
+        <option value="bosta">🚚 بوستا (Bosta)</option>
+        <option value="aramex">✈️ أرامكس (Aramex)</option>
+        <option value="smsa">📦 سمسا (SMSA)</option>
+        <option value="dhl">🌍 DHL</option>
+        <option value="fedex">🌐 FedEx</option>
+        <option value="other">📋 أخرى</option>
+      </select>
+    </div>
+    
+    <div class="field">
+      <label>رقم الت跟踪 (Shipment Number)</label>
+      <input id="trackingNumberInput" type="text" placeholder="مثال: 1461025956" style="direction:ltr;text-align:left;font-family:'Cairo',monospace" />
+      <p style="color:var(--text-dim);font-size:.75rem;margin-top:.3rem">هذا الرقم هيوصل للعميل كرابط تتبع مباشر</p>
+    </div>
+    
+    <input type="hidden" id="trackingOrderId" value="" />
+    
+    <div style="display:flex;gap:.8rem;margin-top:1.5rem">
+      <button class="btn-primary" style="flex:1" onclick="saveTrackingInfo()"><i class='bx bx-check-double' style="margin-left:.4rem"></i> حفظ وتأكيد الشحن</button>
+      <button class="btn-secondary" onclick="closeTrackingModal()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-backdrop" id="bulkShippingModal">
   <div class="modal-box" style="width:420px">
     <div class="modal-header">
@@ -1530,6 +1566,7 @@ function renderOrdersTable(list) {
         <select class="status-select" onchange="updateOrderStatus('${o.id}',this.value)">
           ${Object.entries(STATUS_LABELS).map(([k,v])=>`<option value="${k}" ${o.status===k?'selected':''}>${v}</option>`).join("")}
         </select>
+        ${o.status === 'shipping' && o.trackingNumber ? `<div style="margin-top:.4rem"><a href="${getTrackingUrl(o.shippingCompany, o.trackingNumber)}" target="_blank" style="font-size:.72rem;color:var(--gold);text-decoration:none;display:inline-flex;align-items:center;gap:.3rem"><i class='bx bx-link-external'></i> تتبع</a><button onclick="event.stopPropagation();editTrackingInfo('${o.id}')" style="background:none;border:none;color:var(--text-dim);font-size:.7rem;cursor:pointer;margin-right:.4rem" title="تعديل"><i class='bx bx-edit'></i></button></div>` : ''}
       </td>
       <td>
         <button class="action-btn" style="width:32px;height:32px;font-size:.9rem" onclick="viewOrder('${o.id}')" title="عرض"><i class='bx bx-show'></i></button>
@@ -1559,8 +1596,17 @@ function filterOrders(q) {
   ));
 }
 
+let pendingTrackingOrderId = null;
+
 async function updateOrderStatus(orderId, newStatus) {
   try {
+    // If changing to shipping status, show tracking info modal first
+    if (newStatus === "shipping") {
+      pendingTrackingOrderId = orderId;
+      openTrackingModal(orderId);
+      return;
+    }
+    
     const statusNote = `تم تغيير الحالة إلى: ${STATUS_LABELS[newStatus]}`;
     await db.ref("orders/" + orderId).update({
       status: newStatus,
@@ -1576,6 +1622,97 @@ async function updateOrderStatus(orderId, newStatus) {
   } catch (e) {
     showToast("حدث خطأ");
   }
+}
+
+// ====== Tracking Modal for Shipping ======
+function openTrackingModal(orderId) {
+  const order = allOrders.find(o => o.id === orderId);
+  if (!order) return;
+  
+  // Pre-fill if tracking info already exists
+  document.getElementById("trackingNumberInput").value = order.trackingNumber || "";
+  document.getElementById("shippingCompanySelect").value = order.shippingCompany || "bosta";
+  document.getElementById("trackingOrderId").value = orderId;
+  
+  document.getElementById("trackingModal").classList.add("show");
+}
+
+function closeTrackingModal() {
+  document.getElementById("trackingModal").classList.remove("show");
+  pendingTrackingOrderId = null;
+}
+
+async function saveTrackingInfo() {
+  const orderId = document.getElementById("trackingOrderId").value;
+  const trackingNumber = document.getElementById("trackingNumberInput").value.trim();
+  const shippingCompany = document.getElementById("shippingCompanySelect").value;
+  
+  if (!trackingNumber) {
+    showToast("يرجى إدخال رقم التتبع");
+    return;
+  }
+  
+  try {
+    const statusNote = `تم تغيير الحالة إلى: ${STATUS_LABELS["shipping"]} - تم الشحن عبر ${getShippingCompanyName(shippingCompany)}`;
+    
+    await db.ref("orders/" + orderId).update({
+      status: "shipping",
+      trackingNumber: trackingNumber,
+      shippingCompany: shippingCompany,
+      statusHistory: firebase.database.ServerValue.TIMESTAMP
+    });
+    
+    // Add to history
+    await db.ref("orders/" + orderId + "/statusHistory").push({
+      status: "shipping",
+      note: statusNote,
+      ts: Date.now(),
+      trackingNumber: trackingNumber,
+      shippingCompany: shippingCompany
+    });
+    
+    closeTrackingModal();
+    showToast("تم تحديث حالة الطلب وإضافة رقم التتبع");
+  } catch (e) {
+    showToast("حدث خطأ أثناء الحفظ");
+  }
+}
+
+function getShippingCompanyName(companyKey) {
+  const companies = {
+    bosta: "بوستا (Bosta)",
+    aramex: "أرامكس (Aramex)",
+    smsa: "سمسا (SMSA)",
+    dhl: "DHL",
+    fedex: "FedEx",
+    other: "أخرى"
+  };
+  return companies[companyKey] || companyKey;
+}
+
+async function editTrackingInfo(orderId) {
+  const order = allOrders.find(o => o.id === orderId);
+  if (!order) return;
+  
+  pendingTrackingOrderId = orderId;
+  document.getElementById("trackingNumberInput").value = order.trackingNumber || "";
+  document.getElementById("shippingCompanySelect").value = order.shippingCompany || "bosta";
+  document.getElementById("trackingOrderId").value = orderId;
+  
+  document.getElementById("trackingModal").classList.add("show");
+}
+
+function getTrackingUrl(company, trackingNumber) {
+  if (!trackingNumber) return "#";
+  const urls = {
+    bosta: `https://bosta.co/ar-eg/tracking-shipments?shipment-number=${trackingNumber}`,
+    aramex: `https://www.aramex.com/track/details?ShipmentNumber=${trackingNumber}`,
+    smsa: `https://smsaexpress.com/tracking?tracknumbers=${trackingNumber}`,
+    dhl: `https://www.dhl.com/eg-en/tracking.html?tracking-id=${trackingNumber}`,
+    fedex: `https://www.fedex.com/fedextrack/?trknbr=${trackingNumber}`,
+    other: "#"
+  };
+  return urls[company] || urls.bosta;
 }
 
 function viewOrder(id) {

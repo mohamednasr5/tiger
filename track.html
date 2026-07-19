@@ -98,6 +98,31 @@
 .timeline-item.done::before{background:var(--gold)}
 .timeline-item b{display:block;font-size:.92rem;margin-bottom:.3rem}
 .timeline-item .note{color:var(--text-dim);font-size:.82rem}
+
+/* Tracking Button */
+.tracking-btn{
+  display:inline-flex;align-items:center;gap:.4rem;
+  background:linear-gradient(135deg,#3b82f6,#1d4ed8);
+  color:#fff !important;
+  padding:.6rem 1.2rem;border-radius:10px;
+  font-size:.88rem;font-weight:700;
+  text-decoration:none;transition:.2s;margin-top:1rem;
+  box-shadow:0 2px 8px rgba(59,130,246,.3);
+}
+.tracking-btn:hover{
+  transform:translateY(-1px);box-shadow:0 4px 12px rgba(59,130,246,.4);
+  text-decoration:none !important;
+}
+.tracking-btn i{font-size:1.1rem}
+
+.tracking-info-bar{
+  background:rgba(59,130,246,.08);
+ border:1px solid rgba(59,130,246,.2);
+ border-radius:10px;padding:.8rem 1rem;
+ margin-top:1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.7rem;
+}
+.tracking-info-bar .company-name{font-weight:700;color:#3b82f6;font-size:.9rem}
+.tracking-info-bar .tracking-num{font-family:'Cairo',monospace;direction:ltr;text-align:left;color:var(--text)}
 </style>
 </head>
 <body>
@@ -168,6 +193,32 @@ const STATUS_LABELS = {
 };
 const STATUS_ORDER = ["pending", "confirmed", "shipping", "delivered"];
 
+// ====== Tracking URL Helper ======
+function getTrackingUrl(company, trackingNumber) {
+  if (!trackingNumber) return "#";
+  const urls = {
+    bosta: `https://bosta.co/ar-eg/tracking-shipments?shipment-number=${trackingNumber}`,
+    aramex: `https://www.aramex.com/track/details?ShipmentNumber=${trackingNumber}`,
+    smsa: `https://smsaexpress.com/tracking?tracknumbers=${trackingNumber}`,
+    dhl: `https://www.dhl.com/eg-en/tracking.html?tracking-id=${trackingNumber}`,
+    fedex: `https://www.fedex.com/fedextrack/?trknbr=${trackingNumber}`,
+    other: "#"
+  };
+  return urls[company] || urls.bosta;
+}
+
+function getShippingCompanyName(companyKey) {
+  const companies = {
+    bosta: "بوستا (Bosta)",
+    aramex: "أرامكس (Aramex)",
+    smsa: "سمسا (SMSA)",
+    dhl: "DHL",
+    fedex: "FedEx",
+    other: "شركة شحن"
+  };
+  return companies[companyKey] || companyKey;
+}
+
 async function doTrack() {
   const q = document.getElementById("trackInput").value.trim();
   const results = document.getElementById("trackResults");
@@ -207,6 +258,16 @@ async function doTrack() {
           ${new Date(o.createdAt).toLocaleDateString("ar-EG", {year:'numeric',month:'long',day:'numeric'})} 
           — الإجمالي: <span class="order-total">${fmtPrice(o.total)}</span>
         </div>
+        ${o.status === 'shipping' && o.trackingNumber ? `
+        <div class="tracking-info-bar">
+          <div>
+            <div class="company-name"><i class='bx bx-truck'></i> ${getShippingCompanyName(o.shippingCompany)}</div>
+            <div class="tracking-num">رقم الشحنة: ${o.trackingNumber}</div>
+          </div>
+          <a href="${getTrackingUrl(o.shippingCompany, o.trackingNumber)}" target="_blank" rel="noopener" class="tracking-btn">
+            <i class='bx bx-target-lock'></i> تتبع طلبك لحظة بلحظة
+          </a>
+        </div>` : ''}
         ${o.status === "cancelled" ? "" : `
         <div class="timeline">
           ${STATUS_ORDER.map((s, i) => `

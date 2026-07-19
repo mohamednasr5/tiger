@@ -669,6 +669,7 @@ window.checkStock = checkStock;
 window.deductStock = deductStock;
 window.addStockBack = addStockBack;
 window.showPreorderModal = showPreorderModal;
+window.openPreorderModal = showPreorderModal; // Alias for product.html
 window.closePreorderModal = closePreorderModal;
 window.submitPreorder = submitPreorder;
 window.loadPreorders = loadPreorders;
