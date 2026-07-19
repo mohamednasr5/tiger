@@ -1,5 +1,5 @@
 // Tiger Jeans Service Worker - PWA
-const CACHE_NAME = 'tiger-jeans-v1';
+const CACHE_NAME = 'tiger-jeans-v2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -8,12 +8,24 @@ const ASSETS_TO_CACHE = [
   './product.html',
   './track.html',
   './admin.html',
+  './orders.html',
+  './wishlist.html',
+  './size-guide.html',
   './css/style.css',
   './js/config.js',
   './js/upload.js',
+  './js/admin-enhancements.js',
+  './manifest.json',
   './images/favicon-32x32.png',
+  './images/icon-72.png',
+  './images/icon-96.png',
+  './images/icon-128.png',
+  './images/icon-144.png',
+  './images/icon-152.png',
   './images/icon-192.png',
-  './images/icon-512.png'
+  './images/icon-384.png',
+  './images/icon-512.png',
+  './images/logo-icon.png'
 ];
 
 // Install - Cache Assets
@@ -102,7 +114,7 @@ async function syncOrders() {
 self.addEventListener('push', (event) => {
   const options = {
     body: event.data ? event.data.text() : 'إشعار جديد من Tiger Jeans',
-    icon: './images/icon-192.png',
+    icon: './images/icon-512.png',
     badge: './images/icon-72.png',
     dir: 'rtl',
     lang: 'ar',

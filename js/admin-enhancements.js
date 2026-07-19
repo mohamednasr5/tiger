@@ -350,9 +350,27 @@ function renderPreordersTable(list) {
     const st = statusMap[p.status] || statusMap.pending;
     const date = p.createdAt ? new Date(p.createdAt).toLocaleDateString('ar-EG') : '-';
     
+    // WhatsApp & Phone contact buttons
+    const phone = p.customer?.phone || '';
+    const whatsappLink = phone ? `https://wa.me/2${phone.replace(/^0/, '')}?text=مرحباً ${p.customer?.name || ''}، نتواصل معاك بخصوص طلبك المسبق لمنتج ${p.productName || ''}` : '#';
+    const telLink = phone ? `tel:${phone}` : '#';
+    
     return `<tr>
       <td><strong>${p.id?.slice(-6)}</strong></td>
-      <td>${p.customer?.name || '-'}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
+          <span>${p.customer?.name || '-'}</span>
+          <div style="display:flex;gap:.3rem">
+            <a href="${whatsappLink}" target="_blank" title="واتساب" style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;background:#25D366;color:#fff;border-radius:50%;font-size:.85rem;text-decoration:none;transition:.2s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+              <i class='bx bxl-whatsapp'></i>
+            </a>
+            <a href="${telLink}" title="اتصال" style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;background:#3498db;color:#fff;border-radius:50%;font-size:.8rem;text-decoration:none;transition:.2s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+              <i class='bx bx-phone'></i>
+            </a>
+          </div>
+        </div>
+        ${phone ? `<small style="color:var(--text-dim);direction:ltr;display:block;text-align:right">${phone}</small>` : ''}
+      </td>
       <td>${p.productName || '-'}<br><small style="color:var(--text-dim)">${p.size} / ${p.color}</small></td>
       <td>${p.qty}</td>
       <td>${date}</td>
@@ -428,7 +446,7 @@ const RANDOM_NAMES = [
 
 // Load notification settings from Firebase
 function loadNotificationSettings() {
-  db.ref('settings/salesNotifications').once('value').then(snap => {
+  return db.ref('settings/salesNotifications').once('value').then(snap => {
     const settings = snap.val();
     notificationSettings = settings || {
       enabled: true,
@@ -438,7 +456,30 @@ function loadNotificationSettings() {
       interval: 30000,
       showOnMobile: true
     };
+    
+    // Ensure defaults for missing properties
+    if (notificationSettings.enabled === undefined) notificationSettings.enabled = true;
+    if (!notificationSettings.types) notificationSettings.types = ['purchase', 'wishlist', 'viewing'];
+    if (!notificationSettings.displayDuration) notificationSettings.displayDuration = 5000;
+    if (!notificationSettings.position) notificationSettings.position = 'bottom-left';
+    if (!notificationSettings.interval) notificationSettings.interval = 30000;
+    if (notificationSettings.showOnMobile === undefined) notificationSettings.showOnMobile = true;
+    
+    console.log('[Sales Popups] Settings loaded:', notificationSettings);
     applyNotificationSettingsUI();
+    return notificationSettings;
+  }).catch(err => {
+    console.error('[Sales Popups] Error loading settings:', err);
+    // Use default settings on error
+    notificationSettings = {
+      enabled: true,
+      types: ['purchase', 'wishlist', 'viewing', 'hot'],
+      displayDuration: 5000,
+      position: 'bottom-left',
+      interval: 30000,
+      showOnMobile: true
+    };
+    return notificationSettings;
   });
 }
 
@@ -584,13 +625,27 @@ function showSalesPopup(productData) {
 // Start showing popups periodically
 let popupInterval = null;
 let productsForPopups = [];
+let isPopupsRunning = false;
 
 function startSalesPopups() {
-  loadNotificationSettings().then(() => {
-    if (!notificationSettings.enabled) return;
+  console.log('[Sales Popups] Starting...');
+  
+  // Stop existing interval if running
+  if (popupInterval) {
+    clearInterval(popupInterval);
+    popupInterval = null;
+  }
+  
+  loadNotificationSettings().then((settings) => {
+    console.log('[Sales Popups] Enabled:', settings.enabled);
+    
+    if (!settings.enabled) {
+      console.log('[Sales Popups] Disabled in settings, not starting');
+      return;
+    }
     
     // Load products for popups
-    db.ref('products').orderByChild('active').equalTo(true).once('value').then(snap => {
+    db.ref('products').once('value').then(snap => {
       productsForPopups = [];
       snap.forEach(child => {
         const p = child.val();
@@ -599,25 +654,46 @@ function startSalesPopups() {
         }
       });
       
+      console.log(`[Sales Popups] Loaded ${productsForPopups.length} products`);
+      
       if (productsForPopups.length > 0) {
+        isPopupsRunning = true;
+        
         // Show first popup after 5 seconds
-        setTimeout(() => showSalesPopup(getRandomItem(productsForPopups)), 5000);
+        setTimeout(() => {
+          if (isPopupsRunning && notificationSettings.enabled) {
+            showSalesPopup(getRandomItem(productsForPopups));
+          }
+        }, 5000);
         
         // Then show at interval
+        const intervalTime = notificationSettings.interval || 30000;
         popupInterval = setInterval(() => {
-          showSalesPopup(getRandomItem(productsForPopups));
-        }, notificationSettings.interval || 30000);
+          if (isPopupsRunning && notificationSettings.enabled) {
+            showSalesPopup(getRandomItem(productsForPopups));
+          }
+        }, intervalTime);
+        
+        console.log(`[Sales Popups] Started! Interval: ${intervalTime}ms`);
+      } else {
+        console.warn('[Sales Popups] No products found to show popups for');
       }
+    }).catch(err => {
+      console.error('[Sales Popups] Error loading products:', err);
     });
+  }).catch(err => {
+    console.error('[Sales Popups] Error:', err);
   });
 }
 
 // Stop popups
 function stopSalesPopups() {
+  isPopupsRunning = false;
   if (popupInterval) {
     clearInterval(popupInterval);
     popupInterval = null;
   }
+  console.log('[Sales Popups] Stopped');
 }
 
 

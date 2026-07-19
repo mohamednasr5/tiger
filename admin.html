@@ -269,9 +269,70 @@
   cursor:pointer;
 }
 
+/* ====== Mobile More Menu Styles ====== */
+.more-menu-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.6);
+  z-index:299;
+  display:none;
+  animation:fadeIn .2s ease;
+}
+.more-menu-overlay.show{display:block}
+.more-menu-popup{
+  position:fixed;
+  bottom:80px;
+  left:1rem;
+  right:1rem;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:16px;
+  z-index:300;
+  display:none;
+  max-height:70vh;
+  overflow-y:auto;
+  box-shadow:0 -10px 40px rgba(0,0,0,.3);
+  transform:translateY(20px);
+  transition:transform .3s ease,opacity .3s ease;
+  opacity:0;
+}
+.more-menu-popup.show{
+  display:block;transform:translateY(0);opacity:1}
+.more-menu-header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:1rem 1.2rem;border-bottom:1px solid var(--line);
+  position:sticky;top:0;background:var(--surface);border-radius:16px 16px 0 0;z-index:1;
+}
+.more-menu-header h3{margin:0;font-size:1rem;font-weight:700}
+.more-menu-close{
+  background:none;border:none;font-size:1.6rem;cursor:pointer;color:var(--text-dim);padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:.2s
+}
+.more-menu-close:hover{background:var(--bg-alt);color:var(--text)}
+.more-menu-items{padding:.5rem}
+.more-menu-item{
+  display:flex;align-items:center;gap:1rem;
+  padding:.9rem 1rem;
+  border-radius:12px;
+  color:var(--text);
+  text-decoration:none;
+  transition:.2s;margin-bottom:.3rem;
+}
+.more-menu-item:hover,.more-menu-item:active{background:rgba(212,175,55,.1)}
+.more-menu-item i{font-size:1.4rem;width:28px;text-align:center;color:var(--gold)}
+.more-menu-item div{flex:1}
+.more-menu-item div b{display:block;font-size:.92rem;font-weight:700}
+.more-menu-item div small{color:var(--text-dim);font-size:.75rem}
+.more-menu-item .bn-badge{margin-left:auto}
+
+@keyframes fadeIn{
+  from{opacity:0}to{opacity:1}
+}
+
 /* Responsive */
 @media(max-width:1024px){
   .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  /* Hide sidebar on mobile */
+  .admin-sidebar{transform:translateX(100%);transition:transform .3s ease}
+  .admin-sidebar.open{transform:translateX(0)}
+  .admin-main{margin-right:0 !important}
 }
 @media(max-width:600px){.kpi-grid{grid-template-columns:1fr}}
 
@@ -428,9 +489,45 @@
       <a href="#" data-tab="products" data-nav="products" onclick="switchTab('products')"><i class='bx bx-shopping-bag'></i><span>المنتجات</span></a>
       <a href="#" data-tab="orders" data-nav="orders" onclick="switchTab('orders')"><i class='bx bx-receipt'></i><span>الطلبات</span><span class="bn-badge" id="navOrdersBadgeMobile" style="display:none">0</span></a>
       <a href="#" data-tab="customers" data-nav="customers" onclick="switchTab('customers')"><i class='bx bx-group'></i><span>العملاء</span></a>
-      <a href="#" data-tab="settings" data-nav="settings" onclick="switchTab('settings')"><i class='bx bx-cog'></i><span>الإعدادات</span></a>
+      <a href="#" onclick="openMoreMenu(event)" data-nav="more" id="moreMenuBtn"><i class='bx bx-dots-horizontal-rounded'></i><span>المزيد</span></a>
     </div>
   </nav>
+
+  <!-- More Menu Popup for Mobile -->
+  <div class="more-menu-overlay" id="moreMenuOverlay" onclick="closeMoreMenu()"></div>
+  <div class="more-menu-popup" id="moreMenuPopup">
+    <div class="more-menu-header">
+      <h3><i class='bx bx-menu' style="margin-left:.5rem;color:var(--gold)"></i> جميع الأقسام</h3>
+      <button onclick="closeMoreMenu()" class="more-menu-close">&times;</button>
+    </div>
+    <div class="more-menu-items">
+      <a href="#" onclick="closeMoreMenu();switchTab('shipping')" class="more-menu-item">
+        <i class='bx bxs-truck'></i>
+        <div><b>الشحن</b><small>أسعار الشحن للمحافظات</small></div>
+      </a>
+      <a href="#" onclick="closeMoreMenu();switchTab('promo')" class="more-menu-item">
+        <i class='bx bxs-tag'></i>
+        <div><b>الخصومات</b><small>كوبونات الخصم</small></div>
+      </a>
+      <a href="#" onclick="closeMoreMenu();switchTab('settings')" class="more-menu-item">
+        <i class='bx bx-cog'></i>
+        <div><b>الإعدادات</b><small>إعدادات المتجر العامة</small></div>
+      </a>
+      <a href="#" onclick="closeMoreMenu();switchTab('notifications')" class="more-menu-item">
+        <i class='bx bx-bell'></i>
+        <div><b>الإشعارات</b><small>إعدادات الإشعارات</small></div>
+      </a>
+      <a href="#" onclick="closeMoreMenu();switchTab('preorders')" class="more-menu-item">
+        <i class='bx bx-time-five'></i>
+        <div><b>الطلبات المسبقة</b><small>إدارة الطلبات المسبقة</small></div>
+        <span class="bn-badge" id="navPreordersBadgeMobile" style="display:none">0</span>
+      </a>
+      <a href="#" onclick="closeMoreMenu();switchTab('sales-notifications')" class="more-menu-item">
+        <i class='bx bx-bullseye'></i>
+        <div><b>إشعارات المبيعات</b><small>نوافذ المبيعات المنبثقة</small></div>
+      </a>
+    </div>
+  </div>
 
   <!-- Main Content -->
   <main class="admin-main">
@@ -1085,6 +1182,24 @@ function doLogout() {
   });
 }
 
+// ====== Mobile More Menu Functions ======
+function openMoreMenu(event) {
+  event.preventDefault();
+  event.stopPropagation();
+  document.getElementById('moreMenuOverlay').classList.add('show');
+  document.getElementById('moreMenuPopup').classList.add('show');
+}
+
+function closeMoreMenu() {
+  document.getElementById('moreMenuOverlay').classList.remove('show');
+  document.getElementById('moreMenuPopup').classList.remove('show');
+}
+
+// Close more menu on escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeMoreMenu();
+});
+
 // ====== Tab Switching ======
 function switchTab(tab) {
   currentTab = tab;
@@ -1332,6 +1447,18 @@ async function saveProduct() {
   
   if (!name || !price) { showToast("أدخل اسم المنتج والسعر"); return; }
   
+  // Get stock matrix data
+  const stockInputs = document.querySelectorAll('.stock-input');
+  const stockData = {};
+  stockInputs.forEach(input => {
+    const size = input.dataset.size;
+    const color = input.dataset.color;
+    const qty = parseInt(input.value) || 0;
+    if (size && color) {
+      stockData[`${size}_${color}`] = qty;
+    }
+  });
+  
   const productData = {
     name,
     price,
@@ -1350,10 +1477,18 @@ async function saveProduct() {
   try {
     if (editId) {
       await db.ref("products/" + editId).update(productData);
-      showToast("تم تحديث المنتج");
+      // Save stock data
+      if (Object.keys(stockData).length > 0) {
+        await db.ref("products/" + editId + "/stock").set(stockData);
+      }
+      showToast("تم تحديث المنتج والمخزون");
     } else {
       productData.createdAt = Date.now();
-      await db.ref("products").push(productData);
+      const newRef = await db.ref("products").push(productData);
+      // Save stock data for new product
+      if (Object.keys(stockData).length > 0) {
+        await db.ref("products/" + newRef.key + "/stock").set(stockData);
+      }
       showToast("تم إضافة المنتج");
     }
     closeModal("productModal");
