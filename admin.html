@@ -470,15 +470,38 @@
       <div class="card">
         <h3 style="margin-bottom:1.5rem">بيانات الدفع</h3>
         
+        <!-- Vodafone Cash Section -->
+        <h4 style="margin:1.5rem 0 1rem;color:var(--gold);font-family:'Cairo',sans-serif;font-size:1rem">
+          <i class='bx bx-mobile-alt'></i> محفظة فودافون كاش
+        </h4>
         <div class="row2">
+          <div class="field">
+            <label>اسم صاحب المحفظة</label>
+            <input id="settingVodafoneName" placeholder="مثال: أحمد محمد" />
+          </div>
           <div class="field">
             <label>رقم فودافون كاش</label>
             <input id="settingVodafone" placeholder="010xxxxxxxxx" />
           </div>
+        </div>
+        
+        <!-- InstaPay Section -->
+        <h4 style="margin:1.5rem 0 1rem;color:var(--gold);font-family:'Cairo',sans-serif;font-size:1rem">
+          <i class='bx bx-transfer'></i> انستاباي (InstaPay)
+        </h4>
+        <div class="row2">
           <div class="field">
             <label>اسم مستخدم انستاباي</label>
             <input id="settingInstapay" placeholder="@username" />
           </div>
+          <div class="field">
+            <label>اسم صاحب الحساب</label>
+            <input id="settingInstapayOwner" placeholder="الاسم الظاهر للحساب" />
+          </div>
+        </div>
+        <div class="field" style="margin-top:.5rem">
+          <label>رابط الدفع المباشر</label>
+          <input id="settingInstapayLink" placeholder="https://ipn.eg/S/username/instapay/..." />
         </div>
         
         <h3 style="margin:2rem 0 1.5rem">بنر الصفحة الرئيسية</h3>
@@ -1407,7 +1430,10 @@ function loadSettings() {
   db.ref("settings/payment").once("value").then(snap => {
     const s = snap.val() || {};
     document.getElementById("settingVodafone").value = s.vodafone || "";
+    document.getElementById("settingVodafoneName").value = s.vodafoneName || "";
     document.getElementById("settingInstapay").value = s.instapay || "";
+    document.getElementById("settingInstapayOwner").value = s.instapayOwner || "";
+    document.getElementById("settingInstapayLink").value = s.instapayLink || "";
   });
   
   db.ref("banners/hero").once("value").then(snap => {
@@ -1434,7 +1460,10 @@ function loadSettings() {
 function saveSettings() {
   const payment = {
     vodafone: document.getElementById("settingVodafone").value.trim(),
-    instapay: document.getElementById("settingInstapay").value.trim()
+    vodafoneName: document.getElementById("settingVodafoneName").value.trim(),
+    instapay: document.getElementById("settingInstapay").value.trim(),
+    instapayOwner: document.getElementById("settingInstapayOwner").value.trim(),
+    instapayLink: document.getElementById("settingInstapayLink").value.trim()
   };
   const hero = {
     title: document.getElementById("heroTitle").value.trim(),

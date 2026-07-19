@@ -1568,6 +1568,61 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
   .site-header .burger{display:none !important}
   .main-nav{display:none !important}
   .container{padding:0 1rem}
+  
+  /* ====== MOBILE HEADER FIX - Prevent icons overlapping logo ====== */
+  .header-main{
+    padding:.7rem 0;
+    gap:.8rem;
+  }
+  
+  /* Logo - smaller on mobile */
+  .logo-icon{
+    width:36px;height:36px;
+  }
+  .logo-text strong{
+    font-size:1.05rem;
+    letter-spacing:1px;
+  }
+  .logo-text small{
+    font-size:.65rem;
+  }
+  
+  /* Header actions - compact on mobile */
+  .header-actions{
+    gap:.35rem;
+  }
+  .action-btn{
+    width:36px;height:36px;
+    font-size:.95rem;
+  }
+  .theme-toggle{
+    width:32px;height:32px;
+    font-size:.85rem;
+  }
+  
+  /* Badge positioning for mobile */
+  .cart-badge,.wishlist-badge{
+    top:-3px;left:-3px;
+    min-width:15px;height:15px;
+    font-size:.6rem;
+  }
+}
+
+/* Extra small phones */
+@media (max-width:380px){
+  .logo-text strong{
+    font-size:.9rem;
+  }
+  .logo-text small{
+    display:none; /* Hide Arabic subtitle on very small screens */
+  }
+  .action-btn{
+    width:33px;height:33px;
+    font-size:.85rem;
+  }
+  .header-actions{
+    gap:.25rem;
+  }
 }
 @media (max-width:480px){
   .container{padding:0 .85rem}

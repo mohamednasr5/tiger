@@ -234,10 +234,16 @@
           </button>
         </div>
         
+        <!-- Owner Name Display -->
+        <div id="ownerNameDisplay" style="margin-top:.7rem;padding:.6rem .8rem;background:rgba(212,175,55,.08);border-radius:8px;display:none">
+          <span style="font-size:.82rem;color:var(--text-dim)">اسم صاحب الحساب: </span>
+          <b id="ownerNameText" style="font-size:.9rem;color:var(--gold);font-family:'Cairo',sans-serif"></b>
+        </div>
+        
         <!-- Instapay Link (shown when instapay selected) -->
         <div id="instapaySection" style="display:none;margin-top:1rem;padding-top:1rem;border-top:1px dashed var(--line)">
           <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:.6rem">أو اضغط للدفع مباشرة عبر إنستاباي:</p>
-          <a href="https://ipn.eg/S/engmohamednasr/instapay/8NShbl" target="_blank" class="instapay-link" id="instapayLink">
+          <a href="#" target="_blank" class="instapay-link" id="instapayLink">
             <i class='bx bx-link-external'></i> فتح رابط الدفع
           </a>
         </div>
@@ -393,22 +399,35 @@ function updatePayNumber() {
   const val = document.getElementById("payNumberVal");
   const instapaySec = document.getElementById("instapaySection");
   const copyBtn = document.getElementById("copyPhoneBtn");
+  const ownerNameDisplay = document.getElementById("ownerNameDisplay");
+  const ownerNameText = document.getElementById("ownerNameText");
   
   // Hide all special sections first
   instapaySec.style.display = "none";
+  ownerNameDisplay.style.display = "none";
   
   if (method === "vodafone") {
     label.textContent = "حوّل المبلغ على رقم فودافون كاش:";
     val.textContent = paySettings.vodafone || "01012345678";
     copyBtn.style.display = "inline-flex";
+    // Show Vodafone owner name if available
+    if (paySettings.vodafoneName) {
+      ownerNameText.textContent = paySettings.vodafoneName;
+      ownerNameDisplay.style.display = "block";
+    }
   } else if (method === "instapay") {
     label.textContent = "حوّل المبلغ على انستاباي للمستخدم:";
     val.textContent = "@" + (paySettings.instapay || "engmohamednasr");
     copyBtn.style.display = "inline-flex";
-    // Show Instapay direct link
+    // Show Instapay section with link
     instapaySec.style.display = "block";
     // Update the link from admin settings
-    document.getElementById("instapayLink").href = paySettings.instapayLink || "https://ipn.eg/S/engmohamednasr/instapay/8NShbl";
+    document.getElementById("instapayLink").href = paySettings.instapayLink || "#";
+    // Show InstaPay owner name if available
+    if (paySettings.instapayOwner) {
+      ownerNameText.textContent = paySettings.instapayOwner;
+      ownerNameDisplay.style.display = "block";
+    }
   } else {
     label.textContent = "الدفع عند الاستلام:";
     const city = document.getElementById("cCity").value;
