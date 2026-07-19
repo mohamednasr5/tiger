@@ -898,18 +898,97 @@ if ('serviceWorker' in navigator) {
 // ====== Products Data ======
 let ALL_PRODUCTS = [];
 let ACTIVE_CAT = "all";
+let productsLoadAttempted = false;
+let productsLoadTimeout = null;
 
-// Load products from Firebase
-db.ref("products").on("value", (snap) => {
-  const val = snap.val() || {};
-  ALL_PRODUCTS = Object.entries(val)
-    .map(([id, p]) => ({ id, ...p }))
-    .filter((p) => p.active !== false);
-  buildCategoryFilters();
-  renderProducts();
-  renderDeals();
-  applySearchFromUrl();
-});
+// Load products from Firebase with mobile-friendly error handling
+function loadProductsFromFirebase() {
+  if (productsLoadAttempted) return; // Prevent multiple loads
+  productsLoadAttempted = true;
+  
+  // Show loading state
+  const grid = document.getElementById("productsGrid");
+  if (grid && !grid.hasChildNodes()) {
+    grid.innerHTML = '<div class="loading-state"><i class="bx bx-loader-alt bx-spin" style="font-size:2rem"></i><p>جاري تحميل المنتجات...</p></div>';
+  }
+  
+  // Set a timeout to retry if Firebase is slow (common on mobile)
+  productsLoadTimeout = setTimeout(() => {
+    // If still loading after 8 seconds, show message
+    const grid = document.getElementById("productsGrid");
+    if (grid) {
+      const loadingEl = grid.querySelector('.loading-state');
+      if (loadingEl) {
+        loadingEl.innerHTML = '<i class="bx bx-wifi-off" style="font-size:2rem"></i><p>بطء في الاتصال... جاري المحاولة</p><button onclick="retryLoadProducts()" class="btn-secondary" style="margin-top:1rem"><i class="bx bx-refresh"></i> إعادة المحاولة</button>';
+      }
+    }
+  }, 8000);
+  
+  try {
+    db.ref("products").on("value", (snap) => {
+      // Clear the timeout since we got data
+      if (productsLoadTimeout) {
+        clearTimeout(productsLoadTimeout);
+        productsLoadTimeout = null;
+      }
+      
+      const val = snap.val() || {};
+      ALL_PRODUCTS = Object.entries(val)
+        .map(([id, p]) => ({ id, ...p }))
+        .filter((p) => p.active !== false);
+      
+      buildCategoryFilters();
+      renderProducts();
+      renderDeals();
+      applySearchFromUrl();
+      
+      console.log(`✓ Loaded ${ALL_PRODUCTS.length} products successfully`);
+    }, (error) => {
+      console.error('Firebase products load error:', error);
+      handleProductsError(error);
+    });
+  } catch (err) {
+    console.error('Firebase init error:', err);
+    handleProductsError(err);
+  }
+}
+
+function handleProductsError(error) {
+  const grid = document.getElementById("productsGrid");
+  if (!grid) return;
+  
+  grid.innerHTML = `
+    <div class="loading-state" style="padding:3rem;text-align:center">
+      <i class="bx bx-error-circle" style="font-size:2.5rem;color:#ff4757;margin-bottom:1rem;display:block"></i>
+      <h3 style="margin-bottom:.5rem">حدث خطأ في التحميل</h3>
+      <p style="color:var(--text-dim);margin-bottom:1.5rem">تأكد من اتصالك بالإنترنت ثم أعد المحاولة</p>
+      <button onclick="retryLoadProducts()" class="btn-primary">
+        <i class="bx bx-refresh"></i> إعادة تحميل المنتجات
+      </button>
+    </div>
+  `;
+}
+
+function retryLoadProducts() {
+  productsLoadAttempted = false;
+  
+  // Remove old listener
+  try {
+    db.ref("products").off();
+  } catch(e) {}
+  
+  // Reload
+  loadProductsFromFirebase();
+}
+
+// Initialize products when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(loadProductsFromFirebase, 100); // Small delay for mobile
+  });
+} else {
+  setTimeout(loadProductsFromFirebase, 100);
+}
 
 // Supports shared/search-engine links like tiger-jeans.com/?q=جينز رجالي
 // (matches the SearchAction in the WebSite structured data)

@@ -956,13 +956,19 @@
     
     <div class="field">
       <label>المقاسات (اكتب المقاس واضغط Enter أو مسطرة)</label>
-      <input id="pSizesInput" placeholder="مثال: S ثم مسطرة، وهيقترحلك M بعدها تلقائي" onkeydown="addChip(event,'sizes')" />
+      <div style="display:flex;gap:.5rem">
+        <input id="pSizesInput" placeholder="مثال: S ثم مسطرة، وهيقترحلك M بعدها تلقائي" onkeydown="addChip(event,'sizes')" onchange="addChip(event,'sizes')" style="flex:1" />
+        <button type="button" onclick="addSizeFromButton()" class="btn-secondary" style="padding:.5rem 1rem;font-size:1.2rem;min-width:44px" title="إضافة">+</button>
+      </div>
       <div class="chips-container" id="sizesChips"></div>
     </div>
     
     <div class="field">
       <label>الألوان (اختياري) — اضغط على أيقونة الصورة على أي لون لإضافة صورة له</label>
-      <input id="pColorsInput" placeholder="أسود ثم Enter أو مسطرة" onkeydown="addChip(event,'colors')" />
+      <div style="display:flex;gap:.5rem">
+        <input id="pColorsInput" placeholder="أسود ثم Enter أو مسطرة" onkeydown="addChip(event,'colors')" onchange="addChip(event,'colors')" style="flex:1" />
+        <button type="button" onclick="addColorFromButton()" class="btn-secondary" style="padding:.5rem 1rem;font-size:1.2rem;min-width:44px" title="إضافة">+</button>
+      </div>
       <div class="chips-container" id="colorsChips"></div>
       <input type="file" id="colorImageInput" accept="image/*" style="display:none" onchange="onColorImageChange(this)" />
     </div>
@@ -1393,8 +1399,18 @@ function guessNextSize(sizesArr) {
 }
 
 function addChip(e, type) {
-  if (e.key !== "Enter" && e.key !== " ") return;
-  e.preventDefault();
+  // Support both Enter key and mobile keyboard "Go"/"Next" buttons
+  const isEnterKey = e.key === "Enter" || e.key === " " || e.keyCode === 13 || e.which === 13;
+  
+  // For mobile: also check if the input has value and user submitted
+  if (!isEnterKey && e.type !== 'blur' && e.type !== 'change') return;
+  
+  // Only prevent default for enter key, not for blur/change
+  if (isEnterKey) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  
   const input = e.target;
   const val = input.value.trim();
   if (!val) return;
@@ -1410,6 +1426,37 @@ function addChip(e, type) {
     input.value = "";
     renderChips(type);
   }
+}
+
+// Mobile-friendly add buttons for sizes and colors
+function addSizeFromButton() {
+  const input = document.getElementById('pSizesInput');
+  if (!input) return;
+  const val = input.value.trim();
+  if (!val) {
+    // If empty, suggest next size
+    const next = guessNextSize(tempSizes);
+    if (next) {
+      tempSizes.push(next.toUpperCase());
+      renderChips('sizes');
+      input.value = guessNextSize(tempSizes) || '';
+    }
+    return;
+  }
+  tempSizes.push(val.toUpperCase());
+  renderChips('sizes');
+  const next = guessNextSize(tempSizes);
+  input.value = next || '';
+}
+
+function addColorFromButton() {
+  const input = document.getElementById('pColorsInput');
+  if (!input) return;
+  const val = input.value.trim();
+  if (!val) return;
+  tempColors.push({ name: val, image: "" });
+  input.value = "";
+  renderChips('colors');
 }
 
 function removeChip(type, idx) {
