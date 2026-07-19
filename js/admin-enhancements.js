@@ -535,19 +535,66 @@ function timeAgo(minutes) {
   return `منذ ${days} يوم`;
 }
 
-// Create and show sales popup
+// ============================================================
+// 🔔 SALES POPUPS SYSTEM - Queue-Based (No Overlapping)
+// ============================================================
+
+// State variables - all reset on start
+let salesPopupState = {
+  isRunning: false,
+  isShowing: false,
+  count: 0,
+  maxPerSession: 6,        // Max 6 popups per session
+  products: [],
+  nextTimeout: null,       // For scheduling next popup
+  currentPopupEl: null     // Reference to active popup
+};
+
+/**
+ * Create and show a single sales popup
+ * Only ONE popup can exist at a time (guaranteed by state.isShowing)
+ */
 function showSalesPopup(productData) {
-  if (!notificationSettings.enabled) return;
+  console.log('[Sales Popup] showSalesPopup called');
+  
+  // Validate settings loaded
+  if (!notificationSettings || !notificationSettings.enabled) {
+    console.log('[Sales Popup] Disabled or settings not loaded');
+    return;
+  }
   
   // Check mobile setting
-  if (window.innerWidth <= 992 && !notificationSettings.showOnMobile) return;
+  if (window.innerWidth <= 992 && !notificationSettings.showOnMobile) {
+    return;
+  }
+  
+  // 🔒 HARD BLOCK: Don't show if another popup exists
+  if (salesPopupState.isShowing) {
+    console.log('[Sales Popup] ❌ BLOCKED: Already showing a popup');
+    return;
+  }
+  
+  // 🛑 LIMIT: Stop after max reached
+  if (salesPopupState.count >= salesPopupState.maxPerSession) {
+    console.log(`[Sales Popup] 🛑 MAX REACHED (${salesPopupState.maxPerSession}), stopping`);
+    stopSalesPopups();
+    return;
+  }
+  
+  // ✅ LOCK: Mark as showing IMMEDIATELY
+  salesPopupState.isShowing = true;
+  salesPopupState.count++;
+  console.log(`[Sales Popup] ✅ Showing #${salesPopupState.count}/${salesPopupState.maxPerSession}`);
   
   // Get random enabled type
   const enabledTypes = notificationSettings.types || ['purchase'];
   const type = getRandomItem(enabledTypes);
   const typeConfig = NOTIFICATION_TYPES[type];
   
-  if (!typeConfig) return;
+  if (!typeConfig) {
+    salesPopupState.isShowing = false;
+    return;
+  }
   
   // Build message
   let msg = typeConfig.text;
@@ -565,6 +612,7 @@ function showSalesPopup(productData) {
   // Create popup element
   const popup = document.createElement('div');
   popup.className = 'sales-popup';
+  popup.setAttribute('data-sales-popup', 'true'); // Unique identifier
   popup.style.cssText = `
     position: fixed;
     ${notificationSettings.position.includes('right') ? 'right' : 'left'}: 20px;
@@ -586,7 +634,6 @@ function showSalesPopup(productData) {
     font-family: 'Cairo', sans-serif;
   `;
   
-  const productImage = productData?.images?.[0] || '';
   const productName = productData?.name || 'منتج';
   const productId = productData?.id || '';
   
@@ -598,7 +645,7 @@ function showSalesPopup(productData) {
         ${productName}
       </p>
     </div>
-    <button onclick="event.stopPropagation();this.closest('.sales-popup').remove()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-dim);padding:.3rem">&times;</button>
+    <button onclick="event.stopPropagation();closeCurrentSalesPopup()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text-dim);padding:.3rem;line-height:1">&times;</button>
   `;
   
   // Click to go to product
@@ -608,6 +655,10 @@ function showSalesPopup(productData) {
     };
   }
   
+  // Store reference
+  salesPopupState.currentPopupEl = popup;
+  
+  // Add to DOM
   document.body.appendChild(popup);
   
   // Animate in
@@ -615,85 +666,197 @@ function showSalesPopup(productData) {
     popup.style.transform = 'translateX(0)';
   });
   
-  // Auto remove
+  // Display duration (min 4s, default 5s, or from settings)
+  const displayDuration = Math.max(4000, Math.min(8000, notificationSettings.displayDuration || 5000));
+  
+  // ⏰ Auto-remove after duration
   setTimeout(() => {
-    popup.style.transform = `translateX(${notificationSettings.position.includes('right') ? '120%' : '-120%'})`;
-    setTimeout(() => popup.remove(), 400);
-  }, notificationSettings.displayDuration || 5000);
+    removeCurrentPopup(false);
+  }, displayDuration);
 }
 
-// Start showing popups periodically
-let popupInterval = null;
-let productsForPopups = [];
-let isPopupsRunning = false;
-
-function startSalesPopups() {
-  console.log('[Sales Popups] Starting...');
+/**
+ * Remove current popup with animation
+ * @param {boolean} manual - Whether user manually closed it
+ */
+function removeCurrentPopup(manual = false) {
+  const popup = salesPopupState.currentPopupEl;
   
-  // Stop existing interval if running
-  if (popupInterval) {
-    clearInterval(popupInterval);
-    popupInterval = null;
+  if (!popup || !popup.parentNode) {
+    salesPopupState.isShowing = false;
+    salesPopupState.currentPopupEl = null;
+    return;
   }
   
+  // Animate out
+  popup.style.transform = `translateX(${notificationSettings.position.includes('right') ? '120%' : '-120%'})`;
+  
+  setTimeout(() => {
+    if (popup && popup.parentNode) {
+      popup.remove();
+    }
+    
+    // ✅ UNLOCK: Allow next popup
+    salesPopupState.isShowing = false;
+    salesPopupState.currentPopupEl = null;
+    
+    console.log(`[Sales Popup] ${manual ? '👆 Manually closed' : '⏰ Auto-closed'}. Ready for next.`);
+    
+    // Schedule NEXT popup if still running
+    scheduleNextPopup();
+  }, 400);
+}
+
+/**
+ * Close popup manually (called from X button)
+ */
+function closeCurrentSalesPopup() {
+  removeCurrentPopup(true);
+}
+
+/**
+ * Schedule the next popup after a delay
+ * Uses setTimeout chain instead of setInterval for precise control
+ */
+function scheduleNextPopup() {
+  // Clear any existing schedule
+  if (salesPopupState.nextTimeout) {
+    clearTimeout(salesPopupState.nextTimeout);
+    salesPopupState.nextTimeout = null;
+  }
+  
+  // Check if we should continue
+  if (!salesPopupState.isRunning) {
+    console.log('[Sales Popup] Not running, not scheduling next');
+    return;
+  }
+  
+  // Check if we've reached max
+  if (salesPopupState.count >= salesPopupState.maxPerSession) {
+    console.log(`[Sales Popup] Max reached (${salesPopupState.count}), stopping`);
+    stopSalesPopups();
+    return;
+  }
+  
+  // Check if still enabled
+  if (!notificationSettings || !notificationSettings.enabled) {
+    stopSalesPopups();
+    return;
+  }
+  
+  // Calculate delay: use setting value, min 25s, max 60s
+  const baseInterval = notificationSettings.interval || 35000;
+  const delay = Math.max(25000, Math.min(60000, baseInterval));
+  
+  console.log(`[Sales Popup] Scheduling next in ${(delay/1000).toFixed(0)}s...`);
+  
+  salesPopupState.nextTimeout = setTimeout(() => {
+    if (salesPopupState.isRunning && 
+        notificationSettings && 
+        notificationSettings.enabled &&
+        salesPopupState.products.length > 0) {
+      showSalesPopup(getRandomItem(salesPopupState.products));
+    } else {
+      stopSalesPopups();
+    }
+  }, delay);
+}
+
+/**
+ * START the sales popups system
+ * Uses queue-based approach - one at a time, guaranteed
+ */
+function startSalesPopups() {
+  console.log('[Sales Popups] ====== STARTING SYSTEM ======');
+  
+  // Stop any existing system first
+  stopSalesPopups();
+  
+  // Reset state completely
+  salesPopupState = {
+    isRunning: true,
+    isShowing: false,
+    count: 0,
+    maxPerSession: 6,
+    products: [],
+    nextTimeout: null,
+    currentPopupEl: null
+  };
+  
   loadNotificationSettings().then((settings) => {
-    console.log('[Sales Popups] Enabled:', settings.enabled);
+    console.log('[Sales Popups] Settings loaded:', settings.enabled ? '✅ ENABLED' : '❌ DISABLED');
     
     if (!settings.enabled) {
-      console.log('[Sales Popups] Disabled in settings, not starting');
+      salesPopupState.isRunning = false;
       return;
     }
     
-    // Load products for popups
+    // Load products
     db.ref('products').once('value').then(snap => {
-      productsForPopups = [];
+      const products = [];
       snap.forEach(child => {
         const p = child.val();
-        if (p.active !== false) {
-          productsForPopups.push({id: child.key, ...p});
+        if (p && p.active !== false) {
+          products.push({ id: child.key, ...p });
         }
       });
       
-      console.log(`[Sales Popups] Loaded ${productsForPopups.length} products`);
+      salesPopupState.products = products;
+      console.log(`[Sales Popups] Loaded ${products.length} products`);
       
-      if (productsForPopups.length > 0) {
-        isPopupsRunning = true;
-        
-        // Show first popup after 5 seconds
-        setTimeout(() => {
-          if (isPopupsRunning && notificationSettings.enabled) {
-            showSalesPopup(getRandomItem(productsForPopups));
-          }
-        }, 5000);
-        
-        // Then show at interval
-        const intervalTime = notificationSettings.interval || 30000;
-        popupInterval = setInterval(() => {
-          if (isPopupsRunning && notificationSettings.enabled) {
-            showSalesPopup(getRandomItem(productsForPopups));
-          }
-        }, intervalTime);
-        
-        console.log(`[Sales Popups] Started! Interval: ${intervalTime}ms`);
-      } else {
-        console.warn('[Sales Popups] No products found to show popups for');
+      if (products.length === 0) {
+        console.warn('[Sales Popups] No products available');
+        salesPopupState.isRunning = false;
+        return;
       }
+      
+      // Schedule FIRST popup after 10 seconds (let user browse first)
+      console.log('[Sales Popups] Scheduling first popup in 10s...');
+      salesPopupState.nextTimeout = setTimeout(() => {
+        if (salesPopupState.isRunning && notificationSettings?.enabled) {
+          showSalesPopup(getRandomItem(salesPopupState.products));
+        }
+      }, 10000); // 10 seconds delay before first popup
+      
+      console.log(`[Sales Popups] ✅ System started! Max: ${salesPopupState.maxPerSession}/session`);
+      
     }).catch(err => {
       console.error('[Sales Popups] Error loading products:', err);
+      salesPopupState.isRunning = false;
     });
+    
   }).catch(err => {
-    console.error('[Sales Popups] Error:', err);
+    console.error('[Sales Popups] Error loading settings:', err);
+    salesPopupState.isRunning = false;
   });
 }
 
-// Stop popups
+/**
+ * STOP the sales popups system completely
+ */
 function stopSalesPopups() {
-  isPopupsRunning = false;
-  if (popupInterval) {
-    clearInterval(popupInterval);
-    popupInterval = null;
+  console.log(`[Sales Popups] ====== STOPPING (showed ${salesPopupState.count} popups) ======`);
+  
+  // Stop running flag
+  salesPopupState.isRunning = false;
+  
+  // Clear scheduled next popup
+  if (salesPopupState.nextTimeout) {
+    clearTimeout(salesPopupState.nextTimeout);
+    salesPopupState.nextTimeout = null;
   }
-  console.log('[Sales Popups] Stopped');
+  
+  // Remove visible popup if exists
+  if (salesPopupState.currentPopupEl && salesPopupState.currentPopupEl.parentNode) {
+    salesPopupState.currentPopupEl.remove();
+  }
+  
+  // Reset state
+  salesPopupState.isShowing = false;
+  salesPopupState.currentPopupEl = null;
+  
+  // Also remove ANY popup with our identifier (safety net)
+  document.querySelectorAll('[data-sales-popup="true"]').forEach(el => el.remove());
 }
 
 
@@ -756,3 +919,4 @@ window.saveNotificationSettings = saveNotificationSettings;
 window.startSalesPopups = startSalesPopups;
 window.stopSalesPopups = stopSalesPopups;
 window.showSalesPopup = showSalesPopup;
+window.closeCurrentSalesPopup = closeCurrentSalesPopup;

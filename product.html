@@ -158,6 +158,59 @@
   gap:1rem;
   flex-wrap:wrap;
 }
+
+/* WhatsApp Share Button */
+.whatsapp-share-btn{
+  background:linear-gradient(135deg,#25D366,#128C7E)!important;
+  color:#fff!important;
+  border:none!important;
+  cursor:pointer;
+  transition:all .3s ease;
+  position:relative;
+  overflow:hidden;
+}
+.whatsapp-share-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 20px rgba(37,211,102,.4);
+}
+.whatsapp-share-btn::before{
+  content:'';
+  position:absolute;
+  top:50%;left:50%;
+  width:0;height:0;
+  background:rgba(255,255,255,.2);
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  transition:width .4s,height .4s;
+}
+.whatsapp-share-btn:active::before{
+  width:200px;height:200px;
+}
+.share-tooltip{
+  position:absolute;
+  bottom:120%;left:50%;
+  transform:translateX(-50%);
+  background:#1a1a2e;
+  color:#fff;
+  padding:.5rem 1rem;
+  border-radius:8px;
+  font-size:.8rem;
+  white-space:nowrap;
+  opacity:0;visibility:hidden;
+  transition:all .3s ease;
+  z-index:10;
+}
+.share-tooltip::after{
+  content:'';
+  position:absolute;
+  top:100%;left:50%;
+  transform:translateX(-50%);
+  border:6px solid transparent;
+  border-top-color:#1a1a2e;
+}
+.whatsapp-share-btn:hover .share-tooltip{
+  opacity:1;visibility:visible;
+}
 @media(max-width:900px){.product-detail{grid-template-columns:1fr}}
 </style>
 </head>
@@ -311,6 +364,10 @@ function updateActionButton() {
       </button>
       <button class="btn-secondary wishlist-btn" data-id="${pid}" style="padding:1rem 1.2rem" onclick="toggleWishlistDetail()" id="pdWishlistBtn">
         <i class='${isWishlisted(pid) ? "bx bxs-heart" : "bx bx-heart"}'></i>
+      </button>
+      <button class="btn-secondary whatsapp-share-btn" style="padding:1rem 1.2rem" onclick="shareOnWhatsApp()" title="مشاركة على واتساب">
+        <i class='bx bxl-whatsapp' style="font-size:1.3rem"></i>
+        <span class="share-tooltip">مشاركة على واتساب</span>
       </button>
       <a href="cart.html" class="btn-secondary" style="padding:1rem 1.5rem">السلة</a>
     `;
@@ -466,6 +523,10 @@ function render() {
         <button class="btn-secondary wishlist-btn" data-id="${pid}" style="padding:1rem 1.2rem" onclick="toggleWishlistDetail()" id="pdWishlistBtn">
           <i class='${isWishlisted(pid) ? "bx bxs-heart" : "bx bx-heart"}'></i>
         </button>
+        <button class="btn-secondary whatsapp-share-btn" style="padding:1rem 1.2rem" onclick="shareOnWhatsApp()" title="مشاركة على واتساب">
+          <i class='bx bxl-whatsapp' style="font-size:1.3rem"></i>
+          <span class="share-tooltip">مشاركة على واتساب</span>
+        </button>
         <a href="cart.html" class="btn-secondary" style="padding:1rem 1.5rem">السلة</a>
       </div>
     </div>
@@ -533,6 +594,55 @@ function toggleWishlistDetail() {
     btn.classList.toggle("active", added);
   }
   showToast(added ? "تمت الإضافة إلى المفضلة ♥" : "تمت الإزالة من المفضلة");
+}
+
+// Share product on WhatsApp with all details
+function shareOnWhatsApp() {
+  if (!PRODUCT) return;
+  
+  const productName = PRODUCT.name || "منتج";
+  const productPrice = fmtPrice(PRODUCT.price);
+  const oldPriceText = PRODUCT.oldPrice ? `\n💰 السعر قبل الخصم: ${fmtPrice(PRODUCT.oldPrice)}` : "";
+  const discountText = PRODUCT.oldPrice && PRODUCT.price < PRODUCT.oldPrice ? `\n🏷️ الخصم: ${Math.round((1 - PRODUCT.price / PRODUCT.oldPrice) * 100)}%` : "";
+  
+  // Get selected size and color
+  const sizeText = selSize ? `\n📏 المقاس: ${selSize}` : "";
+  const colorText = selColor ? `\n🎨 اللون: ${selColor}` : "";
+  
+  // Product description (truncated)
+  const descText = PRODUCT.description ? `\n\n📝 ${PRODUCT.description.slice(0, 200)}${PRODUCT.description.length > 200 ? '...' : ''}` : "";
+  
+  // Available sizes
+  const sizesText = PRODUCT.sizes && PRODUCT.sizes.length ? `\n\n📐 المقاسات المتاحة: ${PRODUCT.sizes.join(' - ')}` : "";
+  
+  // Available colors
+  const colorsList = PRODUCT.colors ? PRODUCT.colors.map(c => typeof c === 'string' ? c : c.name).filter(Boolean) : [];
+  const colorsText = colorsList.length ? `\n🎨 الألوان المتاحة: ${colorsList.join(' - ')}` : "";
+  
+  // Product link
+  const productUrl = `${window.location.origin}${window.location.pathname}?id=${pid}`;
+  
+  // Build the message
+  const message = `*شاهدت متجر تايجر جينز ولديهم عروض رهيبة قولت أقولكم عليها* 🐯✨
+
+━━━━━━━━━━━━━━━
+
+🛍️ *${productName}*
+
+💵 *السعر: ${productPrice}*${oldPriceText}${discountText}${sizeText}${colorText}${sizesText}${colorsText}${descText}
+
+━━━━━━━━━━━━━━━
+
+🔗 *رابط المنتج:*\n${productUrl}\n\n🌐 *الموقع:* https://tiger-jeans.com\n\n📱 *اطلب الآن واستمتع بأفضل جودة وأسعار!* 🚚 شحن سريع لجميع محافظات مصر`;
+  
+  // Encode and open WhatsApp
+  const encodedMessage = encodeURIComponent(message);
+  const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+  
+  window.open(whatsappUrl, '_blank');
+  
+  // Show feedback
+  showToast("تم فتح الواتساب للمشاركة 📱");
 }
 </script>
 
