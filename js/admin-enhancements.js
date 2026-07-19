@@ -350,9 +350,10 @@ function renderPreordersTable(list) {
     const st = statusMap[p.status] || statusMap.pending;
     const date = p.createdAt ? new Date(p.createdAt).toLocaleDateString('ar-EG') : '-';
     
-    // WhatsApp & Phone contact buttons
+    // WhatsApp & Phone contact buttons (Egypt country code: +20)
     const phone = p.customer?.phone || '';
-    const whatsappLink = phone ? `https://wa.me/2${phone.replace(/^0/, '')}?text=مرحباً ${p.customer?.name || ''}، نتواصل معاك بخصوص طلبك المسبق لمنتج ${p.productName || ''}` : '#';
+    const cleanPhone = phone.replace(/^0/, ''); // Remove leading 0 if exists
+    const whatsappLink = phone ? `https://wa.me/20${cleanPhone}?text=مرحباً ${p.customer?.name || ''}، نتواصل معاك بخصوص طلبك المسبق لمنتج ${p.productName || ''}` : '#';
     const telLink = phone ? `tel:${phone}` : '#';
     
     return `<tr>
