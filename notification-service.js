@@ -13,8 +13,11 @@
  */
 
 // ====== Configuration ======
-const TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE'; // سيتم استبداله
-const TELEGRAM_CHAT_ID = 'YOUR_CHAT_ID_HERE';     // سيتم استبداله
+// ⚠️ مهم: استبدل هذه القيم ببيانات البوت الخاصة بك
+// للحصول على Bot Token: تواصل مع @BotFather على تليجرام
+// للحصول على Chat ID: أرسل رسالة لـ @userinfobot
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || 'YOUR_BOT_TOKEN_HERE';
+const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID || 'YOUR_CHAT_ID_HERE';
 const FIREBASE_DB_URL = 'https://tiger-d1433-default-rtdb.firebaseio.com';
 
 // ====== CORS Headers ======
@@ -141,9 +144,56 @@ export default {
 };
 
 // ====== Get Bot Token & Chat ID ======
+// Cache for Telegram settings (refresh every 5 minutes)
+let cachedTelegramSettings = null;
+let settingsCacheTime = 0;
+const SETTINGS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+async function getTelegramSettings() {
+  const now = Date.now();
+  
+  // Return cache if still valid
+  if (cachedTelegramSettings && (now - settingsCacheTime) < SETTINGS_CACHE_TTL) {
+    return cachedTelegramSettings;
+  }
+  
+  try {
+    // Fetch from Firebase
+    const settings = await fetchFromFirebase('settings/telegram');
+    
+    if (settings && settings.enabled && settings.botToken && settings.chatId) {
+      cachedTelegramSettings = {
+        botToken: settings.botToken,
+        chatId: String(settings.chatId),
+        enabled: settings.enabled
+      };
+      settingsCacheTime = now;
+      console.log('✓ Loaded Telegram settings from Firebase');
+      return cachedTelegramSettings;
+    }
+  } catch (error) {
+    console.warn('⚠️ Failed to fetch Telegram settings from Firebase:', error.message);
+  }
+  
+  // Fallback to environment variables or defaults
+  return {
+    botToken: TELEGRAM_BOT_TOKEN,
+    chatId: TELEGRAM_CHAT_ID,
+    enabled: true
+  };
+}
+
 function getBotConfig(requestOrSettings) {
-  // Try to get from request headers first (for API calls)
-  if (typeof requestOrSettings.headers?.get === 'function') {
+  // If a settings object is passed directly (from scheduled event), use it
+  if (requestOrSettings?.botToken && requestOrSettings?.chatId) {
+    return {
+      botToken: requestOrSettings.botToken,
+      chatId: String(requestOrSettings.chatId)
+    };
+  }
+  
+  // Try to get from request headers (for API calls with custom credentials)
+  if (typeof requestOrSettings?.headers?.get === 'function') {
     const headerToken = requestOrSettings.headers.get('X-Bot-Token');
     const headerChatId = requestOrSettings.headers.get('X-Chat-ID');
     
@@ -152,15 +202,7 @@ function getBotConfig(requestOrSettings) {
     }
   }
   
-  // Otherwise use defaults or passed object
-  if (requestOrSettings.botToken && requestOrSettings.chatId) {
-    return {
-      botToken: requestOrSettings.botToken,
-      chatId: requestOrSettings.chatId
-    };
-  }
-  
-  // Fallback to environment variables or defaults
+  // Return defaults (will be resolved async in handlers)
   return {
     botToken: TELEGRAM_BOT_TOKEN,
     chatId: TELEGRAM_CHAT_ID
@@ -229,7 +271,17 @@ async function updateInFirebase(path, data) {
 async function handleOrderNotification(request) {
   try {
     const orderData = await request.json();
-    const config = getBotConfig(request);
+    
+    // Get Telegram config from Firebase (with fallback)
+    const config = await getTelegramSettings();
+    
+    if (!config.enabled || config.botToken === 'YOUR_BOT_TOKEN_HERE') {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Telegram not configured. Add botToken and chatId to settings/telegram in Firebase.',
+        warning: 'Notification skipped'
+      }), { status: 202, headers: corsHeaders });
+    }
     
     const order = orderData.order || orderData;
     const items = order.items || [];
