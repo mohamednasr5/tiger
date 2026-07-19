@@ -56,13 +56,15 @@ async function sendTelegramMessage(message, parseMode = 'HTML') {
   }
 
   try {
-    // محاولة الإرسال عبر Worker أولاً
+    // ✅ الطريقة الجديدة: إرسال عبر Notification Service (يعمل 24/7)
     const response = await fetch(`${TELEGRAM_CONFIG.workerUrl}/api/telegram/send`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'X-Bot-Token': TELEGRAM_CONFIG.botToken,
+        'X-Chat-ID': TELEGRAM_CONFIG.chatId
+      },
       body: JSON.stringify({
-        botToken: TELEGRAM_CONFIG.botToken,
-        chatId: TELEGRAM_CONFIG.chatId,
         text: message,
         parseMode: parseMode
       })
@@ -71,14 +73,15 @@ async function sendTelegramMessage(message, parseMode = 'HTML') {
     const result = await response.json();
     
     if (result.success) {
-      console.log('✅ Telegram message sent via Worker');
+      console.log('✅ Telegram message sent via Notification Service');
       return result;
     } else {
-      // فشل Worker - نحاول مباشرة
+      // فشل Service - نحاول مباشرة
+      console.log('Service failed, trying direct API...');
       return await sendDirectToTelegram(message, parseMode);
     }
   } catch (error) {
-    console.error('Worker failed, trying direct:', error);
+    console.error('Service failed, trying direct:', error);
     return await sendDirectToTelegram(message, parseMode);
   }
 }
@@ -149,6 +152,22 @@ ${itemsList}
 ⏰ <b>التاريخ:</b> ${new Date(order.createdAt || Date.now()).toLocaleString('ar-EG')}
   `.trim();
 
+  // ✅ إرسال فوري عبر Notification Service (يعمل حتى لو المتصفح مقفول)
+  try {
+    await fetch(`${TELEGRAM_CONFIG.workerUrl}/api/notify/order`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'X-Bot-Token': TELEGRAM_CONFIG.botToken,
+        'X-Chat-ID': TELEGRAM_CONFIG.chatId
+      },
+      body: JSON.stringify({ order: order })
+    });
+    console.log('✅ Order notification sent to service');
+  } catch (e) {
+    console.log('Service notify failed, using fallback');
+  }
+
   return await sendTelegramMessage(message);
 }
 
@@ -202,6 +221,22 @@ async function notifyNewPreOrder(preOrderData) {
 <i>هذا طلب مسبق - يرجى التواصل مع العميل عند توفر المنتج</i>
   `.trim();
 
+  // ✅ إرسال فوري عبر Notification Service
+  try {
+    await fetch(`${TELEGRAM_CONFIG.workerUrl}/api/notify/preorder`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'X-Bot-Token': TELEGRAM_CONFIG.botToken,
+        'X-Chat-ID': TELEGRAM_CONFIG.chatId
+      },
+      body: JSON.stringify({ preOrder: preOrder })
+    });
+    console.log('✅ Preorder notification sent to service');
+  } catch (e) {
+    console.log('Service notify failed');
+  }
+
   return await sendTelegramMessage(message);
 }
 
@@ -222,6 +257,22 @@ async function notifyLowStock(productName, size, color, currentStock, threshold 
 ━━━━━━━━━━━━━━━━━
 <i>يرجى إعادة تعبئة المخزون في أقرب وقت</i>
   `.trim();
+
+  // ✅ إرسال فوري عبر Notification Service
+  try {
+    await fetch(`${TELEGRAM_CONFIG.workerUrl}/api/notify/lowstock`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'X-Bot-Token': TELEGRAM_CONFIG.botToken,
+        'X-Chat-ID': TELEGRAM_CONFIG.chatId
+      },
+      body: JSON.stringify({ productName, size, color, currentStock, threshold })
+    });
+    console.log('✅ Low stock notification sent to service');
+  } catch (e) {
+    console.log('Service notify failed');
+  }
 
   return await sendTelegramMessage(message);
 }
