@@ -214,11 +214,14 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="js/config.js"></script>
+<script src="js/admin-enhancements.js"></script>
 <script>
 const params = new URLSearchParams(location.search);
 const pid = params.get("id");
 let PRODUCT = null;
 let selSize = "", selColor = "", selColorImage = "", qty = 1;
+let productStock = {}; // Store stock data for this product
+let currentStockQty = 0; // Current stock for selected size/color
 
 // Colors can be plain strings (legacy products) or {name, image} objects (new products with optional per-color image)
 function colorName(c) { return typeof c === "string" ? c : (c.name || ""); }
@@ -253,8 +256,75 @@ if (!pid) {
     document.title = (PRODUCT.name || "منتج") + " | تايجر جينز";
     applyProductSeo(PRODUCT, pid);
     
+    // Load stock data
+    loadProductStock(pid);
+    
     render();
   });
+}
+
+// Load stock for this product
+function loadProductStock(productId) {
+  db.ref(`products/${productId}/stock`).once("value").then((snap) => {
+    productStock = snap.val() || {};
+    updateStockDisplay();
+  }).catch(() => {
+    productStock = {};
+  });
+}
+
+// Update stock display based on selected size/color
+function updateStockDisplay() {
+  if (!selSize || !selColor) return;
+  
+  const key = `${selSize}_${selColor}`;
+  currentStockQty = productStock[key] || 0;
+  
+  // Update stock indicator
+  const stockEl = document.getElementById('stockIndicator');
+  if (stockEl) {
+    if (currentStockQty <= 0) {
+      stockEl.innerHTML = '<span style="color:#ff4757;font-weight:700"><i class='bx bx-x-circle'></i> غير متوفر حالياً</span>';
+      stockEl.className = 'stock-indicator out-of-stock';
+    } else if (currentStockQty <= 5) {
+      stockEl.innerHTML = `<span style="color:#ffa502;font-weight:700"><i class='bx bx-error'></i> يتبقى ${currentStockQty} قطع فقط!</span>`;
+      stockEl.className = 'stock-indicator low-stock';
+    } else {
+      stockEl.innerHTML = `<span style="color:#2ed573;font-weight:700"><i class='bx bx-check-circle'></i> متوفر (${currentStockQty} قطعة)</span>`;
+      stockEl.className = 'stock-indicator in-stock';
+    }
+  }
+  
+  // Update add to cart / pre-order button
+  updateActionButton();
+}
+
+// Update action button based on stock
+function updateActionButton() {
+  const actionDiv = document.getElementById('actionButtonContainer');
+  if (!actionDiv) return;
+  
+  if (currentStockQty <= 0) {
+    actionDiv.innerHTML = `
+      <button class="btn-primary" style="flex:1;justify-content:center;padding:1rem;background:linear-gradient(135deg,#ff6b81,#ff4757)" onclick="openPreorderModal('${pid}', '${PRODUCT?.name || ''}', '${selSize}', '${selColor}')">
+        <i class='bx bx-time-five'></i> طلب مسبق
+      </button>
+      <button class="btn-secondary wishlist-btn" data-id="${pid}" style="padding:1rem 1.2rem" onclick="toggleWishlistDetail()" id="pdWishlistBtn">
+        <i class='${isWishlisted(pid) ? "bx bxs-heart" : "bx bx-heart"}'></i>
+      </button>
+      <a href="cart.html" class="btn-secondary" style="padding:1rem 1.5rem">السلة</a>
+    `;
+  } else {
+    actionDiv.innerHTML = `
+      <button class="btn-primary" style="flex:1;justify-content:center;padding:1rem" onclick="addToCartNow()">
+        <i class='bx bx-cart-add'></i> أضف إلى السلة
+      </button>
+      <button class="btn-secondary wishlist-btn" data-id="${pid}" style="padding:1rem 1.2rem" onclick="toggleWishlistDetail()" id="pdWishlistBtn">
+        <i class='${isWishlisted(pid) ? "bx bxs-heart" : "bx bx-heart"}'></i>
+      </button>
+      <a href="cart.html" class="btn-secondary" style="padding:1rem 1.5rem">السلة</a>
+    `;
+  }
 }
 
 // Fills in per-product SEO: meta description, canonical URL, Open Graph tags,
@@ -375,6 +445,11 @@ function render() {
         </div>
       </div>` : ""}
       
+      <!-- Stock Indicator -->
+      <div id="stockIndicator" style="margin-bottom:1rem;padding:.8rem;background:var(--bg-alt);border-radius:10px;text-align:center;border:1px solid var(--line)">
+        <span style="color:var(--text-dim)">جاري التحقق من المخزون...</span>
+      </div>
+      
       <div class="qty-row">
         <label>الكمية</label>
         <div class="qty-box">
@@ -384,7 +459,7 @@ function render() {
         </div>
       </div>
       
-      <div class="pd-actions">
+      <div class="pd-actions" id="actionButtonContainer">
         <button class="btn-primary" style="flex:1;justify-content:center;padding:1rem" onclick="addToCartNow()">
           <i class='bx bx-cart-add'></i> أضف إلى السلة
         </button>
@@ -407,6 +482,8 @@ function pickSize(s, el) {
   selSize = s;
   document.querySelectorAll("#sizeList .option-btn").forEach(b => b.classList.remove("active"));
   el.classList.add("active");
+  // Update stock display for new size
+  updateStockDisplay();
 }
 
 function pickColor(c, img, el) {
@@ -420,6 +497,9 @@ function pickColor(c, img, el) {
   const mainImg = document.getElementById("mainImage");
   if (mainImg) mainImg.src = selColorImage || images[0];
   document.querySelectorAll(".pd-thumbs img").forEach((t, i) => t.classList.toggle("active", !selColorImage && i === 0));
+  
+  // Update stock display for new color
+  updateStockDisplay();
 }
 
 function changeQty(d) {

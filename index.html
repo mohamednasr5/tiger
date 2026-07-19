@@ -824,6 +824,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="js/config.js"></script>
+<script src="js/admin-enhancements.js"></script>
 
 <script>
 // ====== PWA Install Logic ======
@@ -1588,6 +1589,17 @@ function toggleCatSheet() {
   sheet.classList.toggle("show", opening);
   navBtn.classList.toggle("active", opening);
 }
+
+// ====== Start Sales Popups ======
+// Initialize sales popups after page loads
+document.addEventListener('DOMContentLoaded', () => {
+  // Wait a bit for products to load, then start popups
+  setTimeout(() => {
+    if (typeof startSalesPopups === 'function') {
+      startSalesPopups();
+    }
+  }, 5000);
+});
 </script>
 </body>
 </html>
