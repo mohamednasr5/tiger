@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+<title>إتمام الشراء | Tiger Jeans</title>
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#d4af37" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png" />
+<link rel="shortcut icon" href="images/favicon-32x32.png" type="image/png" />
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+<style>
+.page-hero{padding:2.5rem 0;border-bottom:1px solid var(--line);background:var(--bg-alt)}
+.page-hero h1{font-size:1.8rem;font-weight:800}
+.breadcrumb{color:var(--text-dim);font-size:.85rem;margin-top:.5rem}
+.breadcrumb a:hover{color:var(--gold)}
+.checkout-layout{display:grid;grid-template-columns:1fr .45fr;gap:2rem;padding:3rem 0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:1.8rem}
+.field{margin-bottom:1.2rem}
+.field label{display:block;margin-bottom:.5rem;font-size:.88rem;font-weight:600;color:var(--text-dim)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+
+/* Payment Options */
+.pay-options{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.3rem}
+.pay-option{
+  border:2px solid var(--line);
+  border-radius:12px;
+  padding:1rem;
+  cursor:pointer;
+  transition:.25s;
+  text-align:center;
+  background:var(--surface);
+}
+.pay-option:hover{border-color:var(--gold-deep)}
+.pay-option.active{
+  border-color:var(--gold);
+  background:rgba(212,175,55,.08);
+}
+.pay-option i{
+  font-size:1.8rem;
+  color:var(--gold);
+  display:block;
+  margin-bottom:.5rem;
+}
+.pay-option div{font-weight:700;font-size:.9rem}
+
+/* Payment Number Box with Copy */
+.pay-number-box{
+  background:var(--surface-2);
+  border:1.5px dashed var(--gold-deep);
+  border-radius:10px;
+  padding:1rem 1.3rem;
+  margin-bottom:1.3rem;
+}
+.pay-number-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:.6rem;
+  flex-wrap:wrap;
+  gap:.5rem;
+}
+.pay-number-label{font-size:.88rem;color:var(--text-dim)}
+.pay-number-value{
+  display:flex;
+  align-items:center;
+  gap:.6rem;
+  flex-wrap:wrap;
+}
+.pay-number-value b{
+  color:var(--gold);
+  font-family:'Cairo',sans-serif;
+  font-size:1.15rem;
+  letter-spacing:1px;
+  direction:ltr;
+}
+
+/* Upload Box */
+.upload-area{
+  border:2px dashed var(--line);
+  border-radius:12px;
+  padding:1.8rem;
+  text-align:center;
+  cursor:pointer;
+  transition:.25s;
+  background:var(--surface);
+}
+.upload-area:hover{border-color:var(--gold);background:rgba(212,175,55,.03)}
+.upload-area img{max-height:150px;margin:0 auto;border-radius:8px;display:block}
+
+/* Order Items */
+.order-item{
+  display:flex;
+  gap:.8rem;
+  padding:.7rem 0;
+  border-bottom:1px solid var(--line);
+  align-items:center;
+}
+.order-item img{width:52px;height:62px;object-fit:cover;border-radius:6px;background:var(--surface-2)}
+.order-item .item-name{flex:1;font-size:.88rem}
+.order-item .item-price{color:var(--gold);font-weight:700;font-size:.88rem}
+
+/* Summary */
+.summary-row{display:flex;justify-content:space-between;padding:.55rem 0;font-size:.92rem;color:var(--text-dim)}
+.summary-row.total{color:var(--text);font-weight:800;font-size:1.15rem;border-top:1px solid var(--line);margin-top:.6rem;padding-top:1.1rem}
+
+/* Success Box */
+.success-container{text-align:center;padding:3.5rem 1rem}
+.success-container i{font-size:4.5rem;color:var(--success);display:block;margin-bottom:1rem}
+.order-code-display{
+  background:var(--surface);
+  border:1.5px dashed var(--gold);
+  padding:1.1rem 2.2rem;
+  border-radius:14px;
+  display:inline-block;
+  margin:1.5rem 0;
+  font-size:1.35rem;
+  font-weight:800;
+  font-family:'Cairo',sans-serif;
+  color:var(--gold);
+}
+.success-actions{display:flex;gap:1rem;justify-content:center;margin-top:2rem;flex-wrap:wrap}
+
+/* WhatsApp Invoice Button */
+.whatsapp-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:.6rem;
+  background:#25D366;
+  color:#fff;
+  padding:.7rem 1.4rem;
+  border-radius:10px;
+  font-weight:700;
+  font-family:'Cairo',sans-serif;
+  font-size:.9rem;
+  text-decoration:none;
+  margin-top:1rem;
+  width:100%;
+  justify-content:center;
+  transition:.25s;
+}
+.whatsapp-btn:hover{
+  background:#128C7E;
+  transform:translateY(-2px);
+  box-shadow:0 6px 20px rgba(37,211,102,.4);
+}
+
+@media(max-width:900px){.checkout-layout{grid-template-columns:1fr}.row2{grid-template-columns:1fr}.pay-options{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="container">
+    <div class="header-main">
+      <a href="index.html" class="logo">
+        <img src="images/logo-icon.png" class="logo-icon" alt="Tiger Jeans" />
+        <div class="logo-text"><strong>TIGER JEANS</strong><small>لأرقى الملابس العالمية</small></div>
+      </a>
+      <nav class="main-nav">
+        <a href="index.html">الرئيسية</a>
+        <a href="track.html">تتبع الطلب</a>
+      </nav>
+      <div class="header-actions">
+        <a href="orders.html" class="action-btn" title="طلباتي"><i class='bx bx-receipt'></i></a>
+        <a href="wishlist.html" class="action-btn wishlist-btn-header"><i class='bx bx-heart'></i><span class="wishlist-badge" style="display:none">0</span></a>
+        <a href="cart.html" class="action-btn cart-btn"><i class='bx bx-cart-alt'></i><span class="cart-badge" style="display:none">0</span></a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Page Hero -->
+<div class="page-hero">
+  <div class="container">
+    <h1>إتمام الشراء</h1>
+    <div class="breadcrumb"><a href="index.html">الرئيسية</a> / <a href="cart.html">السلة</a> / إتمام الشراء</div>
+  </div>
+</div>
+
+<!-- Checkout Content -->
+<div class="container" id="checkoutContainer">
+  
+  <!-- Checkout Form -->
+  <div class="checkout-layout" id="checkoutForm">
+    
+    <!-- Left Column - Form -->
+    <div class="card">
+      <h3 style="margin-bottom:1.4rem;font-family:'Cairo',sans-serif">بيانات التوصيل</h3>
+      
+      <div class="row2">
+        <div class="field"><label>الاسم الكامل</label><input id="cName" placeholder="مثال: أحمد محمد" /></div>
+        <div class="field"><label>رقم الموبايل</label><input id="cPhone" placeholder="01xxxxxxxxx" /></div>
+      </div>
+      
+      <div class="row2">
+        <div class="field"><label>المحافظة</label><select id="cCity"><option value="">اختر المحافظة</option></select></div>
+        <div class="field"><label>العنوان بالتفصيل</label><input id="cAddress" placeholder="الشارع، رقم العمارة..." /></div>
+      </div>
+      
+      <div class="field">
+        <label>ملاحظات (اختياري)</label>
+        <textarea id="cNotes" rows="2" placeholder="أي تفاصيل إضافية"></textarea>
+      </div>
+
+      <h3 style="margin:2rem 0 1.2rem;font-family:'Cairo',sans-serif">طريقة الدفع</h3>
+      <div class="pay-options">
+        <div class="pay-option active" data-method="vodafone" onclick="selectPay('vodafone', this)">
+          <i class='bx bx-mobile-alt'></i>
+          <div>فودافون كاش</div>
+        </div>
+        <div class="pay-option" data-method="instapay" onclick="selectPay('instapay', this)">
+          <i class='bx bx-transfer'></i>
+          <div>انستاباي</div>
+        </div>
+        <div class="pay-option" data-method="cod" onclick="selectPay('cod', this)">
+          <i class='bx bx-money'></i>
+          <div>الدفع عند الاستلام</div>
+        </div>
+      </div>
+
+      <!-- Payment Details (Dynamic) -->
+      <div class="pay-number-box" id="payNumberBox">
+        <div class="pay-number-header">
+          <span class="pay-number-label" id="payLabel">حوّل المبلغ على رقم فودافون كاش:</span>
+        </div>
+        <div class="pay-number-value">
+          <b id="payNumberVal">جاري التحميل...</b>
+          <button class="copy-btn" id="copyPhoneBtn" onclick="copyToClipboard(document.getElementById('payNumberVal').textContent, this)">
+            <i class='bx bx-copy'></i> نسخ
+          </button>
+        </div>
+        
+        <!-- Owner Name Display -->
+        <div id="ownerNameDisplay" style="margin-top:.7rem;padding:.6rem .8rem;background:rgba(212,175,55,.08);border-radius:8px;display:none">
+          <span style="font-size:.82rem;color:var(--text-dim)">اسم صاحب الحساب: </span>
+          <b id="ownerNameText" style="font-size:.9rem;color:var(--gold);font-family:'Cairo',sans-serif"></b>
+        </div>
+        
+        <!-- Instapay Link (shown when instapay selected) -->
+        <div id="instapaySection" style="display:none;margin-top:1rem;padding-top:1rem;border-top:1px dashed var(--line)">
+          <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:.6rem">أو اضغط للدفع مباشرة عبر إنستاباي:</p>
+          <a href="#" target="_blank" class="instapay-link" id="instapayLink">
+            <i class='bx bx-link-external'></i> فتح رابط الدفع
+          </a>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>ارفع صورة إيصال التحويل (اختياري للدفع عند الاستلام)</label>
+        <div class="upload-area" onclick="document.getElementById('receiptInput').click()">
+          <img id="receiptPreview" style="display:none" alt="" />
+          <div id="receiptPlaceholder">
+            <i class='bx bx-cloud-upload' style="font-size:2.2rem;color:var(--gold)"></i>
+            <p style="margin-top:.6rem;color:var(--text-dim)">اضغط لرفع صورة الإيصال</p>
+          </div>
+          <div id="receiptStatus"></div>
+        </div>
+        <input type="file" id="receiptInput" accept="image/*" style="display:none" onchange="onReceiptChange()" />
+      </div>
+
+      <button class="btn-primary full-width" style="margin-top:1.5rem" onclick="submitOrder()" id="submitBtn">تأكيد الطلب <i class='bx bx-check-double'></i></button>
+    </div>
+
+    <!-- Right Column - Order Summary -->
+    <div class="card" style="height:fit-content;position:sticky;top:100px">
+      <h3 style="margin-bottom:1.2rem;font-family:'Cairo',sans-serif">طلبك</h3>
+      <div id="orderItemsList"></div>
+      <div class="summary-row"><span>المجموع الفرعي</span><span id="sSub">0 ج.م</span></div>
+      <div class="summary-row"><span>الشحن</span><span id="sShip">يحدد لاحقاً</span></div>
+      <div id="discountRow" class="summary-row" style="display:none"><span>الخصم</span><span id="sDiscount" style="color:var(--success)">-0 ج.م</span></div>
+      <div class="summary-row total"><span>الإجمالي</span><span id="sTotal">0 ج.م</span></div>
+      
+      <div class="field" style="margin-top:1.3rem">
+        <label>كود الخصم (إن وجد)</label>
+        <div style="display:flex;gap:.6rem">
+          <input id="promoCode" placeholder="أدخل الكود" style="flex:1" />
+          <button class="btn-primary" style="padding:0 1.2rem" onclick="applyPromo()">تطبيق</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Message + WhatsApp Invoice -->
+  <div id="successBox" style="display:none" class="success-container">
+    <i class='bx bx-badge-check'></i>
+    <h2 style="margin-top:1rem;font-family:'Cairo',sans-serif">تم استلام طلبك بنجاح!</h2>
+    <p style="color:var(--text-dim);margin-top:.6rem">سيتم مراجعة إيصال الدفع وتأكيد الطلب خلال وقت قصير</p>
+    <div class="order-code-display" id="orderCodeDisplay"></div>
+    <p style="color:var(--text-dim);font-size:.85rem;margin-top:.8rem">احتفظ برقم الطلب لمتابعة حالة الشحن</p>
+    
+    <!-- WhatsApp Invoice Button -->
+    <a href="#" class="whatsapp-btn" id="whatsappInvoice" target="_blank">
+      <i class='bx bxl-whatsapp'></i> إرسال الفاتورة على واتساب
+    </a>
+    
+    <div class="success-actions">
+      <a href="track.html" class="btn-secondary">تتبع الطلب</a>
+      <a href="index.html" class="btn-primary">متابعة التسوق</a>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="container footer-bottom">
+    <p>جميع الحقوق محفوظة © Tiger Jeans 2026 | تطوير
+        <a href="https://www.facebook.com/en.mohamed.nasr" target="_blank" rel="noopener" class="credit-link">
+          <i class='bx bxs-code-alt'></i> المهندس محمد حماد
+        </a>
+      </p>
+  </div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="js/config.js"></script>
+<script src="js/upload.js"></script>
+<script>
+let method = "vodafone";
+let receiptUrl = "";
+let paySettings = {};
+let discountAmount = 0;
+
+const cart = getCart();
+if (!cart.length) location.href = "cart.html";
+
+// Populate governorates dropdown
+document.getElementById("cCity").innerHTML =
+  '<option value="">اختر المحافظة</option>' +
+  EGYPT_GOVERNORATES.map((g) => `<option value="${g}">${g}</option>`).join("");
+document.getElementById("cCity").addEventListener("change", () => {
+  updatePayNumber();
+  updateTotals();
+});
+
+// Render order items
+function renderOrder() {
+  document.getElementById("orderItemsList").innerHTML = cart
+    .map((i) => `<div class="order-item">
+      <img src="${i.image || "images/product-1.png"}" alt="${i.name}" />
+      <div class="item-name">${i.name}${i.size ? " - " + i.size : ""} × ${i.qty}</div>
+      <div class="item-price">${fmtPrice(i.price * i.qty)}</div>
+    </div>`).join("");
+  
+  updateTotals();
+}
+renderOrder();
+
+// Load payment settings from Firebase (controllable from admin)
+db.ref("settings/payment").once("value").then((snap) => {
+  paySettings = snap.val() || {};
+  // Default values if not set in admin
+  if (!paySettings.vodafone) paySettings.vodafone = "01012345678";
+  if (!paySettings.instapay) paySettings.instapay = "engmohamednasr";
+  if (!paySettings.instapayLink) paySettings.instapayLink = "https://ipn.eg/S/engmohamednasr/instapay/8NShbl";
+  updatePayNumber();
+});
+
+// Load payment methods status (enabled/disabled) from admin
+let availablePaymentMethods = ['vodafone', 'instapay', 'cod']; // default all enabled
+db.ref("settings/paymentMethods").once("value").then((snap) => {
+  const methodsStatus = snap.val() || {};
+  
+  // Check each method status
+  const methods = {
+    vodafone: methodsStatus.vodafone !== false,
+    instapay: methodsStatus.instapay !== false,
+    cod: methodsStatus.cod !== false
+  };
+  
+  // Hide disabled payment options
+  Object.keys(methods).forEach(m => {
+    const optionEl = document.querySelector(`.pay-option[data-method="${m}"]`);
+    if (optionEl && !methods[m]) {
+      optionEl.style.display = 'none';
+    }
+  });
+  
+  // Get only enabled methods
+  availablePaymentMethods = Object.keys(methods).filter(m => methods[m]);
+  
+  // If current selected method is disabled, switch to first available
+  if (availablePaymentMethods.indexOf(method) === -1 && availablePaymentMethods.length > 0) {
+    const firstAvailable = document.querySelector(`.pay-option[data-method="${availablePaymentMethods[0]}"]`);
+    if (firstAvailable) {
+      selectPay(availablePaymentMethods[0], firstAvailable);
+    }
+  }
+  
+  // Show warning if no payment methods available
+  if (availablePaymentMethods.length === 0) {
+    document.querySelector('.pay-options').innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--text-dim)">
+        <i class='bx bx-error-circle' style="font-size:2rem;color:var(--danger);margin-bottom:.5rem;display:block"></i>
+        <p>لا توجد طرق دفع متاحة حالياً</p>
+        <p style="font-size:.8rem;margin-top:.3rem">يرجى المحاولة لاحقاً أو التواصل معنا</p>
+      </div>
+    `;
+  }
+});
+
+// Load shipping rates per governorate (managed from admin > الشحن)
+let shippingRates = {}; // { governate: cost } — only active rates included
+db.ref("shippingRates").once("value").then((snap) => {
+  const val = snap.val() || {};
+  shippingRates = {};
+  Object.values(val).forEach((r) => {
+    if (r && r.governate && r.active !== false) {
+      shippingRates[r.governate] = r.cost;
+    }
+  });
+  updatePayNumber();
+  updateTotals();
+});
+
+// Returns the shipping cost for the currently selected governorate.
+// Falls back to 0 if no city selected yet, or no rate was set for it in admin.
+function getShippingCost() {
+  const city = document.getElementById("cCity").value;
+  if (!city) return 0;
+  if (Object.prototype.hasOwnProperty.call(shippingRates, city)) {
+    return shippingRates[city];
+  }
+  return 0;
+}
+
+function selectPay(m, el) {
+  method = m;
+  document.querySelectorAll(".pay-option").forEach((p) => p.classList.remove("active"));
+  el.classList.add("active");
+  updatePayNumber();
+  updateTotals();
+}
+
+function updatePayNumber() {
+  const label = document.getElementById("payLabel");
+  const val = document.getElementById("payNumberVal");
+  const instapaySec = document.getElementById("instapaySection");
+  const copyBtn = document.getElementById("copyPhoneBtn");
+  const ownerNameDisplay = document.getElementById("ownerNameDisplay");
+  const ownerNameText = document.getElementById("ownerNameText");
+  
+  // Hide all special sections first
+  instapaySec.style.display = "none";
+  ownerNameDisplay.style.display = "none";
+  
+  if (method === "vodafone") {
+    label.textContent = "حوّل المبلغ على رقم فودافون كاش:";
+    val.textContent = paySettings.vodafone || "01012345678";
+    copyBtn.style.display = "inline-flex";
+    // Show Vodafone owner name if available
+    if (paySettings.vodafoneName) {
+      ownerNameText.textContent = paySettings.vodafoneName;
+      ownerNameDisplay.style.display = "block";
+    }
+  } else if (method === "instapay") {
+    label.textContent = "حوّل المبلغ على انستاباي للمستخدم:";
+    val.textContent = "@" + (paySettings.instapay || "engmohamednasr");
+    copyBtn.style.display = "inline-flex";
+    // Show Instapay section with link
+    instapaySec.style.display = "block";
+    // Update the link from admin settings
+    document.getElementById("instapayLink").href = paySettings.instapayLink || "#";
+    // Show InstaPay owner name if available
+    if (paySettings.instapayOwner) {
+      ownerNameText.textContent = paySettings.instapayOwner;
+      ownerNameDisplay.style.display = "block";
+    }
+  } else {
+    label.textContent = "الدفع عند الاستلام:";
+    const city = document.getElementById("cCity").value;
+    const cost = getShippingCost();
+    val.textContent = city ? `مصاريف الشحن: ${fmtPrice(cost)}` : "اختر المحافظة لمعرفة مصاريف الشحن";
+    copyBtn.style.display = "none";
+  }
+}
+
+function updateTotals() {
+  let subtotal = cartTotal();
+  let shippingCost = getShippingCost();
+  let total = subtotal + shippingCost - discountAmount;
+  const city = document.getElementById("cCity").value;
+  
+  document.getElementById("sSub").textContent = fmtPrice(subtotal);
+  document.getElementById("sShip").textContent = city ? fmtPrice(shippingCost) : "يحدد حسب المحافظة";
+  document.getElementById("sTotal").textContent = fmtPrice(Math.max(0, total));
+  
+  if (discountAmount > 0) {
+    document.getElementById("discountRow").style.display = "flex";
+    document.getElementById("sDiscount").textContent = "-" + fmtPrice(discountAmount);
+  } else {
+    document.getElementById("discountRow").style.display = "none";
+  }
+}
+
+// Apply promo code
+async function applyPromo() {
+  const code = document.getElementById("promoCode").value.trim().toUpperCase();
+  if (!code) { showToast("أدخل كود الخصم"); return; }
+  
+  try {
+    const snap = await db.ref("promoCodes/" + code).once("value");
+    const promo = snap.val();
+    
+    if (!promo || !promo.active) {
+      showToast("كود الخصم غير صالح");
+      return;
+    }
+    
+    if (promo.discountType === "percentage") {
+      discountAmount = Math.round(cartTotal() * promo.discountValue / 100);
+    } else {
+      discountAmount = promo.discountValue;
+    }
+    
+    showToast(`تم تطبيق خصم ${fmtPrice(discountAmount)} ✓`);
+    updateTotals();
+  } catch (err) {
+    showToast("حدث خطأ في التحقق من الكود");
+  }
+}
+
+// Receipt upload
+async function onReceiptChange() {
+  const input = document.getElementById("receiptInput");
+  const file = input.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    document.getElementById("receiptPreview").src = e.target.result;
+    document.getElementById("receiptPreview").style.display = "block";
+    document.getElementById("receiptPlaceholder").style.display = "none";
+  };
+  reader.readAsDataURL(file);
+  
+  await handleImageInput(input, (url) => { receiptUrl = url; }, document.getElementById("receiptStatus"));
+}
+
+// Generate WhatsApp Invoice
+function generateWhatsAppLink(orderData) {
+  const phone = "201012345678"; // Can be controlled from admin
+  
+  let message = `🛒 *طلب جديد من Tiger Jeans*\n\n`;
+  message += `📋 *رقم الطلب:* ${orderData.code}\n`;
+  message += `👤 *العميل:* ${orderData.customer.name}\n`;
+  message += `📱 *الموبايل:* ${orderData.customer.phone}\n`;
+  message += `🏙️ *المدينة:* ${orderData.customer.city}\n`;
+  message += `📍 *العنوان:* ${orderData.customer.address}\n\n`;
+  message += `📦 *المنتجات:*\n`;
+  
+  orderData.items.forEach((item, idx) => {
+    message += `${idx+1}. ${item.name} ×${item.qty} = ${fmtPrice(item.price * item.qty)}\n`;
+  });
+  
+  message += `\n💰 *المجموع:* ${fmtPrice(orderData.total)}\n`;
+  message += `💳 *طريقة الدفع:* ${getPaymentMethodName(orderData.payment.method)}\n\n`;
+  message += `_تم إنشاء هذا الطلب تلقائياً_`;
+  
+  return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+}
+
+function getPaymentMethodName(method) {
+  const names = { vodafone: "فودافون كاش", instapay: "إنستاباي", cod: "الدفع عند الاستلام" };
+  return names[method] || method;
+}
+
+// Submit order
+async function submitOrder() {
+  const name = document.getElementById("cName").value.trim();
+  const phone = document.getElementById("cPhone").value.trim();
+  const city = document.getElementById("cCity").value.trim();
+  const address = document.getElementById("cAddress").value.trim();
+  const notes = document.getElementById("cNotes").value.trim();
+
+  // Validation
+  if (!name || !phone || !city || !address) {
+    showToast("من فضلك أكمل بيانات التوصيل");
+    return;
+  }
+  if (!/^01[0125][0-9]{8}$/.test(phone)) {
+    showToast("رقم الموبايل غير صحيح");
+    return;
+  }
+  if (method !== "cod" && !receiptUrl) {
+    showToast("من فضلك ارفع صورة إيصال التحويل");
+    return;
+  }
+
+  const btn = document.getElementById("submitBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> جاري إرسال الطلب...';
+
+  const code = genOrderCode();
+  const shippingCost = getShippingCost();
+  let total = cartTotal() + shippingCost - discountAmount;
+  
+  const order = {
+    code,
+    items: cart,
+    subtotal: cartTotal(),
+    shippingCost,
+    discount: discountAmount,
+    total: Math.max(0, total),
+    customer: { name, phone, city, address, notes },
+    uid: (typeof currentUser !== "undefined" && currentUser) ? currentUser.uid : null,
+    payment: { 
+      method, 
+      receiptImage: receiptUrl || null,
+      status: method === "cod" ? "pending_payment" : "pending_verification"
+    },
+    status: "pending",
+    statusHistory: [{ 
+      status: "pending", 
+      note: method === "cod" ? "تم استلام الطلب - في انتظار الدفع عند الاستلام" : "تم استلام الطلب وفي انتظار مراجعة الدفع", 
+      ts: Date.now() 
+    }],
+    createdAt: Date.now()
+  };
+
+  try {
+    await db.ref("orders").push(order);
+    localStorage.setItem("tj_customer_phone", phone);
+    clearCart();
+    
+    // Hide form, show success
+    document.getElementById("checkoutForm").style.display = "none";
+    document.getElementById("successBox").style.display = "block";
+    document.getElementById("orderCodeDisplay").textContent = code;
+    
+    // Set WhatsApp invoice link
+    document.getElementById("whatsappInvoice").href = generateWhatsAppLink(order);
+    
+  } catch (err) {
+    showToast("حدث خطأ أثناء إرسال الطلب، حاول مرة أخرى");
+    btn.disabled = false;
+    btn.innerHTML = "تأكيد الطلب <i class='bx bx-check-double'></i>";
+  }
+}
+
+// ====== Copy to Clipboard ======
+function copyToClipboard(text, btnElement) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      showCopySuccess(btnElement);
+    }).catch(() => fallbackCopy(text, btnElement));
+  } else {
+    fallbackCopy(text, btnElement);
+  }
+}
+
+function fallbackCopy(text, btnElement) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand('copy');
+    showCopySuccess(btnElement);
+  } catch (err) {
+    showToast("فشل النسخ");
+  }
+  document.body.removeChild(textarea);
+}
+
+function showCopySuccess(btn) {
+  const originalText = btn.innerHTML;
+  btn.classList.add('copied');
+  btn.innerHTML = '<i class=\'bx bx-check\'></i> تم النسخ!';
+  setTimeout(() => {
+    btn.classList.remove('copied');
+    btn.innerHTML = originalText;
+  }, 2000);
+}
+</script>
+
+<!-- ====== Bottom Navigation (Mobile, <992px) ====== -->
+<nav class="bottom-nav" aria-label="التنقل السفلي">
+  <div class="bottom-nav-inner">
+    <a href="index.html" data-nav="home" class=""><i class='bx bx-home-alt'></i><span>الرئيسية</span></a>
+    <a href="index.html#products" data-nav="search" class="" onclick="if(window.location.pathname.endsWith('index.html')){event.preventDefault();toggleSearch();}"><i class='bx bx-search'></i><span>بحث</span></a>
+    <a href="index.html#products" data-nav="categories" class=""><i class='bx bx-category'></i><span>الأقسام</span></a>
+    <a href="cart.html" data-nav="cart" class="active"><i class='bx bx-cart-alt'></i><span>السلة</span><span class="bn-badge cart-badge" style="display:none">0</span></a>
+    <a href="orders.html" id="bottomAccountLink" data-nav="account" class=""><i class='bx bx-user'></i><span>طلباتي</span></a>
+  </div>
+</nav>
+</body>
+</html>
