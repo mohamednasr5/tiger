@@ -305,9 +305,21 @@ function submitPreorder() {
     preorderData.productName = snap.val() || '';
     
     return db.ref('preorders').push(preorderData);
-  }).then(() => {
+  }).then((ref) => {
+    // Add ID for notification
+    preorderData.id = ref.key;
+    
     showToast('تم تسجيل طلبك المسبق بنجاح! سنشعرك عند توفر المنتج ✓');
     closePreorderModal();
+    
+    // Send Telegram notification (async, don't block UI)
+    if (typeof window.TelegramBot !== 'undefined') {
+      loadTelegramSettings().then(() => {
+        if (TELEGRAM_CONFIG.enabled) {
+          notifyNewPreOrder(preorderData).catch(e => console.log('Telegram preorder notify error:', e));
+        }
+      });
+    }
   }).catch(err => {
     console.error('Preorder error:', err);
     showToast('حدث خطأ، يرجى المحاولة مرة أخرى');

@@ -320,6 +320,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="js/config.js"></script>
 <script src="js/upload.js"></script>
+<script src="js/telegram-bot.js"></script>
 <script>
 let method = "vodafone";
 let receiptUrl = "";
@@ -624,7 +625,14 @@ async function submitOrder() {
   };
 
   try {
-    await db.ref("orders").push(order);
+    const orderRef = await db.ref("orders").push(order);
+    const orderId = orderRef.key;
+    
+    // Add orderCode and ID for Telegram notification
+    order.orderCode = code;
+    order.id = orderId;
+    order.totalPrice = order.total;
+    
     localStorage.setItem("tj_customer_phone", phone);
     clearCart();
     
@@ -635,6 +643,15 @@ async function submitOrder() {
     
     // Set WhatsApp invoice link
     document.getElementById("whatsappInvoice").href = generateWhatsAppLink(order);
+    
+    // Send Telegram notification (async, don't block UI)
+    if (typeof window.TelegramBot !== 'undefined') {
+      loadTelegramSettings().then(() => {
+        if (TELEGRAM_CONFIG.enabled) {
+          notifyNewOrder(order).catch(e => console.log('Telegram notify error:', e));
+        }
+      });
+    }
     
   } catch (err) {
     showToast("حدث خطأ أثناء إرسال الطلب، حاول مرة أخرى");
