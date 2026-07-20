@@ -1,0 +1,79 @@
+# robots.txt — Tiger Jeans (https://tiger-jeans.com)
+
+# ====== Default rule for all crawlers ======
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /cart.html
+Disallow: /checkout.html
+Disallow: /orders.html
+Disallow: /track.html
+Disallow: /wishlist.html
+
+# ====== Traditional search engines (explicit, for clarity) ======
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Yandex
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+# ====== AI answer engines / assistants (allowed so the store can be
+# discovered and cited in AI Overviews, Copilot, ChatGPT Search, Perplexity, etc.) ======
+User-agent: Google-Extended
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: FacebookBot
+Allow: /
+
+User-agent: meta-externalagent
+Allow: /
+
+Sitemap: https://tiger-jeans.com/sitemap.xml
