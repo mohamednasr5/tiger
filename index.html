@@ -446,7 +446,7 @@
   <div class="container">
     <div class="header-main">
       <!-- Logo -->
-      <a href="index.html" class="logo">
+      <a href="/" class="logo">
         <img src="images/logo-icon.png" class="logo-icon" width="128" height="128" alt="Tiger Jeans" />
         <div class="logo-text">
           <strong>TIGER JEANS</strong>
@@ -456,7 +456,7 @@
 
       <!-- Navigation -->
       <nav class="main-nav" id="mainNav">
-        <a href="index.html" class="active">الرئيسية</a>
+        <a href="/" class="active">الرئيسية</a>
         <a href="#products">المنتجات</a>
         <a href="#deals-section">عروض مميزة 🔥</a>
         <a href="#deals-section">الخصومات</a>
@@ -733,7 +733,7 @@
       </div>
       <div class="footer-col">
         <h3>روابط سريعة</h3>
-        <a href="index.html">الرئيسية</a>
+        <a href="/">الرئيسية</a>
         <a href="#products">المنتجات</a>
         <a href="#featured">العروض</a>
         <a href="track.html">تتبع الطلب</a>
@@ -749,6 +749,14 @@
         <p><i class='bx bxs-map'></i> جمهورية مصر العربية</p>
         <p><i class='bx bxs-envelope'></i> info@tiger-jeans.com</p>
         <p><i class='bx bxs-phone'></i> 01289440111</p>
+      </div>
+      <div class="footer-col">
+        <h3>معلومات</h3>
+        <a href="about.html">من نحن</a>
+        <a href="contact.html">اتصل بنا</a>
+        <a href="privacy-policy.html">سياسة الخصوصية</a>
+        <a href="terms.html">الشروط والأحكام</a>
+        <a href="return-policy.html">سياسة الاسترجاع والاستبدال</a>
       </div>
     </div>
     <div class="footer-bottom">
@@ -1671,8 +1679,8 @@ function showCopySuccess(btn) {
 <!-- ====== Bottom Navigation (Mobile, <992px) ====== -->
 <nav class="bottom-nav" aria-label="التنقل السفلي">
   <div class="bottom-nav-inner">
-    <a href="index.html" data-nav="home" class="active"><i class='bx bx-home-alt'></i><span>الرئيسية</span></a>
-    <a href="index.html#products" data-nav="search" class="" onclick="if(window.location.pathname.endsWith('index.html')){event.preventDefault();toggleSearch();}"><i class='bx bx-search'></i><span>بحث</span></a>
+    <a href="/" data-nav="home" class="active"><i class='bx bx-home-alt'></i><span>الرئيسية</span></a>
+    <a href="/#products" data-nav="search" class="" onclick="if(window.location.pathname==='/'||window.location.pathname.endsWith('/index.html')){event.preventDefault();toggleSearch();}"><i class='bx bx-search'></i><span>بحث</span></a>
     <a href="#" data-nav="categories" class="" onclick="event.preventDefault();toggleCatSheet();"><i class='bx bx-category'></i><span>الأقسام</span></a>
     <a href="cart.html" data-nav="cart" class=""><i class='bx bx-cart-alt'></i><span>السلة</span><span class="bn-badge cart-badge" style="display:none">0</span></a>
     <a href="orders.html" id="bottomAccountLink" data-nav="account" class=""><i class='bx bx-user'></i><span>طلباتي</span></a>

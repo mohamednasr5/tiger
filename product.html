@@ -220,13 +220,13 @@
 <header class="site-header">
   <div class="container">
     <div class="header-main">
-      <a href="index.html" class="logo">
+      <a href="/" class="logo">
         <img src="images/logo-icon.png" class="logo-icon" alt="Tiger Jeans" />
         <div class="logo-text"><strong>TIGER JEANS</strong><small>لأرقى الملابس العالمية</small></div>
       </a>
       <nav class="main-nav">
-        <a href="index.html">الرئيسية</a>
-        <a href="index.html#products">المتجر</a>
+        <a href="/">الرئيسية</a>
+        <a href="/#products">المتجر</a>
         <a href="track.html">تتبع الطلب</a>
       </nav>
       <div class="header-actions">
@@ -241,7 +241,7 @@
 <!-- Breadcrumb -->
 <div class="page-hero">
   <div class="container">
-    <div class="breadcrumb"><a href="index.html">الرئيسية</a> / <span id="crumbName">منتج</span></div>
+    <div class="breadcrumb"><a href="/">الرئيسية</a> / <span id="crumbName">منتج</span></div>
   </div>
 </div>
 
@@ -255,6 +255,13 @@
 <!-- Footer -->
 <footer class="site-footer">
   <div class="container footer-bottom">
+    <div class="footer-legal-links">
+      <a href="about.html">من نحن</a>
+      <a href="contact.html">اتصل بنا</a>
+      <a href="privacy-policy.html">سياسة الخصوصية</a>
+      <a href="terms.html">الشروط والأحكام</a>
+      <a href="return-policy.html">سياسة الاسترجاع والاستبدال</a>
+    </div>
     <p>جميع الحقوق محفوظة © Tiger Jeans 2026 | تطوير
         <a href="https://www.facebook.com/en.mohamed.nasr" target="_blank" rel="noopener" class="credit-link">
           <i class='bx bxs-code-alt'></i> المهندس محمد حماد
@@ -649,9 +656,9 @@ function shareOnWhatsApp() {
 <!-- ====== Bottom Navigation (Mobile, <992px) ====== -->
 <nav class="bottom-nav" aria-label="التنقل السفلي">
   <div class="bottom-nav-inner">
-    <a href="index.html" data-nav="home" class=""><i class='bx bx-home-alt'></i><span>الرئيسية</span></a>
-    <a href="index.html#products" data-nav="search" class="" onclick="if(window.location.pathname.endsWith('index.html')){event.preventDefault();toggleSearch();}"><i class='bx bx-search'></i><span>بحث</span></a>
-    <a href="index.html#products" data-nav="categories" class="active"><i class='bx bx-category'></i><span>الأقسام</span></a>
+    <a href="/" data-nav="home" class=""><i class='bx bx-home-alt'></i><span>الرئيسية</span></a>
+    <a href="/#products" data-nav="search" class="" onclick="if(window.location.pathname==='/'||window.location.pathname.endsWith('/index.html')){event.preventDefault();toggleSearch();}"><i class='bx bx-search'></i><span>بحث</span></a>
+    <a href="/#products" data-nav="categories" class="active"><i class='bx bx-category'></i><span>الأقسام</span></a>
     <a href="cart.html" data-nav="cart" class=""><i class='bx bx-cart-alt'></i><span>السلة</span><span class="bn-badge cart-badge" style="display:none">0</span></a>
     <a href="orders.html" id="bottomAccountLink" data-nav="account" class=""><i class='bx bx-user'></i><span>طلباتي</span></a>
   </div>
