@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>طلباتي | Tiger Jeans</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="shortcut icon" href="images/favicon-32x32.png" type="image/png" />
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+<style>
+.page-hero{padding:2.5rem 0;border-bottom:1px solid var(--line);background:var(--bg-alt)}
+.page-hero h1{font-size:1.8rem;font-weight:800}
+.breadcrumb{color:var(--text-dim);font-size:.85rem;margin-top:.5rem}
+.breadcrumb a:hover{color:var(--gold)}
+
+.orders-container{max-width:760px;margin:3rem auto}
+
+/* ---- Phone gate (first visit) ---- */
+.phone-gate{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:2rem;text-align:center;margin-bottom:2rem;
+}
+.phone-gate i{font-size:2.4rem;color:var(--gold);margin-bottom:.8rem;display:block}
+.phone-gate h3{font-size:1.15rem;margin-bottom:.4rem}
+.phone-gate p{color:var(--text-dim);font-size:.88rem;margin-bottom:1.4rem}
+.phone-gate .search-box{display:flex;gap:.7rem;max-width:420px;margin:0 auto}
+.phone-gate input{flex:1;padding:1rem 1.2rem;font-size:1rem}
+
+/* ---- Identity bar (once phone/account known) ---- */
+.identity-bar{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.8rem;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:1rem 1.3rem;margin-bottom:1.6rem;
+}
+.identity-bar .who{display:flex;align-items:center;gap:.7rem;color:var(--text-dim);font-size:.9rem}
+.identity-bar .who b{color:var(--text)}
+.identity-bar .who i{font-size:1.4rem;color:var(--gold)}
+.identity-bar .actions{display:flex;gap:.6rem}
+.identity-bar button{
+  font-size:.8rem;font-weight:700;color:var(--text-dim);
+  border:1px solid var(--line);border-radius:8px;padding:.5rem .9rem;transition:.2s;
+}
+.identity-bar button:hover{color:var(--text);border-color:var(--gold)}
+
+/* ---- Filters ---- */
+.order-filters{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.4rem}
+.order-filters button{
+  font-size:.82rem;font-weight:700;color:var(--text-dim);
+  border:1px solid var(--line);border-radius:999px;padding:.5rem 1.1rem;transition:.2s;
+}
+.order-filters button.active,.order-filters button:hover{background:var(--gold);color:#000;border-color:var(--gold)}
+
+/* ---- Order card ---- */
+.order-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:1.6rem;margin-bottom:1.2rem}
+.order-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.7rem}
+.order-code-text{font-family:'Cairo',sans-serif;color:var(--gold);font-weight:800;font-size:1.05rem}
+.order-date{color:var(--text-dim);font-size:.85rem;margin-bottom:1rem}
+.order-total{color:var(--gold);font-weight:700;font-family:'Cairo',sans-serif}
+
+.status-badge{display:inline-flex;align-items:center;gap:.4rem;padding:.4rem .9rem;border-radius:999px;font-size:.8rem;font-weight:700}
+.status-pending{background:rgba(224,166,60,.15);color:var(--warn)}
+.status-confirmed{background:rgba(62,207,142,.15);color:var(--success)}
+.status-shipping{background:rgba(58,77,112,.4);color:#9db3e0}
+.status-delivered{background:rgba(62,207,142,.25);color:var(--success)}
+.status-cancelled{background:rgba(224,85,75,.15);color:var(--danger)}
+
+.order-items{display:flex;flex-direction:column;gap:.6rem;margin:1rem 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:1rem 0}
+.order-item-row{display:flex;align-items:center;gap:.8rem;font-size:.86rem}
+.order-item-row img{width:44px;height:44px;object-fit:cover;border-radius:8px;background:var(--surface-2)}
+.order-item-row .meta{flex:1;color:var(--text-dim)}
+.order-item-row .meta b{color:var(--text);display:block;font-size:.88rem;margin-bottom:.15rem}
+.order-item-row .qty{color:var(--text-dim);font-size:.8rem}
+
+.order-card-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.7rem}
+.order-actions a{font-size:.82rem;font-weight:700;color:var(--gold)}
+.order-actions a:hover{text-decoration:underline}
+
+/* Tracking Button */
+.tracking-btn{
+  display:inline-flex;align-items:center;gap:.4rem;
+  background:linear-gradient(135deg,#3b82f6,#1d4ed8);
+  color:#fff !important;
+  padding:.5rem 1rem;border-radius:10px;
+  font-size:.82rem;font-weight:700;
+  text-decoration:none;transition:.2s;
+  box-shadow:0 2px 8px rgba(59,130,246,.3);
+}
+.tracking-btn:hover{
+  transform:translateY(-1px);box-shadow:0 4px 12px rgba(59,130,246,.4);
+  text-decoration:none !important;
+}
+.tracking-btn i{font-size:1rem}
+
+.timeline{border-right:2px solid var(--line);margin-right:12px;padding-right:1.8rem;margin-top:1.2rem}
+.timeline-item{position:relative;padding-bottom:1.4rem}
+.timeline-item::before{content:'';position:absolute;right:-1.6rem;top:.25rem;width:14px;height:14px;border-radius:50%;background:var(--line);border:3px solid var(--bg)}
+.timeline-item.done::before{background:var(--gold)}
+.timeline-item b{display:block;font-size:.9rem;margin-bottom:.2rem}
+.timeline-item .note{color:var(--text-dim);font-size:.82rem}
+.timeline-toggle{font-size:.8rem;color:var(--text-dim);font-weight:700;margin-top:.6rem}
+.timeline-toggle:hover{color:var(--gold)}
+.timeline{display:none}
+.order-card.open .timeline{display:block}
+
+.empty-state,.loading-state{text-align:center;padding:3rem 1rem;color:var(--text-dim)}
+.empty-state i,.loading-state i{font-size:2.6rem;margin-bottom:1rem;display:block}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="container">
+    <div class="header-main">
+      <a href="index.html" class="logo">
+        <img src="images/logo-icon.png" class="logo-icon" alt="Tiger Jeans" />
+        <div class="logo-text"><strong>TIGER JEANS</strong><small>لأرقى الملابس العالمية</small></div>
+      </a>
+      <nav class="main-nav">
+        <a href="index.html">الرئيسية</a>
+        <a href="index.html#products">المتجر</a>
+        <a href="track.html">تتبع الطلب</a>
+        <a href="orders.html" class="active">طلباتي</a>
+      </nav>
+      <div class="header-actions">
+        <a href="wishlist.html" class="action-btn wishlist-btn-header"><i class='bx bx-heart'></i><span class="wishlist-badge" style="display:none">0</span></a>
+        <a href="cart.html" class="action-btn cart-btn"><i class='bx bx-cart-alt'></i><span class="cart-badge" style="display:none">0</span></a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Page Hero -->
+<div class="page-hero">
+  <div class="container">
+    <h1>طلباتي</h1>
+    <div class="breadcrumb"><a href="index.html">الرئيسية</a> / طلباتي</div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="orders-container">
+
+    <!-- Phone gate: shown once, until we know who the customer is -->
+    <div class="phone-gate" id="phoneGate">
+      <i class='bx bx-receipt'></i>
+      <h3>سجل طلباتك</h3>
+      <p>أدخل رقم الموبايل اللي استخدمته وقت الطلب، وهنعرضلك كل طلباتك وحالة كل واحد فيها</p>
+      <div class="search-box">
+        <input id="phoneInput" type="tel" placeholder="01xxxxxxxxx" />
+        <button class="btn-primary" onclick="loadMyOrders()">عرض طلباتي</button>
+      </div>
+    </div>
+
+    <!-- Identity bar: shown once phone/account is known -->
+    <div class="identity-bar" id="identityBar" style="display:none">
+      <div class="who"><i class='bx bx-user-circle'></i> <span id="identityText"></span></div>
+      <div class="actions">
+        <button onclick="refreshMyOrders()"><i class='bx bx-refresh'></i> تحديث</button>
+        <button onclick="forgetMe()"><i class='bx bx-log-out'></i> رقم آخر</button>
+      </div>
+    </div>
+
+    <div class="order-filters" id="orderFilters" style="display:none">
+      <button class="active" data-status="all" onclick="filterMyOrders('all', this)">الكل</button>
+      <button data-status="pending" onclick="filterMyOrders('pending', this)">معلق</button>
+      <button data-status="confirmed" onclick="filterMyOrders('confirmed', this)">مؤكد</button>
+      <button data-status="shipping" onclick="filterMyOrders('shipping', this)">جاري الشحن</button>
+      <button data-status="delivered" onclick="filterMyOrders('delivered', this)">تم التسليم</button>
+      <button data-status="cancelled" onclick="filterMyOrders('cancelled', this)">ملغي</button>
+    </div>
+
+    <div id="myOrdersResults"></div>
+
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="container footer-bottom">
+    <p>جميع الحقوق محفوظة © Tiger Jeans 2026 | تطوير
+        <a href="https://www.facebook.com/en.mohamed.nasr" target="_blank" rel="noopener" class="credit-link">
+          <i class='bx bxs-code-alt'></i> المهندس محمد حماد
+        </a>
+      </p>
+  </div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="js/config.js"></script>
+<script src="js/telegram-bot.js"></script>
+<script>
+const MY_PHONE_KEY = "tj_customer_phone";
+const STATUS_LABELS = {
+  pending: "بانتظار مراجعة الدفع",
+  confirmed: "تم تأكيد الطلب",
+  shipping: "جاري الشحن",
+  delivered: "تم التسليم",
+  cancelled: "ملغي"
+};
+const STATUS_ORDER = ["pending", "confirmed", "shipping", "delivered"];
+
+let myAllOrders = [];
+
+// ====== Tracking URL Helper ======
+function getTrackingUrl(company, trackingNumber) {
+  if (!trackingNumber) return "#";
+  const urls = {
+    bosta: `https://bosta.co/ar-eg/tracking-shipments?shipment-number=${trackingNumber}`,
+    aramex: `https://www.aramex.com/track/details?ShipmentNumber=${trackingNumber}`,
+    smsa: `https://smsaexpress.com/tracking?tracknumbers=${trackingNumber}`,
+    dhl: `https://www.dhl.com/eg-en/tracking.html?tracking-id=${trackingNumber}`,
+    fedex: `https://www.fedex.com/fedextrack/?trknbr=${trackingNumber}`,
+    other: "#"
+  };
+  return urls[company] || urls.bosta;
+}
+
+function getShippingCompanyName(companyKey) {
+  const companies = {
+    bosta: "بوستا (Bosta)",
+    aramex: "أرامكس (Aramex)",
+    smsa: "سمسا (SMSA)",
+    dhl: "DHL",
+    fedex: "FedEx",
+    other: "شركة شحن"
+  };
+  return companies[companyKey] || companyKey;
+}
+let myActiveFilter = "all";
+
+// ====== Entry point: try uid first (if logged in), then saved phone ======
+async function initMyOrders() {
+  const savedPhone = localStorage.getItem(MY_PHONE_KEY);
+
+  // Give Firebase auth a moment to report state on first load
+  setTimeout(async () => {
+    if (currentUser) {
+      showIdentity(currentUser.displayName || currentUser.email || "حسابك");
+      await fetchMyOrders({ uid: currentUser.uid, phone: savedPhone });
+    } else if (savedPhone) {
+      showIdentity(savedPhone);
+      await fetchMyOrders({ phone: savedPhone });
+    }
+  }, 400);
+}
+
+function showIdentity(label) {
+  document.getElementById("phoneGate").style.display = "none";
+  document.getElementById("identityBar").style.display = "flex";
+  document.getElementById("orderFilters").style.display = "flex";
+  document.getElementById("identityText").innerHTML = `مسجل باسم: <b>${label}</b>`;
+}
+
+function loadMyOrders() {
+  const phone = document.getElementById("phoneInput").value.trim();
+  if (!/^01[0125][0-9]{8}$/.test(phone)) {
+    showToast("أدخل رقم موبايل مصري صحيح");
+    return;
+  }
+  localStorage.setItem(MY_PHONE_KEY, phone);
+  showIdentity(phone);
+  fetchMyOrders({ uid: currentUser ? currentUser.uid : null, phone });
+}
+
+function refreshMyOrders() {
+  const savedPhone = localStorage.getItem(MY_PHONE_KEY);
+  fetchMyOrders({ uid: currentUser ? currentUser.uid : null, phone: savedPhone });
+}
+
+function forgetMe() {
+  localStorage.removeItem(MY_PHONE_KEY);
+  document.getElementById("phoneGate").style.display = "block";
+  document.getElementById("identityBar").style.display = "none";
+  document.getElementById("orderFilters").style.display = "none";
+  document.getElementById("myOrdersResults").innerHTML = "";
+}
+
+async function fetchMyOrders({ uid, phone }) {
+  const results = document.getElementById("myOrdersResults");
+  results.innerHTML = `<div class="loading-state"><i class='bx bx-loader-alt bx-spin'></i>جاري تحميل طلباتك...</div>`;
+
+  try {
+    const snap = await db.ref("orders").once("value");
+    const all = snap.val() || {};
+    myAllOrders = Object.entries(all)
+      .filter(([id, o]) => (uid && o.uid === uid) || (phone && o.customer && o.customer.phone === phone))
+      .map(([id, o]) => ({ id, ...o }))
+      .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+    renderMyOrders();
+  } catch (err) {
+    results.innerHTML = `<div class="empty-state"><i class='bx bx-error'></i><p>حدث خطأ أثناء تحميل الطلبات، حاول مرة أخرى</p></div>`;
+  }
+}
+
+function filterMyOrders(status, btn) {
+  myActiveFilter = status;
+  document.querySelectorAll("#orderFilters button").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  renderMyOrders();
+}
+
+function renderMyOrders() {
+  const results = document.getElementById("myOrdersResults");
+  const list = myActiveFilter === "all" ? myAllOrders : myAllOrders.filter(o => o.status === myActiveFilter);
+
+  if (!list.length) {
+    results.innerHTML = `
+      <div class="empty-state">
+        <i class='bx bx-receipt'></i>
+        <p>${myAllOrders.length ? "لا يوجد طلبات بهذه الحالة" : "لا يوجد طلبات مسجلة بهذا الرقم بعد"}</p>
+      </div>`;
+    return;
+  }
+
+  results.innerHTML = list.map(o => {
+    const cls = o.status === "cancelled" ? "cancelled" : o.status;
+    const currentIdx = STATUS_ORDER.indexOf(o.status);
+    const items = o.items || [];
+
+    return `
+    <div class="order-card" id="order-${o.id}">
+      <div class="order-header">
+        <div>رقم الطلب: <b class="order-code-text">${o.code}</b></div>
+        <span class="status-badge status-${cls}">${STATUS_LABELS[o.status] || o.status}</span>
+      </div>
+      <div class="order-date">
+        ${o.createdAt ? new Date(o.createdAt).toLocaleDateString("ar-EG", {year:'numeric',month:'long',day:'numeric'}) : ""}
+        — الإجمالي: <span class="order-total">${fmtPrice(o.total)}</span>
+      </div>
+
+      <div class="order-items">
+        ${items.map(it => `
+          <div class="order-item-row">
+            <img src="${it.image || 'images/product-1.png'}" alt="${it.name || ''}" />
+            <div class="meta"><b>${it.name || 'منتج'}</b>${it.size ? ` مقاس ${it.size}` : ""}${it.color ? ` — ${it.color}` : ""}</div>
+            <div class="qty">x${it.qty || 1}</div>
+          </div>`).join("")}
+      </div>
+
+      <div class="order-card-footer">
+        <div class="order-actions">
+          ${o.status === 'shipping' && o.trackingNumber ? `
+            <a href="${getTrackingUrl(o.shippingCompany, o.trackingNumber)}" target="_blank" rel="noopener" class="tracking-btn">
+              <i class='bx bx-truck'></i> تتبع طلبك مع ${getShippingCompanyName(o.shippingCompany)} لحظة بلحظة
+            </a>
+          ` : `<a href="track.html">تتبع الطلب بالتفصيل <i class='bx bx-right-arrow-alt'></i></a>`}
+        </div>
+        <button class="timeline-toggle" onclick="document.getElementById('order-${o.id}').classList.toggle('open')">
+          <i class='bx bx-chevron-down'></i> عرض مراحل الطلب
+        </button>
+      </div>
+
+      ${o.status === "cancelled" ? "" : `
+      <div class="timeline">
+        ${STATUS_ORDER.map((s, i) => `
+          <div class="timeline-item ${i <= currentIdx ? 'done' : ''}">
+            <b>${STATUS_LABELS[s]}</b>
+            ${i === currentIdx && o.statusHistory && o.statusHistory.length ?
+              `<div class="note">${o.statusHistory[o.statusHistory.length - 1].note || ""}</div>` : ""}
+          </div>`).join("")}
+      </div>`}
+    </div>`;
+  }).join("");
+}
+
+document.getElementById("phoneInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") loadMyOrders();
+});
+
+document.addEventListener("DOMContentLoaded", initMyOrders);
+</script>
+
+<!-- ====== Bottom Navigation (Mobile, <992px) ====== -->
+<nav class="bottom-nav" aria-label="التنقل السفلي">
+  <div class="bottom-nav-inner">
+    <a href="index.html" data-nav="home" class=""><i class='bx bx-home-alt'></i><span>الرئيسية</span></a>
+    <a href="index.html#products" data-nav="search" class="" onclick="if(window.location.pathname.endsWith('index.html')){event.preventDefault();toggleSearch();}"><i class='bx bx-search'></i><span>بحث</span></a>
+    <a href="index.html#products" data-nav="categories" class=""><i class='bx bx-category'></i><span>الأقسام</span></a>
+    <a href="cart.html" data-nav="cart" class=""><i class='bx bx-cart-alt'></i><span>السلة</span><span class="bn-badge cart-badge" style="display:none">0</span></a>
+    <a href="orders.html" id="bottomAccountLink" data-nav="account" class="active"><i class='bx bx-user'></i><span>طلباتي</span></a>
+  </div>
+</nav>
+</body>
+</html>
