@@ -9,6 +9,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preconnect" href="https://www.gstatic.com" crossorigin />
 
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@300;400;500;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" />
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@300;400;500;700&display=swap" /></noscript>
@@ -31,8 +32,8 @@
         <a href="https://wa.me/201289440111" target="_blank" rel="noopener"><i class='bx bxl-whatsapp'></i> الواتساب: 01289440111</a>
       </div>
       <div class="top-right">
-        <a href="#" onclick="openAuthModal()"><i class='bx bx-user'></i> حسابي</a>
-        <a href="#" onclick="openAuthModal()">سجل دخولك</a>
+        <a href="#" id="topAccountLink"><i class='bx bx-user'></i> حسابي</a>
+        <a href="#" id="topLoginLink">سجل دخولك</a>
       </div>
     </div>
   </div>
@@ -51,8 +52,10 @@
         <a href="products.html">المنتجات</a>
         <a href="deals.html" class="active">عروض مميزة 🔥</a>
         <a href="size-guide.html">دليل المقاسات</a>
+        <a href="contact.html">تواصل معنا</a>
       </nav>
       <div class="header-actions">
+        <button class="action-btn theme-toggle" onclick="toggleTheme()" title="تبديل الوضع"><i class='bx bx-moon'></i></button>
         <button class="action-btn" onclick="toggleSearch()"><i class='bx bx-search'></i></button>
         <button class="action-btn" onclick="openAuthModal()"><i class='bx bx-user'></i></button>
         <a href="orders.html" class="action-btn"><i class='bx bx-receipt'></i></a>
@@ -70,6 +73,15 @@
     <span style="background:rgba(0,0,0,.2);padding:.5rem 1.5rem;border-radius:999px;font-size:.85rem;font-weight:700;color:#000;display:inline-block;margin-bottom:1rem">⏰ عرض لفترة محدودة</span>
     <h1 style="font-size:2.5rem;color:#000;margin:1rem 0;font-family:'Cairo',sans-serif">عروض مميزة وحصرية ✨</h1>
     <p style="color:rgba(0,0,0,.7);max-width:600px;margin:0 auto;font-size:1.1rem">وفر حتى 50% على تشكيلة مختارة من أفضل بناطيل الجينز - العرض ساري لفترة محدودة!</p>
+  </div>
+</section>
+
+<!-- Category Filters for Deals -->
+<section class="section" style="background:var(--bg)">
+  <div class="container">
+    <div class="category-filters" id="catFilters">
+      <button class="cat-chip active" data-cat="all" onclick="filterDeals('all', this)">الكل</button>
+    </div>
   </div>
 </section>
 
@@ -113,15 +125,21 @@
         <a href="index.html">الرئيسية</a>
         <a href="products.html">المنتجات</a>
         <a href="deals.html">العروض</a>
+        <a href="contact.html">تواصل معنا</a>
+        <a href="faq.html">الأسئلة الشائعة</a>
       </div>
       <div class="footer-col">
         <h4>حسابي</h4>
+        <a href="track.html">تتبع طلبي</a>
         <a href="cart.html">السلة</a>
         <a href="checkout.html">إتمام الشراء</a>
+        <a href="wishlist.html">المفضلة</a>
       </div>
       <div class="footer-col">
-        <h4>تواصل معنا</h4>
-        <p><i class='bx bxs-phone'></i> 01289440111</p>
+        <h4>معلومات قانونية</h4>
+        <a href="privacy.html">سياسة الخصوصية</a>
+        <a href="terms.html">الشروط والأحكام</a>
+        <a href="about.html">من نحن</a>
       </div>
     </div>
     <div class="footer-bottom">
@@ -132,63 +150,265 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js" defer></script>
-<script src="js/config.js" defer></script>
+<!-- Firebase SDK (without defer) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="js/config.js"></script>
 
 <script>
 window.addEventListener('load', () => document.body.classList.add('loaded'));
 
+// ====== Products Data ======
 let ALL_PRODUCTS = [];
+let ACTIVE_CAT = "all";
+
+// Helper function to format price
+function fmtPrice(n) {
+  return Number(n || 0).toLocaleString("ar-EG") + " ج.م";
+}
+
+// Check if product is a deal (has discount)
+function isDeal(p) {
+  return p.deal || p.discount || (p.oldPrice && p.oldPrice > p.price);
+}
 
 function loadDealsFromFirebase() {
+  console.log('🔄 Loading deals from Firebase...');
+  
   try {
+    if (typeof db === 'undefined') {
+      console.warn('⚠️ Firebase not available');
+      useSampleData();
+      return;
+    }
+    
     db.ref("products").on("value", (snap) => {
       const val = snap.val() || {};
-      ALL_PRODUCTS = Object.entries(val).map(([id, p]) => ({ id, ...p })).filter(p => p.active !== false && (p.deal || p.discount));
+      
+      // Load ALL products first, then filter for deals
+      ALL_PRODUCTS = Object.entries(val)
+        .map(([id, p]) => ({ id, ...p }))
+        .filter(p => p.active !== false);
+      
+      console.log(`✓ Loaded ${ALL_PRODUCTS.length} products from Firebase`);
+      console.log(`📊 Deals found: ${ALL_PRODUCTS.filter(isDeal).length}`);
+      
+      buildCategoryFilters();
       renderDeals();
+    }, (error) => {
+      console.error('Firebase error:', error);
+      useSampleData();
     });
-  } catch(e) { console.error(e); }
+  } catch(e) { 
+    console.error('Error loading deals:', e);
+    useSampleData();
+  }
+}
+
+function buildCategoryFilters() {
+  const dealProducts = ALL_PRODUCTS.filter(isDeal);
+  const cats = [...new Set(dealProducts.map(p => p.category).filter(Boolean))];
+  const container = document.getElementById("catFilters");
+  if (!container) return;
+  
+  container.innerHTML = `<button class="cat-chip active" data-cat="all" onclick="filterDeals('all', this)">الكل (${dealProducts.length})</button>` +
+    cats.map(c => {
+      const count = dealProducts.filter(p => p.category === c).length;
+      return `<button class="cat-chip" data-cat="${c}" onclick="filterDeals('${c}', this)">${c} (${count})</button>`;
+    }).join("");
+}
+
+function filterDeals(cat, btn) {
+  ACTIVE_CAT = cat;
+  document.querySelectorAll("#catFilters .cat-chip").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  renderDeals();
 }
 
 function renderDeals() {
   const grid = document.getElementById("dealsGrid");
-  if (!ALL_PRODUCTS.length) {
-    grid.innerHTML = '<div class="loading-state"><p>لا توجد عروض حالياً</p></div>';
+  if (!grid) return;
+  
+  // Filter deals by category and deal status
+  let filtered = ALL_PRODUCTS.filter(isDeal);
+  
+  if (ACTIVE_CAT !== "all") {
+    filtered = filtered.filter(p => p.category === ACTIVE_CAT);
+  }
+  
+  if (!filtered.length) {
+    grid.innerHTML = `
+      <div class="loading-state" style="padding:3rem;text-align:center;grid-column:1/-1">
+        <i class='bx bx-tag' style="font-size:3rem;color:var(--gold);margin-bottom:1rem;display:block"></i>
+        <h3>لا توجد عروض حالياً</h3>
+        <p style="color:var(--text-dim)">تابعنا لتصلك أحدث العروض أول بأول</p>
+        <a href="products.html" class="btn-primary" style="margin-top:1rem">تصفح جميع المنتجات</a>
+      </div>`;
     return;
   }
   
-  grid.innerHTML = ALL_PRODUCTS.slice(0, 9).map(p => `
+  grid.innerHTML = filtered.map((p, idx) => {
+    // Get image from images array or fallback
+    const productImage = (p.images && p.images.length > 0) ? p.images[0] : (p.image || 'images/product-' + ((idx % 16) + 1) + '.png');
+    const hasDiscount = p.discount || (p.oldPrice ? Math.round((1 - p.price / p.oldPrice) * 100) : 0);
+    
+    return `
     <div class="deal-card">
       <div class="deal-image">
-        <img src="${p.image || 'images/product-1.png'}" alt="${p.name}" loading="lazy" width="400" height="300" />
-        ${p.discount ? `<span class="deal-badge">خصم ${p.discount}%</span>` : ''}
+        <a href="product.html?id=${p.id}">
+          <img src="${productImage}" alt="${p.name}" loading="lazy" width="400" height="300" onerror="this.src='images/product-1.png'" />
+        </a>
+        ${hasDiscount ? `<span class="deal-badge">خصم ${hasDiscount}%</span>` : ''}
+        ${(p.isNew && !hasDiscount) ? `<span class="deal-badge" style="background:var(--gold)">جديد</span>` : ''}
       </div>
       <div class="deal-body">
         <div class="deal-title">${p.name}</div>
         <div class="deal-desc">${p.description || 'جودة عالية وسعر مميز'}</div>
         <div class="deal-pricing">
-          <span class="deal-price">${p.price || 0} ج.م</span>
-          ${p.oldPrice ? `<span class="deal-old-price">${p.oldPrice} ج.م</span>` : ''}
+          <span class="deal-price">${fmtPrice(p.price)}</span>
+          ${p.oldPrice ? `<span class="deal-old-price">${fmtPrice(p.oldPrice)}</span>` : ''}
         </div>
-        <button class="btn-primary" style="margin-top:1rem;width:100%" onclick="addToCart('${p.id}')">أضف للسلة</button>
+        <div style="display:flex;gap:.5rem;margin-top:1rem;flex-wrap:wrap">
+          <button class="btn-primary" style="flex:1;min-width:120px" onclick="addToCartFromDeals('${p.id}')">
+            <i class='bx bx-cart-add'></i> أضف للسلة
+          </button>
+          <button class="btn-secondary" onclick="toggleWishlistItem('${p.id}')">
+            <i class='bx bx-heart'></i>
+          </button>
+        </div>
       </div>
     </div>
-  `).join("");
+  `;
+  }).join("");
+  
+  console.log(`✓ Rendered ${filtered.length} deals`);
 }
 
-function addToCart(id) { showToast('تمت الإضافة للسلة ✓'); }
-function openAuthModal() { showToast('قريباً...'); }
-function toggleSearch() { /* search */ }
+// Sample data as fallback
+const SAMPLE_DEALS = [
+  { id: 's1', name: 'جينز رجالي كلاسيك أزرق', category: 'بناطيل جينز', price: 350, oldPrice: 450, image: 'images/product-1.png', description: 'جينز رجالي كلاسيك بقصة سليم فيت، خامة قطن عالية الجودة', discount: 22, images: ['images/product-1.png'] },
+  { id: 's2', name: 'جينز سكيني حريمي أسود', category: 'جينز حريمي', price: 320, oldPrice: 420, image: 'images/product-2.png', description: 'جينز سكيني أنيق للسيدات، قصة ضيقة لتبرز الأناقة', discount: 24, images: ['images/product-2.png'] },
+  { id: 's3', name: 'بنطلون جينز واسع', category: 'بناطيل جينز', price: 380, oldPrice: 480, image: 'images/product-5.png', description: 'بنطلون بقصة واسعة مريحة وعصرية', discount: 21, images: ['images/product-5.png'] },
+  { id: 's4', name: 'جينز وايد ليج حريمي', category: 'جينز حريمي', price: 360, oldPrice: 400, image: 'images/product-6.png', description: 'جينز وايد ليج مريح وأنيق للسيدات', discount: 10, images: ['images/product-6.png'] },
+  { id: 's5', name: 'جينز رجالي بني', category: 'بناطيل جينز', price: 380, oldPrice: 450, image: 'images/product-10.png', description: 'جينز رجالي بني دافئ للشتاء', discount: 16, images: ['images/product-10.png'] },
+];
+
+function useSampleData() {
+  console.log('📦 Using sample data...');
+  ALL_PRODUCTS = SAMPLE_DEALS;
+  buildCategoryFilters();
+  renderDeals();
+}
+
+// Cart functions
+function addToCartFromDeals(productId) {
+  const product = ALL_PRODUCTS.find(p => p.id === productId);
+  if (!product) return;
+  
+  let cart = JSON.parse(localStorage.getItem('tj_cart') || '[]');
+  const existing = cart.find(item => item.id === productId);
+  
+  if (existing) {
+    existing.qty += 1;
+  } else {
+    cart.push({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: (product.images && product.images[0]) || product.image,
+      qty: 1,
+      size: product.sizes?.[0] || '32',
+      color: 'أزرق'
+    });
+  }
+  
+  localStorage.setItem('tj_cart', JSON.stringify(cart));
+  showToast('تمت الإضافة للسلة ✓');
+  
+  // Update badge
+  document.querySelectorAll('.cart-badge').forEach(b => {
+    b.textContent = cart.reduce((sum, i) => sum + i.qty, 0);
+    b.style.display = 'flex';
+  });
+}
+
+function toggleWishlistItem(productId) {
+  let wishlist = JSON.parse(localStorage.getItem('tj_wishlist') || '[]');
+  const idx = wishlist.findIndex(w => w.id === productId);
+  
+  if (idx > -1) {
+    wishlist.splice(idx, 1);
+    showToast('تم الإزالة من المفضلة');
+  } else {
+    const product = ALL_PRODUCTS.find(p => p.id === productId);
+    if (product) {
+      wishlist.push({ id: product.id, name: product.name, price: product.price, image: (product.images && product.images[0]) || product.image });
+      showToast('تمت الإضافة للمفضلة ❤️');
+    }
+  }
+  
+  localStorage.setItem('tj_wishlist', JSON.stringify(wishlist));
+  renderDeals(); // Re-render to update heart icons
+}
+
+function openAuthModal() { 
+  if (typeof window.openAuthModalGlobal === 'function') {
+    window.openAuthModalGlobal();
+  } else {
+    showToast('قريباً...'); 
+  }
+}
+
+function toggleSearch() { 
+  if (typeof window.toggleSearchGlobal === 'function') {
+    window.toggleSearchGlobal();
+  }
+}
 
 function showToast(msg) {
-  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3000);
+  const t = document.getElementById('toast'); 
+  t.textContent = msg; 
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-function toggleMobileNav() { document.querySelector('.mobile-nav')?.classList.toggle('open'); }
+function toggleMobileNav() { 
+  document.querySelector('.mobile-nav')?.classList.toggle('open'); 
+}
 
-setTimeout(loadDealsFromFirebase, 200);
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('tj_theme', next);
+}
+
+// Mobile nav creation
+(function() {
+  if (!document.querySelector('.mobile-nav')) {
+    const mobileNav = document.createElement('div');
+    mobileNav.className = 'mobile-nav';
+    mobileNav.innerHTML = `
+      <button class="mobile-nav-close" onclick="toggleMobileNav()"><i class='bx bx-x'></i></button>
+      <div class="mobile-nav-links">
+        <a href="index.html" onclick="toggleMobileNav()"><i class='bx bx-home'></i> الرئيسية</a>
+        <a href="products.html" onclick="toggleMobileNav()"><i class='bx bx-package'></i> المنتجات</a>
+        <a href="deals.html" onclick="toggleMobileNav()"><i class='bx bx-fire'></i> العروض</a>
+        <a href="cart.html" onclick="toggleMobileNav()"><i class='bx bx-cart'></i> السلة</a>
+        <a href="contact.html" onclick="toggleMobileNav()"><i class='bx bx-phone'></i> تواصل معنا</a>
+      </div>
+    `;
+    document.body.appendChild(mobileNav);
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'mobile-nav-overlay';
+    overlay.onclick = toggleMobileNav;
+    document.body.appendChild(overlay);
+  }
+})();
+
+// Initialize
+setTimeout(loadDealsFromFirebase, 100);
 </script>
 
 </body>
