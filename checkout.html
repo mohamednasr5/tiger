@@ -531,6 +531,7 @@ function updatePayNumber() {
   const ownerNameDisplay = document.getElementById("ownerNameDisplay");
   const ownerNameText = document.getElementById("ownerNameText");
   const payNumberBox = document.getElementById("payNumberBox");
+  const receiptLabel = document.getElementById("receiptLabel");
   
   // Safety check - ensure elements exist
   if (!traditionalDetails || !label || !val) {
@@ -575,6 +576,7 @@ function updatePayNumber() {
         ownerNameText.textContent = paySettings.vodafoneName;
         ownerNameDisplay.style.display = "block";
       }
+      if (receiptLabel) receiptLabel.textContent = "ارفع صورة إيصال التحويل (إلزامي)";
     } else if (method === "instapay") {
       label.textContent = "حوّل المبلغ على انستاباي للمستخدم:";
       val.textContent = "@" + (paySettings.instapay || "engmohamednasr");
@@ -588,12 +590,14 @@ function updatePayNumber() {
         ownerNameText.textContent = paySettings.instapayOwner;
         ownerNameDisplay.style.display = "block";
       }
+      if (receiptLabel) receiptLabel.textContent = "ارفع صورة إيصال التحويل (إلزامي)";
     } else {
       label.textContent = "الدفع عند الاستلام:";
       const city = document.getElementById("cCity").value;
       const cost = getShippingCost();
       val.textContent = city ? `مصاريف الشحن: ${fmtPrice(cost)}` : "اختر المحافظة لمعرفة مصاريف الشحن";
       copyBtn.style.display = "none";
+      if (receiptLabel) receiptLabel.textContent = "ارفع صورة إيصال التحويل (اختياري للدفع عند الاستلام)";
     }
   }
 }
@@ -638,7 +642,7 @@ async function validateGiftCardForPayment() {
       partialSection.style.display = "none";
     } else {
       // Partial payment needed
-      showGcPayMsg("info`, `البطاقة تغطي ${fmtPrice(cardBalance)} - يتبقى ${fmtPrice(remaining)}`);
+      showGcPayMsg("info", `البطاقة تغطي ${fmtPrice(cardBalance)} - يتبقى ${fmtPrice(remaining)} من فضلك اختر وسيلة دفع أخرى لاستكمال المبلغ`);
       partialInfo.innerHTML = `
         <div style="display:flex;justify-content:space-between;margin-bottom:.4rem">
           <span>إجمالي الطلب:</span><b>${fmtPrice(orderTotal)}</b>
