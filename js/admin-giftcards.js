@@ -21,29 +21,102 @@ function genGiftCardPin() {
   return String(Math.floor(100000 + Math.random() * 900000));
 }
 
+// ---------- Real-time sync (mirrors initOrdersRealtime) ----------
+// Runs from the moment the admin logs in — not only when the "بطاقات الهدايا"
+// tab is opened — so new requests update the nav badge and pop a toast
+// immediately, the same way new orders already do.
+let gcRealtimeStarted = false;
+let gcRequestsLoaded = false;
+let gcCardsLoaded = false;
+
+function initGiftCardsRealtime() {
+  if (gcRealtimeStarted) return;
+  gcRealtimeStarted = true;
+
+  db.ref("giftCardRequests").on("value", (snap) => {
+    const val = snap.val() || {};
+    const newList = Object.entries(val).map(([id, r]) => ({ id, ...r }));
+    const prevIds = new Set(gcAdminRequests.map((r) => r.id));
+    const isFirstLoad = !gcRequestsLoaded;
+    const addedPending = isFirstLoad ? [] : newList.filter((r) => !prevIds.has(r.id) && r.status === "pending");
+
+    gcAdminRequests = newList;
+    gcRequestsLoaded = true;
+
+    updateGcBadge();
+    if (addedPending.length) {
+      const msg = addedPending.length > 1
+        ? `🎁 وصلت ${addedPending.length} طلبات بطاقات هدايا جديدة!`
+        : `🎁 وصل طلب بطاقة هدايا جديد من ${addedPending[0].senderName || "عميل"} بقيمة ${fmtPrice(addedPending[0].amount)}`;
+      showToast(msg);
+      pulseGcNav();
+    }
+
+    if (typeof currentTab !== "undefined" && currentTab === "giftcards") {
+      renderGcKpis();
+      renderGcAdminTable();
+    }
+  }, (err) => console.error("giftCardRequests realtime error", err));
+
+  db.ref("giftCards").on("value", (snap) => {
+    const val = snap.val() || {};
+    gcAdminCards = Object.entries(val).map(([id, c]) => ({ id, ...c }));
+    gcCardsLoaded = true;
+
+    if (typeof currentTab !== "undefined" && currentTab === "giftcards") {
+      renderGcKpis();
+      renderGcAdminTable();
+    }
+  }, (err) => console.error("giftCards realtime error", err));
+}
+
+function updateGcBadge() {
+  const pendingCount = gcAdminRequests.filter((r) => r.status === "pending").length;
+  ["navGiftCardsBadge", "navGiftCardsBadgeMobile"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.display = pendingCount > 0 ? "inline-block" : "none";
+    el.textContent = pendingCount;
+  });
+}
+
+function pulseGcNav() {
+  ["navGiftCardsBadge", "navGiftCardsBadgeMobile"].forEach((id) => {
+    const b = document.getElementById(id);
+    if (!b) return;
+    b.classList.remove("pulse");
+    void b.offsetWidth;
+    b.classList.add("pulse");
+  });
+}
+
+// Called when the "بطاقات الهدايا" tab is opened. If the real-time
+// listeners are already running (normal case, started at login) this just
+// renders the current in-memory data instantly. It also acts as a safety
+// net: if for any reason the listeners haven't started yet, it starts them.
 async function loadGiftCards() {
-  document.getElementById("gcTableBody").innerHTML =
-    `<tr><td colspan="8" style="text-align:center;color:var(--text-dim);padding:2rem">جاري التحميل...</td></tr>`;
+  if (!gcRealtimeStarted) {
+    document.getElementById("gcTableBody").innerHTML =
+      `<tr><td colspan="8" style="text-align:center;color:var(--text-dim);padding:2rem">جاري التحميل...</td></tr>`;
+    initGiftCardsRealtime();
+  }
   try {
-    const [reqSnap, cardsSnap] = await Promise.all([
-      db.ref("giftCardRequests").once("value"),
-      db.ref("giftCards").once("value"),
-    ]);
-    gcAdminRequests = [];
-    reqSnap.forEach((c) => gcAdminRequests.push({ id: c.key, ...c.val() }));
-    gcAdminCards = [];
-    cardsSnap.forEach((c) => gcAdminCards.push({ id: c.key, ...c.val() }));
+    // Give the just-started listeners a brief moment to deliver their first
+    // snapshot if this is the very first load.
+    if (!gcRequestsLoaded || !gcCardsLoaded) {
+      await new Promise((resolve) => {
+        const check = () => {
+          if (gcRequestsLoaded && gcCardsLoaded) resolve();
+          else setTimeout(check, 100);
+        };
+        check();
+        setTimeout(resolve, 4000); // failsafe timeout
+      });
+    }
 
     renderGcKpis();
     renderGcAdminTable();
-
-    const pendingCount = gcAdminRequests.filter((r) => r.status === "pending").length;
-    ["navGiftCardsBadge", "navGiftCardsBadgeMobile"].forEach((id) => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.style.display = pendingCount > 0 ? "inline-block" : "none";
-      el.textContent = pendingCount;
-    });
+    updateGcBadge();
   } catch (e) {
     console.error(e);
     document.getElementById("gcTableBody").innerHTML =

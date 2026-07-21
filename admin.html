@@ -1683,6 +1683,7 @@ function doAdminLogin() {
     document.getElementById("adminLayout").style.display = "block";
     loadDashboardData();
     initOrdersRealtime();
+    initGiftCardsRealtime();
   }).catch(e => {
     errEl.textContent = "بيانات الدخول غير صحيحة";
     btn.disabled = false;

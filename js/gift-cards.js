@@ -138,11 +138,6 @@ function gcSelectPay(method, el) {
     val.textContent = "@" + (gcPaySettings.instapay || "engmohamednasr");
     box.style.display = "block";
     receiptField.style.display = "block";
-  } else {
-    label.textContent = "سيتم تحصيل المبلغ نقدًا عند التفعيل / التسليم";
-    val.textContent = "—";
-    box.style.display = "block";
-    receiptField.style.display = "none";
   }
 }
 
@@ -193,7 +188,7 @@ async function submitGiftCardOrder() {
     showToast(`قيمة البطاقة يجب أن تكون بين ${GC_MIN} و ${GC_MAX} ج.م`);
     return;
   }
-  if (gcMethod !== "cod" && !gcReceiptUrl) {
+  if (!gcReceiptUrl) {
     showToast("من فضلك ارفع صورة إيصال التحويل");
     return;
   }
