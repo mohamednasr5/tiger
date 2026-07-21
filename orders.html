@@ -105,6 +105,34 @@
 
 .empty-state,.loading-state{text-align:center;padding:3rem 1rem;color:var(--text-dim)}
 .empty-state i,.loading-state i{font-size:2.6rem;margin-bottom:1rem;display:block}
+
+/* ---- Return button / status ---- */
+.return-btn{
+  display:inline-flex;align-items:center;gap:.4rem;
+  background:transparent;color:var(--danger) !important;
+  border:1px solid var(--danger);border-radius:10px;padding:.5rem 1rem;
+  font-size:.82rem;font-weight:700;transition:.2s;
+}
+.return-btn:hover{background:var(--danger);color:#fff !important}
+.return-btn i{font-size:1rem}
+.return-status-box{
+  margin-top:1rem;padding:.9rem 1.1rem;border-radius:10px;
+  background:var(--surface-2,rgba(255,255,255,.03));border:1px solid var(--line);font-size:.85rem;
+}
+.return-status-box .rs-head{display:flex;align-items:center;gap:.5rem;font-weight:700;margin-bottom:.3rem}
+.return-status-box.pending .rs-head{color:var(--warn)}
+.return-status-box.approved .rs-head{color:var(--success)}
+.return-status-box.rejected .rs-head{color:var(--danger)}
+.return-status-box .rs-note{color:var(--text-dim);margin-top:.4rem}
+
+/* ---- Return Modal ---- */
+.return-modal{max-width:480px;width:100%;text-align:right}
+.return-modal h3{font-size:1.15rem;margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem}
+.return-modal .field{margin-bottom:1rem}
+.return-modal label{display:block;font-size:.85rem;color:var(--text-dim);margin-bottom:.4rem}
+.return-modal select,.return-modal textarea,.return-modal input[type="file"]{width:100%}
+.return-modal textarea{min-height:90px;resize:vertical}
+.return-img-preview{margin-top:.6rem;display:none;max-width:140px;border-radius:8px;border:1px solid var(--line)}
 </style>
 </head>
 <body>
@@ -122,6 +150,7 @@
         <a href="/#products">المتجر</a>
         <a href="track.html">تتبع الطلب</a>
         <a href="orders.html" class="active">طلباتي</a>
+        <a href="gift-cards.html">بطاقات الهدايا</a>
       </nav>
       <div class="header-actions">
         <a href="wishlist.html" class="action-btn wishlist-btn-header"><i class='bx bx-heart'></i><span class="wishlist-badge" style="display:none">0</span></a>
@@ -199,6 +228,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="js/config.js"></script>
 <script src="js/telegram-bot.js"></script>
+<script src="js/upload.js"></script>
 <script>
 const MY_PHONE_KEY = "tj_customer_phone";
 const STATUS_LABELS = {
@@ -356,6 +386,7 @@ function renderMyOrders() {
               <i class='bx bx-truck'></i> تتبع طلبك مع ${getShippingCompanyName(o.shippingCompany)} لحظة بلحظة
             </a>
           ` : `<a href="track.html">تتبع الطلب بالتفصيل <i class='bx bx-right-arrow-alt'></i></a>`}
+          ${canReturnOrder(o) ? `<button class="return-btn" onclick="openReturnModal('${o.id}')"><i class='bx bx-undo'></i> استرجاع المنتج</button>` : ""}
         </div>
         <button class="timeline-toggle" onclick="document.getElementById('order-${o.id}').classList.toggle('open')">
           <i class='bx bx-chevron-down'></i> عرض مراحل الطلب
@@ -367,12 +398,126 @@ function renderMyOrders() {
         ${STATUS_ORDER.map((s, i) => `
           <div class="timeline-item ${i <= currentIdx ? 'done' : ''}">
             <b>${STATUS_LABELS[s]}</b>
-            ${i === currentIdx && o.statusHistory && o.statusHistory.length ?
-              `<div class="note">${o.statusHistory[o.statusHistory.length - 1].note || ""}</div>` : ""}
+            ${i === currentIdx ? `<div class="note">${lastStatusNote(o)}</div>` : ""}
           </div>`).join("")}
       </div>`}
+
+      ${renderReturnStatusBox(o)}
     </div>`;
   }).join("");
+}
+
+// ====== Helpers: status history / return eligibility ======
+const RETURN_WINDOW_DAYS = 14;
+
+function statusHistoryArray(o) {
+  const sh = o.statusHistory;
+  if (!sh) return [];
+  return Array.isArray(sh) ? sh : Object.values(sh);
+}
+
+function lastStatusNote(o) {
+  const list = statusHistoryArray(o).sort((a, b) => (a.ts || 0) - (b.ts || 0));
+  return list.length ? (list[list.length - 1].note || "") : "";
+}
+
+function canReturnOrder(o) {
+  if (o.status !== "delivered") return false;
+  if (o.returnRequest) return false; // already requested once
+  const deliveredAt = o.deliveredAt || (statusHistoryArray(o).find(h => h.status === "delivered") || {}).ts;
+  if (!deliveredAt) return false;
+  const daysPassed = (Date.now() - deliveredAt) / (1000 * 60 * 60 * 24);
+  return daysPassed <= RETURN_WINDOW_DAYS;
+}
+
+function renderReturnStatusBox(o) {
+  if (!o.returnRequest) return "";
+  const r = o.returnRequest;
+  const labels = { pending: "قيد المراجعة", approved: "تمت الموافقة على الاسترجاع", rejected: "تم رفض طلب الاسترجاع" };
+  const icons = { pending: "bx-time-five", approved: "bx-check-circle", rejected: "bx-x-circle" };
+  return `
+    <div class="return-status-box ${r.status}">
+      <div class="rs-head"><i class='bx ${icons[r.status] || "bx-info-circle"}'></i> طلب الاسترجاع: ${labels[r.status] || r.status}</div>
+      <div>السبب: ${r.reason || ""}</div>
+      ${r.adminNote ? `<div class="rs-note">ملاحظة المتجر: ${r.adminNote}</div>` : ""}
+    </div>`;
+}
+
+// ====== Return Request Modal ======
+let returnTargetOrderId = null;
+let returnImageUrl = null;
+
+function openReturnModal(orderId) {
+  const o = myAllOrders.find(x => x.id === orderId);
+  if (!o) return;
+  returnTargetOrderId = orderId;
+  returnImageUrl = null;
+  document.getElementById("returnOrderCode").value = o.code || "";
+  document.getElementById("returnReasonSelect").value = "مقاس غير مناسب";
+  document.getElementById("returnDetailsInput").value = "";
+  document.getElementById("returnImageInput").value = "";
+  document.getElementById("returnImageStatus").textContent = "";
+  const preview = document.getElementById("returnImagePreview");
+  preview.style.display = "none";
+  preview.src = "";
+  document.getElementById("returnModal").classList.add("show");
+}
+
+function closeReturnModal() {
+  document.getElementById("returnModal").classList.remove("show");
+  returnTargetOrderId = null;
+}
+
+function handleReturnImageSelect(input) {
+  const statusEl = document.getElementById("returnImageStatus");
+  handleImageInput(input, (url) => {
+    returnImageUrl = url;
+    const preview = document.getElementById("returnImagePreview");
+    preview.src = url;
+    preview.style.display = "block";
+    statusEl.textContent = "تم رفع الصورة ✓";
+  }, statusEl);
+}
+
+async function submitReturnRequest() {
+  const o = myAllOrders.find(x => x.id === returnTargetOrderId);
+  if (!o) return;
+
+  const reason = document.getElementById("returnReasonSelect").value;
+  const details = document.getElementById("returnDetailsInput").value.trim();
+  const btn = document.getElementById("returnSubmitBtn");
+
+  btn.disabled = true;
+  btn.textContent = "جاري الإرسال...";
+
+  try {
+    const requestData = {
+      orderId: o.id,
+      orderCode: o.code || "",
+      phone: o.customer?.phone || localStorage.getItem(MY_PHONE_KEY) || "",
+      name: o.customer?.name || "",
+      reason,
+      details,
+      imageUrl: returnImageUrl || null,
+      status: "pending",
+      adminNote: "",
+      createdAt: Date.now()
+    };
+    const ref = await db.ref("returns").push(requestData);
+    await db.ref("orders/" + o.id + "/returnRequest").set({
+      id: ref.key,
+      status: "pending",
+      reason
+    });
+    showToast("تم إرسال طلب الاسترجاع بنجاح");
+    closeReturnModal();
+    refreshMyOrders();
+  } catch (e) {
+    showToast("حدث خطأ أثناء إرسال الطلب");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "إرسال طلب الاسترجاع";
+  }
 }
 
 document.getElementById("phoneInput").addEventListener("keydown", (e) => {
@@ -381,6 +526,39 @@ document.getElementById("phoneInput").addEventListener("keydown", (e) => {
 
 document.addEventListener("DOMContentLoaded", initMyOrders);
 </script>
+
+<!-- ====== Return Request Modal ====== -->
+<div class="modal-overlay" id="returnModal">
+  <div class="auth-modal return-modal">
+    <div class="close-modal" onclick="closeReturnModal()"><i class='bx bx-x'></i></div>
+    <h3><i class='bx bx-undo' style="color:var(--gold)"></i> طلب استرجاع</h3>
+    <div class="field">
+      <label>رقم الطلب</label>
+      <input type="text" id="returnOrderCode" disabled />
+    </div>
+    <div class="field">
+      <label>سبب الاسترجاع</label>
+      <select id="returnReasonSelect">
+        <option value="مقاس غير مناسب">مقاس غير مناسب</option>
+        <option value="عيب فى المنتج">عيب فى المنتج</option>
+        <option value="المنتج مختلف عن الموقع">المنتج مختلف عن الموصوف بالموقع</option>
+        <option value="غير راغب فى المنتج">غير راغب فى المنتج</option>
+        <option value="أخرى">سبب آخر</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>تفاصيل إضافية</label>
+      <textarea id="returnDetailsInput" placeholder="اكتب تفاصيل حالة المنتج وسبب الاسترجاع..."></textarea>
+    </div>
+    <div class="field">
+      <label>إرفاق صورة للمنتج (اختياري)</label>
+      <input type="file" id="returnImageInput" accept="image/*" onchange="handleReturnImageSelect(this)" />
+      <div id="returnImageStatus" style="font-size:.8rem;color:var(--text-dim);margin-top:.4rem"></div>
+      <img id="returnImagePreview" class="return-img-preview" alt="" />
+    </div>
+    <button class="btn-primary full-width" onclick="submitReturnRequest()" id="returnSubmitBtn">إرسال طلب الاسترجاع</button>
+  </div>
+</div>
 
 <!-- ====== Bottom Navigation (Mobile, <992px) ====== -->
 <nav class="bottom-nav" aria-label="التنقل السفلي">

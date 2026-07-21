@@ -77,10 +77,9 @@ function updateAuthUI(user) {
   if (bottomAccountLink) {
     const icon = bottomAccountLink.querySelector("i");
     if (icon) icon.className = user ? "bx bxs-user-check" : "bx bx-user";
-    bottomAccountLink.onclick = (e) => {
-      e.preventDefault();
-      user ? openAccountMenu() : (typeof openAuthModal === "function" && openAuthModal());
-    };
+    // Always go straight to "طلباتي" (orders.html) — no logout confirm popup here.
+    // Logging out is handled from the account menu (topAccountLink / headerAccountBtn), not this button.
+    bottomAccountLink.onclick = null;
   }
 }
 
@@ -295,3 +294,91 @@ function setActiveBottomNav(pageKey) {
     a.classList.toggle("active", a.dataset.nav === pageKey);
   });
 }
+
+// ====== تتبع الزوار وحظر الـ IP ======
+// كل زيارة (مرة واحدة لكل جلسة متصفح) بتتسجل فى visitors/{ipKey} مع تقريب الموقع
+// ولو الـ IP محظور من لوحة التحكم (blockedIPs/{ipKey}) بيتوقف عرض الموقع للزائر ده.
+function ipToKey(ip) {
+  return String(ip || "").replace(/[.:]/g, "_");
+}
+
+function showBlockedOverlay(info) {
+  try {
+    document.body.innerHTML =
+      '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;' +
+      'background:#0b0b0c;color:#fff;font-family:Tahoma,Arial,sans-serif;text-align:center;padding:2rem;direction:rtl">' +
+      '<div><i class="bx bx-block" style="font-size:3.2rem;color:#e0554b"></i>' +
+      '<h2 style="margin:1rem 0 .5rem">تم حظر الوصول لهذا الموقع</h2>' +
+      '<p style="color:#999;max-width:420px;margin:0 auto">' +
+      (info && info.reason ? info.reason : "تم حظر عنوان الـ IP الخاص بك من إدارة المتجر") +
+      "</p></div></div>";
+    document.body.style.margin = "0";
+  } catch (e) {}
+}
+
+async function trackVisitorAndCheckBlock() {
+  // متعملش تتبع أو حظر في لوحة التحكم نفسها
+  if (/admin\.html/i.test(location.pathname)) return;
+
+  try {
+    let info = null;
+    const cached = sessionStorage.getItem("tj_visitor_info");
+    if (cached) {
+      try { info = JSON.parse(cached); } catch (e) { info = null; }
+    }
+    if (!info) {
+      const res = await fetch("https://ipapi.co/json/");
+      if (res.ok) {
+        const d = await res.json();
+        if (d && d.ip) {
+          info = { ip: d.ip, city: d.city || null, region: d.region || null, country: d.country_name || null };
+          sessionStorage.setItem("tj_visitor_info", JSON.stringify(info));
+        }
+      }
+    }
+    if (!info || !info.ip) return;
+    const ipKey = ipToKey(info.ip);
+
+    // تحقق من الحظر أولاً
+    const blockSnap = await db.ref("blockedIPs/" + ipKey).once("value");
+    if (blockSnap.exists()) {
+      showBlockedOverlay(blockSnap.val());
+      return;
+    }
+
+    // سجل/حدّث بيانات الزائر مرة واحدة لكل جلسة تصفح فقط
+    if (!sessionStorage.getItem("tj_visit_logged")) {
+      sessionStorage.setItem("tj_visit_logged", "1");
+      const ref = db.ref("visitors/" + ipKey);
+      const snap = await ref.once("value");
+      const now = Date.now();
+      if (snap.exists()) {
+        const cur = snap.val();
+        await ref.update({
+          lastSeen: now,
+          lastPage: location.pathname,
+          visitCount: (cur.visitCount || 0) + 1,
+          city: info.city || cur.city || null,
+          region: info.region || cur.region || null,
+          country: info.country || cur.country || null
+        });
+      } else {
+        await ref.set({
+          ip: info.ip,
+          city: info.city || null,
+          region: info.region || null,
+          country: info.country || null,
+          firstSeen: now,
+          lastSeen: now,
+          lastPage: location.pathname,
+          visitCount: 1
+        });
+      }
+    }
+  } catch (e) {
+    // فشل التتبع (شبكة/أد بلوكر) مش لازم يوقف الموقع
+    console.log("visitor tracking error:", e);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", trackVisitorAndCheckBlock);
