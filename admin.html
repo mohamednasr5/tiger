@@ -749,6 +749,18 @@
               <span class="toggle-slider"></span>
             </label>
           </div>
+          
+          <!-- Gift Card Toggle -->
+          <div class="payment-toggle-item">
+            <div class="toggle-info">
+              <i class='bx bx-gift' style="color:var(--gold)"></i>
+              <span>بطاقة هدايا</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggleGiftcard" checked onchange="togglePaymentMethod('giftcard')" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
         </div>
 
         <hr class="payment-divider" />
@@ -2645,6 +2657,11 @@ function loadSettings() {
     const codEnabled = methods.cod !== false;
     document.getElementById("toggleCod").checked = codEnabled;
     updateToggleUI('cod', codEnabled);
+    
+    // Gift Card
+    const giftcardEnabled = methods.giftcard !== false;
+    document.getElementById("toggleGiftcard").checked = giftcardEnabled;
+    updateToggleUI('giftcard', giftcardEnabled);
   });
   
   db.ref("settings/payment").once("value").then(snap => {
