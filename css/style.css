@@ -1657,10 +1657,10 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
   align-items:center;
   justify-content:center;
   gap:2px;
-  padding:9px 2px 7px;
+  padding:8px 1px 6px;
   border-radius:16px;
   color:var(--text-dim);
-  font-size:.65rem;
+  font-size:.62rem;
   font-weight:700;
   white-space:nowrap;
   transition:color .25s ease, background .25s ease;

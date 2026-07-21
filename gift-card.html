@@ -769,10 +769,15 @@ let isMusicPlaying = false;
 
 // ====== INITIALIZATION ======
 document.addEventListener('DOMContentLoaded', () => {
-  // Extract card ID from URL path
+  // Extract card ID from URL (supports both formats):
+  // Format 1: /gift-card/XXXXX (via 404 redirect)
+  // Format 2: gift-card.html?id=XXXXX (direct link)
   const path = window.location.pathname;
-  const match = path.match(/\/gift-card\/([a-zA-Z0-9_-]+)/);
-  cardId = match ? match[1] : null;
+  const pathMatch = path.match(/\/gift-card\/([a-zA-Z0-9_-]+)/);
+  const urlParams = new URLSearchParams(window.location.search);
+  const queryId = urlParams.get('id');
+  
+  cardId = pathMatch ? pathMatch[1] : queryId;
   
   if (!cardId) {
     showError('رابط البطاقة غير صحيح');
