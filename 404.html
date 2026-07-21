@@ -77,21 +77,21 @@ body {
 .scene {
   position:relative;
   width:400px;
-  height:420px;
+  height:380px;
   margin:0 auto 2rem;
 }
 
 /* Jeans Image Container */
 .jeans-container {
   position:absolute;
-  bottom:10px;
+  bottom:0;
   left:50%;
   transform:translateX(-50%);
   z-index:3;
 }
 
 .jeans-img {
-  width:280px;
+  width:260px;
   height:auto;
   filter:drop-shadow(0 15px 40px rgba(0,0,0,0.6));
   transition:filter 0.3s ease;
@@ -246,7 +246,7 @@ body {
 /* Iron Container */
 .iron-container {
   position:absolute;
-  top:30px;
+  top:2px;
   left:50%;
   transform:translateX(-50%);
   z-index:5;
@@ -254,7 +254,7 @@ body {
 }
 
 .iron-img {
-  width:260px;
+  width:250px;
   height:auto;
   filter:drop-shadow(0 20px 40px rgba(0,0,0,0.5));
   transform-origin: center right;
@@ -461,6 +461,55 @@ body {
   animation:sparkFly 0.7s ease-out forwards;
   box-shadow:0 0 10px currentColor;
 }
+
+/* ====== GIFT CARD SPECIAL STYLES ====== */
+.gift-card-mode .main-message {
+  color: var(--gold);
+  font-size: 1.9rem;
+}
+
+.gift-card-mode .sub-message {
+  font-size: 1.1rem;
+}
+
+.gift-card-mode .countdown-number {
+  color: var(--gold);
+  font-size: 3.2rem;
+}
+
+.redirecting-text {
+  color: var(--gold-light);
+  font-style: italic;
+  margin-top: 0.5rem;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Image error fallback */
+.img-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  border: 2px dashed var(--fire-orange);
+  border-radius: 12px;
+  font-size: 3rem;
+  min-height: 200px;
+}
+
+.img-error.iron-fallback {
+  width: 260px;
+  height: 180px;
+}
+
+.img-error.jeans-fallback {
+  width: 280px;
+  height: 220px;
+}
 </style>
 </head>
 <body class="screen-shake">
@@ -479,7 +528,7 @@ body {
     
     <!-- Iron (Mienta 2300W) -->
     <div class="iron-container">
-      <img src="images/iron-404.png" alt="Mienta Iron" class="iron-img" id="ironImg" />
+      <img src="images/iron-404.png" alt="Mienta Iron" class="iron-img" id="ironImg" onerror="showIronFallback()" />
       <div class="iron-heat-glow"></div>
       <div class="steam-indicator">
         <div class="steam-dot"></div>
@@ -499,7 +548,7 @@ body {
 
     <!-- Jeans -->
     <div class="jeans-container" id="jeansContainer">
-      <img src="images/jeans-404.png" alt="Jeans" class="jeans-img" />
+      <img src="images/jeans-404.png" alt="Jeans" class="jeans-img" id="jeansImg" onerror="showJeansFallback()" />
       
       <!-- Burn Effects Overlay -->
       <div class="burn-overlay"></div>
@@ -521,9 +570,9 @@ body {
   <div class="error-code">404</div>
 
   <!-- Main Message -->
-  <h1 class="main-message">يا سلام! 🤦‍♂️</h1>
+  <h1 class="main-message" id="mainMessage">يا سلام! 🤦‍♂️</h1>
   
-  <p class="sub-message">
+  <p class="sub-message" id="subMessage">
     الصفحة اللي طلبتها ربما <span class="highlight">احترقت مع البنطلون</span> لحظات... 🔥<br>
     المكواة <strong style="color:#ef4444">Mienta 2300W</strong> كانت شغالة والبنطلون انصهر! 👖➡️🔥
   </p>
@@ -534,9 +583,10 @@ body {
     <span class="countdown-number" id="countdown">10</span>
     <span class="countdown-label">ثواني ⏰</span>
   </div>
+  <p class="redirecting-text" id="redirectingText" style="display:none;">جاري التحويل لبطاقتك... 🎁</p>
 
   <!-- Home Button -->
-  <a href="https://tiger-jeans.com/" class="home-btn">
+  <a href="https://tiger-jeans.com/" class="home-btn" id="homeBtn">
     <i class='bx bx-home'></i> روح للصفحة الرئيسية
   </a>
 
@@ -557,16 +607,64 @@ body {
 </div>
 
 <script>
+// ============================================================
+// 🎯 TIGER JEANS 404 PAGE - ENHANCED VERSION
+// Features: Gift Card Auto-Detect + Redirect + Fallback Images
+// ============================================================
+
+// ====== GLOBAL STATE ======
+let isGiftCardMode = false;
+let redirectTarget = 'https://tiger-jeans.com/';
+let countdownSeconds = 10;
+
+// ====== IMAGE FALLBACK HANDLERS ======
+function showIronFallback() {
+  const ironImg = document.getElementById('ironImg');
+  if (ironImg) {
+    ironImg.style.display = 'none';
+    const fallback = document.createElement('div');
+    fallback.className = 'img-error iron-fallback';
+    fallback.innerHTML = '⚡';
+    fallback.style.position = 'absolute';
+    fallback.style.top = '0';
+    fallback.style.left = '0';
+    ironImg.parentNode.appendChild(fallback);
+    console.warn('⚠️ Iron image not found, using emoji fallback');
+  }
+}
+
+function showJeansFallback() {
+  const jeansImg = document.getElementById('jeansImg');
+  if (jeansImg) {
+    jeansImg.style.display = 'none';
+    const fallback = document.createElement('div');
+    fallback.className = 'img-error jeans-fallback';
+    fallback.innerHTML = '👖';
+    fallback.style.position = 'absolute';
+    fallback.style.top = '0';
+    fallback.style.left = '0';
+    jeansImg.parentNode.appendChild(fallback);
+    console.warn('⚠️ Jeans image not found, using emoji fallback');
+  }
+}
+
 // ====== TRIGGER BURN ANIMATION AFTER LOAD ======
 window.addEventListener('load', () => {
+  console.log('✅ 404 page loaded');
+  console.log('📍 Current URL:', window.location.href);
+  console.log('📍 Pathname:', window.location.pathname);
+  
   setTimeout(() => {
     // Add burned class to trigger all fire effects
-    document.getElementById('jeansContainer').classList.add('burned');
-    document.getElementById('scene').classList.add('burned');
+    const jeansContainer = document.getElementById('jeansContainer');
+    const scene = document.getElementById('scene');
+    
+    if (jeansContainer) jeansContainer.classList.add('burned');
+    if (scene) scene.classList.add('burned');
     
     // Make iron press harder
     const iron = document.getElementById('ironImg');
-    iron.style.animation = 'ironPressHard 2s ease-in-out infinite';
+    if (iron) iron.style.animation = 'ironPressHard 2s ease-in-out infinite';
   }, 800);
 });
 
@@ -581,46 +679,75 @@ hardPressStyle.textContent = `
 `;
 document.head.appendChild(hardPressStyle);
 
-// ====== COUNTDOWN TIMER ======
-let seconds = 10;
+// ====== COUNTDOWN TIMER WITH REDIRECT ======
 const countdownEl = document.getElementById('countdown');
 
-const countdownInterval = setInterval(() => {
-  seconds--;
-  if (seconds <= 0) {
-    clearInterval(countdownInterval);
-    countdownEl.textContent = '✓';
-    window.location.href = 'https://tiger-jeans.com/';
-  } else {
-    countdownEl.textContent = seconds;
-    countdownEl.style.animation = 'none';
-    void countdownEl.offsetWidth; // Trigger reflow
-    countdownEl.style.animation = 'numberTick 1s ease-in-out';
+function startCountdown(seconds, targetUrl, isGiftCard = false) {
+  countdownSeconds = seconds;
+  redirectTarget = targetUrl || 'https://tiger-jeans.com/';
+  isGiftCardMode = isGiftCard;
+  
+  if (isGiftCardMode) {
+    // Special styling for gift card mode
+    document.body.classList.add('gift-card-mode');
+    document.getElementById('redirectingText').style.display = 'block';
   }
-}, 1000);
+  
+  const countdownInterval = setInterval(() => {
+    countdownSeconds--;
+    
+    if (countdownSeconds <= 0) {
+      clearInterval(countdownInterval);
+      countdownEl.textContent = '✓';
+      
+      console.log(`🔄 Redirecting to: ${redirectTarget}`);
+      
+      // Force redirect
+      window.location.assign(redirectTarget);
+      
+      // Backup redirect after 1 second
+      setTimeout(() => {
+        window.location.href = redirectTarget;
+        window.location.replace(redirectTarget);
+      }, 1000);
+      
+    } else {
+      countdownEl.textContent = countdownSeconds;
+      countdownEl.style.animation = 'none';
+      void countdownEl.offsetWidth; // Trigger reflow
+      countdownEl.style.animation = 'numberTick 1s ease-in-out';
+    }
+  }, 1000);
+  
+  return countdownInterval;
+}
 
 // ====== GENERATE EMBERS ======
 const embersContainer = document.getElementById('embersContainer');
-for (let i = 0; i < 35; i++) {
-  const ember = document.createElement('div');
-  ember.className = 'ember';
-  ember.style.left = Math.random() * 100 + '%';
-  ember.style.animationDuration = (4 + Math.random() * 7) + 's';
-  ember.style.animationDelay = (Math.random() * 10) + 's';
-  ember.style.width = (4 + Math.random() * 8) + 'px';
-  ember.style.height = ember.style.width;
-  
-  const colors = ['#ff6b35', '#ef4444', '#fbbf24', '#d4af37', '#ff8c00', '#ffa500'];
-  ember.style.background = colors[Math.floor(Math.random() * colors.length)];
-  ember.style.boxShadow = `0 0 ${10 + Math.random() * 15}px ${ember.style.background}`;
-  
-  embersContainer.appendChild(ember);
+if (embersContainer) {
+  for (let i = 0; i < 35; i++) {
+    const ember = document.createElement('div');
+    ember.className = 'ember';
+    ember.style.left = Math.random() * 100 + '%';
+    ember.style.animationDuration = (4 + Math.random() * 7) + 's';
+    ember.style.animationDelay = (Math.random() * 10) + 's';
+    ember.style.width = (4 + Math.random() * 8) + 'px';
+    ember.style.height = ember.style.width;
+    
+    const colors = ['#ff6b35', '#ef4444', '#fbbf24', '#d4af37', '#ff8c00', '#ffa500'];
+    ember.style.background = colors[Math.floor(Math.random() * colors.length)];
+    ember.style.boxShadow = `0 0 ${10 + Math.random() * 15}px ${ember.style.background}`;
+    
+    embersContainer.appendChild(ember);
+  }
 }
 
 // ====== RANDOM SPARKS FROM BURN AREA ======
 setInterval(() => {
   if (Math.random() > 0.5 && document.querySelector('.burned')) {
     const scene = document.getElementById('scene');
+    if (!scene) return;
+    
     const spark = document.createElement('div');
     spark.className = 'spark';
     
@@ -636,39 +763,98 @@ setInterval(() => {
   }
 }, 300);
 
-// ====== GIFT CARD REDIRECT DETECTION ======
+// ====== GIFT CARD REDIRECT DETECTION (ENHANCED) ======
 (function checkGiftCardRedirect() {
   const path = window.location.pathname;
-  const giftCardMatch = path.match(/\/gift-card\/([a-zA-Z0-9_-]+)/);
+  const search = window.location.search;
+  
+  console.log('🔍 Checking for gift card redirect...');
+  console.log('   Path:', path);
+  console.log('   Search:', search);
+  
+  // Pattern 1: /gift-card/XXXXX (clean URL)
+  let giftCardMatch = path.match(/\/gift-card\/([a-zA-Z0-9_-]+)/);
+  
+  // Pattern 2: ?id=XXXXX (query param) - direct access to 404.html?id=XXX
+  if (!giftCardMatch && search) {
+    const params = new URLSearchParams(search);
+    const queryId = params.get('id') || params.get('cardId') || params.get('card');
+    if (queryId) {
+      giftCardMatch = [null, queryId];
+    }
+  }
+  
+  // Pattern 3: Check hash for card ID
+  if (!giftCardMatch && window.location.hash) {
+    const hashMatch = window.location.hash.match(/#?([a-zA-Z0-9_-]{10,})/);
+    if (hashMatch) {
+      giftCardMatch = [null, hashMatch[1]];
+    }
+  }
   
   if (giftCardMatch) {
     const cardId = giftCardMatch[1];
     
-    // Update message for gift card users
-    document.querySelector('.main-message').textContent = 'بطاقة الهدايا متخبية! 🎁';
-    document.querySelector('.sub-message').innerHTML = `
-      بنحاول نلبسلك البطاقة دي... استنى شوية! 🎉<br>
-      <span style="color:var(--gold)">الرابط:</span> 
-      <code style="background:rgba(255,255,255,0.1);padding:3px 10px;border-radius:6px;font-size:.9rem">${cardId}</code>
-    `;
+    console.log('🎁 GIFT CARD DETECTED!');
+    console.log('   Card ID:', cardId);
     
-    // Redirect faster for gift cards
-    clearInterval(countdownInterval);
-    let gcSeconds = 4;
-    countdownEl.textContent = gcSeconds;
+    isGiftCardMode = true;
     
-    const gcInterval = setInterval(() => {
-      gcSeconds--;
-      if (gcSeconds <= 0) {
-        clearInterval(gcInterval);
-        window.location.href = `gift-card.html?id=${cardId}`;
-      } else {
-        countdownEl.textContent = gcSeconds;
-        countdownEl.style.animation = 'none';
-        void countdownEl.offsetWidth;
-        countdownEl.style.animation = 'numberTick 1s ease-in-out';
+    // Update UI for gift card users
+    const mainMsg = document.querySelector('#mainMessage');
+    const subMsg = document.querySelector('#subMessage');
+    const homeBtn = document.querySelector('#homeBtn');
+    
+    if (mainMsg) mainMsg.textContent = 'بطاقة الهدايا متخبية! 🎁';
+    
+    if (subMsg) {
+      subMsg.innerHTML = `
+        بنحاول نلبسلك البطاقة دي... استنى شوية! 🎉<br>
+        <span style="color:var(--gold)">الرابط:</span> 
+        <code style="background:rgba(255,255,255,0.1);padding:3px 10px;border-radius:6px;font-size:.9rem">${cardId}</code>
+      `;
+    }
+    
+    if (homeBtn) {
+      homeBtn.innerHTML = '<i class=\'bx bx-gift\'></i> فتح بطاقة الهدايا';
+      homeBtn.href = `/gift-card.html?id=${cardId}`;
+    }
+    
+    // Build redirect URL - MUST be root-absolute (leading slash).
+    // A relative "gift-card.html?id=..." resolves against the current
+    // path (e.g. /gift-card/TESTCARD123 → /gift-card/gift-card.html),
+    // which doesn't exist and re-triggers this same 404 page in a loop.
+    let redirectUrl = `/gift-card.html?id=${cardId}`;
+    
+    // Also try absolute URL as backup
+    const absoluteUrl = `${window.location.origin}/gift-card.html?id=${cardId}`;
+    
+    console.log('🔄 Will redirect to:', redirectUrl);
+    console.log('🔄 Backup URL:', absoluteUrl);
+    
+    // Start faster countdown for gift cards (3 seconds)
+    startCountdown(3, redirectUrl, true);
+    
+    // Add click-to-redirect functionality
+    document.addEventListener('click', function(e) {
+      if (isGiftCardMode && !e.target.closest('a')) {
+        console.log('🖱️ Click detected, redirecting to gift card...');
+        window.location.assign(absoluteUrl);
       }
-    }, 1000);
+    });
+    
+    // Auto-redirect after countdown
+    setTimeout(() => {
+      if (isGiftCardMode) {
+        console.log('⏰ Auto-redirecting now...');
+        window.location.assign(absoluteUrl);
+      }
+    }, 3500);
+    
+  } else {
+    // Normal 404 - start regular countdown
+    console.log('❌ No gift card detected, showing normal 404');
+    startCountdown(10, 'https://tiger-jeans.com/', false);
   }
 })();
 
@@ -676,6 +862,7 @@ setInterval(() => {
 console.log('%c🔥 يا سلام! البنطلون احترق!', 'font-size:28px;color:#ff6b35;font-weight:bold;');
 console.log('%c👖 المكواة Mienta 2300W كانت شغالة والصفحة فازت...', 'font-size:14px;color:#9ca3af;');
 console.log('%c⚡ الحل: اضغط على "روح للصفحة الرئيسية"', 'font-size:13px;color:#d4af37;');
+console.log('%c🎁 إذا كنت تبحث عن بطاقة هدايا، سيتم تحويلك تلقائياً', 'font-size:12px;color:#d4af37;');
 </script>
 </body>
 </html>
