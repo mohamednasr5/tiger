@@ -398,6 +398,8 @@ let receiptUrl = "";
 let paySettings = {};
 let discountAmount = 0;
 let appliedGiftCard = null; // { key, cardNumber, deduction }
+let partialPayMethod = "vodafone"; // for partial payment when gift card doesn't cover full amount
+let gcPaymentData = null; // stores validated gift card data when used as primary payment
 
 const cart = getCart();
 if (!cart.length) location.href = "cart.html";
@@ -505,9 +507,6 @@ function getShippingCost() {
   }
   return 0;
 }
-
-let partialPayMethod = "vodafone"; // for partial payment when gift card doesn't cover full amount
-let gcPaymentData = null; // stores validated gift card data when used as primary payment
 
 function selectPay(m, el) {
   method = m;
