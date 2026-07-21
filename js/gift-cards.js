@@ -1,459 +1,392 @@
 // ============================================================
-// Tiger Jeans — Gift Cards (client logic)
-// Firebase schema used:
-//   giftCardRequests/{pushId}   -> purchase requests (pending/approved/rejected)
-//   giftCards/{CARDNUMBER}      -> the actual activated card (balance, pin, status)
+// Tiger Jeans — Gift Cards page: motion + sound layer ("gc-fx")
+// Purely additive: does not touch gift-cards.js logic or IDs.
+// - Hero "unboxing" reveal animation
+// - Synthesized UI sounds (no audio files — generated with WebAudio)
+// - 3D tilt on template / preview cards
+// - Confetti bursts on success + scratch-card reveal
+// Respects prefers-reduced-motion and requires a real user gesture
+// before any sound plays (browser autoplay rules).
 // ============================================================
 
-const GC_TEMPLATES = [500, 1000, 2000, 2500, 3000, 5000];
-const GC_MIN = 100;
-const GC_MAX = 50000;
-const GC_EXPIRY_DAYS = 365;
+(function () {
+  "use strict";
 
-let gcSelectedAmount = 500;
-let gcMethod = "vodafone";
-let gcReceiptUrl = "";
-let gcPaySettings = {};
-let gcMyCardsTab = "all";
-let gcMyRequests = [];
-let gcMyCards = [];
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-// ---------- Hero decorative effects (floating boxes / particles / ribbons) ----------
-function initGcHeroEffects() {
-  const glow = document.getElementById("gcHeroGlow");
-  if (!glow) return;
-  const icons = ["🎁", "🎀", "✨", "🎉"];
-  for (let i = 0; i < 10; i++) {
-    const el = document.createElement("span");
-    el.className = "gc-float-box";
-    el.textContent = icons[i % icons.length];
-    el.style.left = Math.random() * 95 + "%";
-    el.style.top = Math.random() * 80 + "%";
-    el.style.animationDelay = Math.random() * 5 + "s";
-    el.style.animationDuration = 6 + Math.random() * 4 + "s";
-    glow.appendChild(el);
-  }
-  for (let i = 0; i < 14; i++) {
-    const p = document.createElement("span");
-    p.className = "gc-particle";
-    p.style.left = Math.random() * 100 + "%";
-    p.style.bottom = Math.random() * 40 + "px";
-    p.style.animationDelay = Math.random() * 6 + "s";
-    glow.appendChild(p);
-  }
-}
+  // ---------------------------------------------------------
+  // Sound manager — everything synthesized, nothing downloaded
+  // ---------------------------------------------------------
+  const Sound = (function () {
+    let ctx = null;
+    let enabled = localStorage.getItem("tj_gc_sound") === "1";
 
-// ---------- Templates ----------
-function renderGcTemplates() {
-  const grid = document.getElementById("gcTemplatesGrid");
-  if (!grid) return;
-  grid.innerHTML = GC_TEMPLATES.map((amt, i) => `
-    <div class="gc-template ${amt === gcSelectedAmount ? "active" : ""}" data-amt="${amt}" onclick="selectGcTemplate(${amt})">
-      <div class="gc-tpl-top">
-        <span class="gc-tpl-logo">TIGER</span>
-        <i class='bx bxs-gift gc-ribbon-icon'></i>
-      </div>
-      <div>
-        <div class="gc-tpl-amount">${amt.toLocaleString("ar-EG")} <small>ج.م</small></div>
-        <div class="gc-tpl-label">بطاقة هدايا فاخرة</div>
-      </div>
-    </div>
-  `).join("");
-}
-
-function selectGcTemplate(amt) {
-  gcSelectedAmount = amt;
-  document.getElementById("gcCustomAmount").value = amt;
-  document.getElementById("gcRange").value = Math.min(amt, GC_MAX);
-  renderGcTemplates();
-  updateGcPreview();
-}
-
-// ---------- Custom amount ----------
-function onCustomAmountInput() {
-  let v = parseInt(document.getElementById("gcCustomAmount").value, 10) || 0;
-  gcSelectedAmount = v;
-  document.getElementById("gcRange").value = Math.max(GC_MIN, Math.min(v, GC_MAX));
-  renderGcTemplates();
-  updateGcPreview();
-}
-
-function onRangeInput() {
-  const v = parseInt(document.getElementById("gcRange").value, 10);
-  gcSelectedAmount = v;
-  document.getElementById("gcCustomAmount").value = v;
-  renderGcTemplates();
-  updateGcPreview();
-}
-
-function onOccasionChange() {
-  updateGcPreview();
-}
-
-function updateGcPreview() {
-  const amountEl = document.getElementById("gcPreviewAmount");
-  const occasionEl = document.getElementById("gcPreviewOccasion");
-  const finalEl = document.getElementById("gcFinalAmount");
-  const occasionSel = document.getElementById("gcOccasion");
-
-  // animated counter
-  animateGcCounter(amountEl, gcSelectedAmount);
-  if (occasionEl && occasionSel) occasionEl.textContent = occasionSel.value + " 🎉";
-  if (finalEl) finalEl.textContent = fmtPrice(gcSelectedAmount);
-}
-
-function animateGcCounter(el, target) {
-  if (!el) return;
-  const start = parseInt(el.dataset.val || "0", 10) || 0;
-  const duration = 300;
-  const startTime = performance.now();
-  function step(now) {
-    const p = Math.min(1, (now - startTime) / duration);
-    const val = Math.round(start + (target - start) * p);
-    el.textContent = val.toLocaleString("ar-EG");
-    if (p < 1) requestAnimationFrame(step);
-    else el.dataset.val = target;
-  }
-  requestAnimationFrame(step);
-}
-
-// ---------- Payment method selection (mirrors checkout.html) ----------
-function gcSelectPay(method, el) {
-  gcMethod = method;
-  document.querySelectorAll(".gc-pay-option").forEach((p) => p.classList.remove("active"));
-  el.classList.add("active");
-
-  const label = document.getElementById("gcPayLabel");
-  const val = document.getElementById("gcPayNumberVal");
-  const box = document.getElementById("gcPayNumberBox");
-  const receiptField = document.getElementById("gcReceiptField");
-
-  if (method === "vodafone") {
-    label.textContent = "حوّل المبلغ على رقم فودافون كاش:";
-    val.textContent = gcPaySettings.vodafone || "01012345678";
-    box.style.display = "block";
-    receiptField.style.display = "block";
-  } else if (method === "instapay") {
-    label.textContent = "حوّل المبلغ عبر إنستاباي:";
-    val.textContent = "@" + (gcPaySettings.instapay || "engmohamednasr");
-    box.style.display = "block";
-    receiptField.style.display = "block";
-  } else {
-    label.textContent = "سيتم تحصيل المبلغ نقدًا عند التفعيل / التسليم";
-    val.textContent = "—";
-    box.style.display = "block";
-    receiptField.style.display = "none";
-  }
-}
-
-async function loadGcPaySettings() {
-  try {
-    const snap = await db.ref("settings/payment").once("value");
-    gcPaySettings = snap.val() || {};
-    gcSelectPay(gcMethod, document.querySelector('.gc-pay-option[data-method="vodafone"]'));
-  } catch (e) {
-    console.error("gift-card pay settings error", e);
-  }
-}
-
-// ---------- Receipt upload ----------
-async function onGcReceiptChange() {
-  const input = document.getElementById("gcReceiptInput");
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    document.getElementById("gcReceiptPreview").src = e.target.result;
-    document.getElementById("gcReceiptPreview").style.display = "block";
-    document.getElementById("gcReceiptPlaceholder").style.display = "none";
-  };
-  reader.readAsDataURL(file);
-  await handleImageInput(input, (url) => { gcReceiptUrl = url; }, document.getElementById("gcReceiptStatus"));
-}
-
-// ---------- Submit purchase request ----------
-async function submitGiftCardOrder() {
-  const senderName = document.getElementById("gcSenderName").value.trim();
-  const senderPhone = document.getElementById("gcSenderPhone").value.trim();
-  const senderEmail = document.getElementById("gcSenderEmail").value.trim();
-  const occasion = document.getElementById("gcOccasion").value;
-  const recipientName = document.getElementById("gcRecipientName").value.trim();
-  const message = document.getElementById("gcMessage").value.trim();
-  const amount = gcSelectedAmount;
-
-  if (!senderName || !senderPhone) {
-    showToast("من فضلك أدخل اسمك ورقم موبايلك");
-    return;
-  }
-  if (!/^01[0125][0-9]{8}$/.test(senderPhone)) {
-    showToast("رقم الموبايل غير صحيح");
-    return;
-  }
-  if (!amount || amount < GC_MIN || amount > GC_MAX) {
-    showToast(`قيمة البطاقة يجب أن تكون بين ${GC_MIN} و ${GC_MAX} ج.م`);
-    return;
-  }
-  if (gcMethod !== "cod" && !gcReceiptUrl) {
-    showToast("من فضلك ارفع صورة إيصال التحويل");
-    return;
-  }
-
-  const btn = document.getElementById("gcSubmitBtn");
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> جاري إرسال الطلب...';
-
-  const request = {
-    senderName, senderPhone, senderEmail: senderEmail || null,
-    occasion, recipientName: recipientName || null, message: message || null,
-    amount,
-    payment: { method: gcMethod, receiptImage: gcReceiptUrl || null },
-    uid: (typeof currentUser !== "undefined" && currentUser) ? currentUser.uid : null,
-    status: "pending",
-    createdAt: Date.now(),
-  };
-
-  try {
-    const ref = await db.ref("giftCardRequests").push(request);
-    localStorage.setItem("tj_gc_phone", senderPhone);
-    showToast("تم إرسال طلب شراء البطاقة ✓ سيتم مراجعته قريبًا");
-    document.getElementById("gcSenderName").value = "";
-    document.getElementById("gcRecipientName").value = "";
-    document.getElementById("gcMessage").value = "";
-    document.getElementById("gcReceiptPreview").style.display = "none";
-    document.getElementById("gcReceiptPlaceholder").style.display = "block";
-    gcReceiptUrl = "";
-    if (typeof currentUser !== "undefined" && currentUser) loadMyGiftCards();
-  } catch (err) {
-    console.error(err);
-    showToast("حدث خطأ أثناء إرسال الطلب");
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = "إرسال طلب الشراء <i class='bx bx-check-double'></i>";
-  }
-}
-
-// ---------- My Gift Cards ----------
-async function loadMyGiftCards() {
-  const wrap = document.getElementById("gcMyCardsWrap");
-  if (!currentUser) return; // login note stays as-is
-  const phone = localStorage.getItem("tj_gc_phone");
-
-  wrap.innerHTML = `
-    <div class="gc-tabs">
-      <button class="gc-tab-btn active" data-t="all" onclick="setGcMyTab('all',this)">الكل</button>
-      <button class="gc-tab-btn" data-t="pending" onclick="setGcMyTab('pending',this)">قيد المراجعة</button>
-      <button class="gc-tab-btn" data-t="active" onclick="setGcMyTab('active',this)">متاحة</button>
-      <button class="gc-tab-btn" data-t="used" onclick="setGcMyTab('used',this)">مستخدمة</button>
-      <button class="gc-tab-btn" data-t="expired" onclick="setGcMyTab('expired',this)">منتهية</button>
-    </div>
-    <div id="gcMyCardsList"><div class="gc-empty">جاري التحميل...</div></div>
-  `;
-
-  try {
-    const [reqSnap, cardsSnap] = await Promise.all([
-      db.ref("giftCardRequests").orderByChild("uid").equalTo(currentUser.uid).once("value"),
-      db.ref("giftCards").orderByChild("ownerUid").equalTo(currentUser.uid).once("value"),
-    ]);
-
-    gcMyRequests = [];
-    reqSnap.forEach((c) => gcMyRequests.push({ id: c.key, ...c.val() }));
-    gcMyCards = [];
-    cardsSnap.forEach((c) => gcMyCards.push({ id: c.key, ...c.val() }));
-
-    // Fallback: also match by phone for requests made before login
-    if (phone) {
-      const byPhoneSnap = await db.ref("giftCardRequests").orderByChild("senderPhone").equalTo(phone).once("value");
-      byPhoneSnap.forEach((c) => {
-        if (!gcMyRequests.find((r) => r.id === c.key)) gcMyRequests.push({ id: c.key, ...c.val() });
-      });
+    function ensureCtx() {
+      if (!ctx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        ctx = new AC();
+      }
+      if (ctx.state === "suspended") ctx.resume();
+      return ctx;
     }
 
-    renderGcMyCards();
-  } catch (e) {
-    console.error(e);
-    document.getElementById("gcMyCardsList").innerHTML = `<div class="gc-empty">تعذر تحميل البطاقات الآن</div>`;
-  }
-}
-
-function setGcMyTab(tab, el) {
-  gcMyCardsTab = tab;
-  document.querySelectorAll(".gc-tab-btn").forEach((b) => b.classList.remove("active"));
-  el.classList.add("active");
-  renderGcMyCards();
-}
-
-function renderGcMyCards() {
-  const list = document.getElementById("gcMyCardsList");
-  if (!list) return;
-
-  let items = [];
-  gcMyRequests.forEach((r) => {
-    if (r.status === "pending" || r.status === "rejected") {
-      items.push({ kind: "request", data: r });
+    function tone(freq, dur, type, delay, gain) {
+      if (!enabled) return;
+      const c = ensureCtx();
+      if (!c) return;
+      const t0 = c.currentTime + (delay || 0);
+      const osc = c.createOscillator();
+      const g = c.createGain();
+      osc.type = type || "sine";
+      osc.frequency.setValueAtTime(freq, t0);
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(gain || 0.16, t0 + 0.015);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      osc.connect(g).connect(c.destination);
+      osc.start(t0);
+      osc.stop(t0 + dur + 0.02);
     }
-  });
-  gcMyCards.forEach((c) => items.push({ kind: "card", data: c }));
 
-  if (gcMyCardsTab !== "all") {
-    items = items.filter((it) => {
-      const status = it.kind === "request" ? it.data.status : it.data.status;
-      if (gcMyCardsTab === "pending") return status === "pending";
-      if (gcMyCardsTab === "active") return status === "active";
-      if (gcMyCardsTab === "used") return status === "used";
-      if (gcMyCardsTab === "expired") return status === "expired";
-      return true;
+    function chime() {
+      tone(1046, 0.16, "sine", 0, 0.14);
+      tone(1568, 0.18, "sine", 0.05, 0.09);
+    }
+
+    function select() {
+      tone(880, 0.09, "triangle", 0, 0.12);
+    }
+
+    function success() {
+      tone(784, 0.14, "sine", 0, 0.14);
+      tone(988, 0.14, "sine", 0.09, 0.13);
+      tone(1318, 0.22, "sine", 0.18, 0.14);
+    }
+
+    function soft404() {
+      tone(220, 0.22, "sine", 0, 0.12);
+      tone(180, 0.26, "sine", 0.08, 0.1);
+    }
+
+    function seal() {
+      if (!enabled) return;
+      const c = ensureCtx();
+      if (!c) return;
+      const t0 = c.currentTime;
+      const osc = c.createOscillator();
+      const g = c.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(120, t0);
+      osc.frequency.exponentialRampToValueAtTime(60, t0 + 0.18);
+      g.gain.setValueAtTime(0.2, t0);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.2);
+      osc.connect(g).connect(c.destination);
+      osc.start(t0);
+      osc.stop(t0 + 0.22);
+    }
+
+    function ribbonWhoosh() {
+      if (!enabled) return;
+      const c = ensureCtx();
+      if (!c) return;
+      const bufSize = c.sampleRate * 0.5;
+      const buffer = c.createBuffer(1, bufSize, c.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufSize);
+      const noise = c.createBufferSource();
+      noise.buffer = buffer;
+      const bp = c.createBiquadFilter();
+      bp.type = "bandpass";
+      bp.frequency.setValueAtTime(2200, c.currentTime);
+      bp.frequency.exponentialRampToValueAtTime(500, c.currentTime + 0.5);
+      const g = c.createGain();
+      g.gain.setValueAtTime(0.25, c.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + 0.5);
+      noise.connect(bp).connect(g).connect(c.destination);
+      noise.start();
+    }
+
+    function setEnabled(v) {
+      enabled = v;
+      localStorage.setItem("tj_gc_sound", v ? "1" : "0");
+      if (v) ensureCtx();
+    }
+
+    return { chime, select, success, soft404, seal, ribbonWhoosh, setEnabled, isEnabled: () => enabled, ensureCtx };
+  })();
+
+  // ---------------------------------------------------------
+  // Sound toggle button
+  // ---------------------------------------------------------
+  function initSoundToggle() {
+    const btn = document.getElementById("gcSoundToggle");
+    if (!btn) return;
+    const icon = btn.querySelector("i");
+    const label = btn.querySelector("span");
+
+    function paint() {
+      const on = Sound.isEnabled();
+      btn.classList.toggle("on", on);
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      icon.className = on ? "bx bx-volume-full" : "bx bx-volume-mute";
+      label.textContent = on ? "صوت الهدايا مفعّل" : "فعّل صوت الهدايا";
+    }
+    paint();
+
+    btn.addEventListener("click", () => {
+      const next = !Sound.isEnabled();
+      Sound.setEnabled(next);
+      paint();
+      if (next) Sound.chime();
     });
   }
 
-  if (!items.length) {
-    list.innerHTML = `<div class="gc-empty">لا توجد بطاقات في هذا القسم</div>`;
-    return;
-  }
+  // ---------------------------------------------------------
+  // Hero unboxing sequence (purely visual — runs once per tab)
+  // ---------------------------------------------------------
+  function initUnbox() {
+    const box = document.getElementById("gcUnbox");
+    const body = document.getElementById("gcHeroBody");
+    const spark = document.getElementById("gcUnboxSpark");
+    if (!box || !body) return;
 
-  list.innerHTML = items.map((it) => {
-    const d = it.data;
-    if (it.kind === "request") {
-      const label = d.status === "rejected" ? "مرفوض" : "قيد المراجعة";
-      const cls = d.status === "rejected" ? "gc-status-rejected" : "gc-status-pending";
-      return `
-        <div class="gc-my-card">
-          <div>
-            <b style="font-family:'Cairo',sans-serif">${fmtPrice(d.amount)}</b>
-            <div style="color:var(--text-dim);font-size:.82rem;margin-top:.2rem">طلب شراء بطاقة هدايا — ${new Date(d.createdAt).toLocaleDateString("ar-EG")}</div>
-          </div>
-          <span class="gc-status-pill ${cls}">${label}</span>
-        </div>`;
+    if (reduceMotion || sessionStorage.getItem("tj_gc_unboxed") === "1") {
+      box.style.display = "none";
+      body.classList.add("gc-in");
+      return;
     }
-    const cls = "gc-status-" + (d.status || "active");
-    const labels = { active: "متاحة", used: "مستخدمة بالكامل", expired: "منتهية", frozen: "موقوفة" };
-    return `
-      <div class="gc-my-card">
-        <div>
-          <b style="font-family:'Cairo',sans-serif">${fmtPrice(d.balance)}</b>
-          <div style="color:var(--text-dim);font-size:.82rem;margin-top:.2rem">من أصل ${fmtPrice(d.originalAmount)} · تنتهي ${d.expiresAt ? new Date(d.expiresAt).toLocaleDateString("ar-EG") : "-"}</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:.6rem">
-          <span class="gc-status-pill ${cls}">${labels[d.status] || d.status}</span>
-          <button class="btn-secondary" style="padding:.5rem 1rem;font-size:.8rem" onclick="openGcCardModal('${d.id}')">عرض</button>
-        </div>
-      </div>`;
-  }).join("");
-}
+    sessionStorage.setItem("tj_gc_unboxed", "1");
 
-// ---------- Card modal: scratch reveal + share ----------
-function openGcCardModal(cardId) {
-  const card = gcMyCards.find((c) => c.id === cardId);
-  if (!card) return;
-  const modal = document.getElementById("gcCardModal");
-  const body = document.getElementById("gcModalBody");
-
-  body.innerHTML = `
-    <div class="gc-scratch-wrap" id="gcScratchWrap">
-      <div class="gc-scratch-reveal">
-        <div style="color:var(--text-dim);font-size:.8rem">رقم البطاقة</div>
-        <div style="font-family:'Cairo',sans-serif;font-size:1.2rem;color:var(--gold);letter-spacing:1px;direction:ltr;margin:.3rem 0 .8rem">${card.cardNumber}</div>
-        <div style="color:var(--text-dim);font-size:.8rem">الرقم السري (PIN)</div>
-        <div style="font-family:'Cairo',sans-serif;font-size:1.4rem;color:#fff;letter-spacing:4px;margin:.3rem 0 .8rem">${card.pin}</div>
-        <div style="color:var(--text-dim);font-size:.8rem">الرصيد المتبقي</div>
-        <div style="font-family:'Cairo',sans-serif;font-size:1.6rem;color:var(--success);margin:.3rem 0">${fmtPrice(card.balance)}</div>
-      </div>
-      <canvas class="gc-scratch-canvas" id="gcScratchCanvas"></canvas>
-    </div>
-    <div style="display:flex;gap:.6rem;margin-top:1.2rem;flex-wrap:wrap">
-      <button class="btn-secondary" style="flex:1" onclick="copyToClipboard('${card.cardNumber}', this)"><i class='bx bx-copy'></i> نسخ الرقم</button>
-      <button class="btn-primary" style="flex:1" onclick="shareGcCardWhatsapp('${card.id}')"><i class='bx bxl-whatsapp'></i> مشاركة واتساب</button>
-    </div>
-  `;
-  modal.style.display = "flex";
-  setTimeout(() => initScratchCanvas(), 30);
-}
-
-function closeGcModal() {
-  document.getElementById("gcCardModal").style.display = "none";
-}
-
-function initScratchCanvas() {
-  const wrap = document.getElementById("gcScratchWrap");
-  const canvas = document.getElementById("gcScratchCanvas");
-  if (!wrap || !canvas) return;
-  const rect = wrap.getBoundingClientRect();
-  canvas.width = rect.width;
-  canvas.height = rect.height;
-  const ctx = canvas.getContext("2d");
-  const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-  grad.addColorStop(0, "#b8942e");
-  grad.addColorStop(1, "#d4af37");
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "#1a1400";
-  ctx.font = "bold 16px Cairo, sans-serif";
-  ctx.textAlign = "center";
-  ctx.fillText("امسح هنا لإظهار البطاقة 🎁", canvas.width / 2, canvas.height / 2);
-
-  let drawing = false;
-  function scratch(x, y) {
-    ctx.globalCompositeOperation = "destination-out";
-    ctx.beginPath();
-    ctx.arc(x, y, 24, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  function pos(e) {
-    const r = canvas.getBoundingClientRect();
-    const t = e.touches ? e.touches[0] : e;
-    return { x: t.clientX - r.left, y: t.clientY - r.top };
-  }
-  function start(e) { drawing = true; const p = pos(e); scratch(p.x, p.y); }
-  function move(e) { if (!drawing) return; const p = pos(e); scratch(p.x, p.y); }
-  function end() { drawing = false; }
-
-  canvas.addEventListener("mousedown", start);
-  canvas.addEventListener("mousemove", move);
-  window.addEventListener("mouseup", end);
-  canvas.addEventListener("touchstart", start, { passive: true });
-  canvas.addEventListener("touchmove", move, { passive: true });
-  canvas.addEventListener("touchend", end);
-}
-
-function shareGcCardWhatsapp(cardId) {
-  const card = gcMyCards.find((c) => c.id === cardId);
-  if (!card) return;
-  const occasion = card.occasion || "مناسبة سعيدة";
-  const recipient = card.recipientName || "";
-  let msg = `🎁 ${occasion} ${recipient ? "يا " + recipient : ""}!\n\n`;
-  msg += `لم أجد شيئًا يعبّر عن سعادتي بهذه المناسبة أكثر من إهدائك بطاقة هدايا من متجر Tiger.\n`;
-  msg += `يمكنك استخدام البطاقة لشراء أفضل الملابس والماركات العالمية.\n\n`;
-  msg += `رقم البطاقة: ${card.cardNumber}\n`;
-  msg += `الرصيد: ${fmtPrice(card.balance)}\n\n`;
-  msg += `رابط المتجر: https://tiger-jeans.com/gift-cards.html`;
-  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
-}
-
-function copyToClipboard(text, btn) {
-  navigator.clipboard.writeText(text).then(() => {
-    showToast("تم النسخ ✓");
-    if (btn) {
-      const original = btn.innerHTML;
-      btn.innerHTML = "<i class='bx bx-check'></i> تم النسخ";
-      setTimeout(() => (btn.innerHTML = original), 1500);
+    // sparkle burst particles
+    if (spark) {
+      const icons = ["✨", "🎉", "⭐"];
+      for (let i = 0; i < 10; i++) {
+        const s = document.createElement("i");
+        s.textContent = icons[i % icons.length];
+        const angle = (Math.PI * 2 * i) / 10;
+        s.style.setProperty("--bx", Math.cos(angle) * 70 + "px");
+        s.style.setProperty("--by", Math.sin(angle) * 70 - 30 + "px");
+        s.style.animationDelay = i * 0.02 + "s";
+        spark.appendChild(s);
+      }
     }
-  }).catch(() => showToast("تعذر النسخ"));
-}
 
-// ---------- Init ----------
-document.addEventListener("DOMContentLoaded", () => {
-  initGcHeroEffects();
-  renderGcTemplates();
-  updateGcPreview();
-  loadGcPaySettings();
+    setTimeout(() => box.classList.add("gc-open"), 250);
+    setTimeout(() => body.classList.add("gc-in"), 900);
+    setTimeout(() => box.classList.add("gc-hide"), 1300);
+  }
 
-  // Wait briefly for auth state (config.js sets currentUser on onAuthStateChanged)
-  setTimeout(() => {
-    if (typeof currentUser !== "undefined" && currentUser) loadMyGiftCards();
-  }, 400);
-});
+  // ---------------------------------------------------------
+  // 3D tilt for template + preview cards
+  // ---------------------------------------------------------
+  function applyTilt(el, e) {
+    const r = el.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    el.style.transform = `perspective(700px) rotateX(${(-y * 8).toFixed(2)}deg) rotateY(${(x * 10).toFixed(2)}deg) translateY(-4px)`;
+  }
+  function resetTilt(el) {
+    el.style.transform = "";
+  }
 
-if (typeof auth !== "undefined") {
-  auth.onAuthStateChanged((user) => {
-    if (user) loadMyGiftCards();
+  function initTilt() {
+    if (reduceMotion) return;
+    const grid = document.getElementById("gcTemplatesGrid");
+    if (grid) {
+      grid.addEventListener("mousemove", (e) => {
+        const card = e.target.closest(".gc-template");
+        if (card) applyTilt(card, e);
+      });
+      grid.addEventListener("mouseleave", () => {
+        grid.querySelectorAll(".gc-template").forEach(resetTilt);
+      }, true);
+    }
+    const preview = document.getElementById("gcPreviewCard");
+    if (preview) {
+      preview.addEventListener("mousemove", (e) => applyTilt(preview, e));
+      preview.addEventListener("mouseleave", () => resetTilt(preview));
+    }
+  }
+
+  // ---------------------------------------------------------
+  // Click feedback: template select chime + pop
+  // ---------------------------------------------------------
+  function initClickFeedback() {
+    const grid = document.getElementById("gcTemplatesGrid");
+    if (grid) {
+      grid.addEventListener("click", (e) => {
+        const card = e.target.closest(".gc-template");
+        if (!card) return;
+        Sound.select();
+        card.classList.remove("gc-pop");
+        // eslint-disable-next-line no-unused-expressions
+        void card.offsetWidth;
+        card.classList.add("gc-pop");
+      });
+    }
+
+    document.querySelectorAll(".gc-pay-option").forEach((opt) => {
+      opt.addEventListener("click", () => Sound.select());
+    });
+
+    const submitBtn = document.getElementById("gcSubmitBtn");
+    if (submitBtn) {
+      submitBtn.addEventListener("click", () => {
+        Sound.seal();
+        submitBtn.classList.remove("gc-sealing");
+        void submitBtn.offsetWidth;
+        submitBtn.classList.add("gc-sealing");
+      });
+    }
+  }
+
+  // ---------------------------------------------------------
+  // Hook into the site-wide showToast() to add sound + confetti
+  // on success messages, without touching the original function.
+  // ---------------------------------------------------------
+  function initToastHook() {
+    if (typeof window.showToast !== "function") return;
+    const original = window.showToast;
+    window.showToast = function (msg) {
+      original(msg);
+      const text = String(msg || "");
+      const isError = /خطأ|تعذر|غير صحيح|من فضلك/.test(text);
+      if (isError) {
+        Sound.soft404();
+      } else if (/✓|تم إرسال|تم الحفظ|تم النسخ/.test(text)) {
+        Sound.success();
+        burstConfetti();
+      }
+    };
+  }
+
+  // ---------------------------------------------------------
+  // Confetti burst (canvas, transient)
+  // ---------------------------------------------------------
+  function burstConfetti(originX, originY) {
+    if (reduceMotion) return;
+    const canvas = document.getElementById("gcConfettiCanvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+    canvas.style.width = window.innerWidth + "px";
+    canvas.style.height = window.innerHeight + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    const cx = originX != null ? originX : window.innerWidth / 2;
+    const cy = originY != null ? originY : window.innerHeight * 0.35;
+    const colors = ["#d4af37", "#f5d97c", "#e8cc6f", "#7c2233", "#ffffff"];
+    const pieces = Array.from({ length: 70 }, () => ({
+      x: cx,
+      y: cy,
+      vx: (Math.random() - 0.5) * 9,
+      vy: Math.random() * -8 - 3,
+      size: 4 + Math.random() * 4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      rot: Math.random() * Math.PI,
+      vr: (Math.random() - 0.5) * 0.3,
+      life: 1,
+    }));
+
+    let frame = 0;
+    function step() {
+      frame++;
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      let alive = false;
+      pieces.forEach((p) => {
+        if (p.life <= 0) return;
+        p.vy += 0.28;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.vr;
+        p.life -= 0.012;
+        if (p.life > 0) {
+          alive = true;
+          ctx.save();
+          ctx.globalAlpha = Math.max(p.life, 0);
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+          ctx.restore();
+        }
+      });
+      if (alive && frame < 240) {
+        requestAnimationFrame(step);
+      } else {
+        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      }
+    }
+    requestAnimationFrame(step);
+  }
+
+  // ---------------------------------------------------------
+  // Scratch-card reveal detection (poll canvas alpha coverage)
+  // ---------------------------------------------------------
+  function watchScratchReveal() {
+    const modal = document.getElementById("gcCardModal");
+    if (!modal) return;
+    let watching = false;
+    let revealedFired = false;
+
+    const observer = new MutationObserver(() => {
+      const canvas = document.getElementById("gcScratchCanvas");
+      if (canvas && !watching) {
+        watching = true;
+        revealedFired = false;
+        pollScratch(canvas);
+      }
+      if (modal.style.display === "none") {
+        watching = false;
+      }
+    });
+    observer.observe(modal, { attributes: true, childList: true, subtree: true, attributeFilter: ["style"] });
+
+    function pollScratch(canvas) {
+      const ctx = canvas.getContext("2d");
+      const timer = setInterval(() => {
+        if (!document.body.contains(canvas) || modal.style.display === "none") {
+          clearInterval(timer);
+          return;
+        }
+        let cleared = 0;
+        const total = 200;
+        try {
+          const w = canvas.width, h = canvas.height;
+          for (let i = 0; i < total; i++) {
+            const x = Math.floor(Math.random() * w);
+            const y = Math.floor(Math.random() * h);
+            const alpha = ctx.getImageData(x, y, 1, 1).data[3];
+            if (alpha < 40) cleared++;
+          }
+        } catch (e) {
+          clearInterval(timer);
+          return;
+        }
+        if (cleared / total > 0.55 && !revealedFired) {
+          revealedFired = true;
+          clearInterval(timer);
+          const wrap = document.getElementById("gcScratchWrap");
+          if (wrap) wrap.classList.add("gc-revealed");
+          Sound.success();
+          const r = canvas.getBoundingClientRect();
+          burstConfetti(r.left + r.width / 2, r.top + r.height / 2);
+        }
+      }, 350);
+    }
+  }
+
+  // ---------------------------------------------------------
+  // Init
+  // ---------------------------------------------------------
+  document.addEventListener("DOMContentLoaded", () => {
+    initSoundToggle();
+    initUnbox();
+    initTilt();
+    initClickFeedback();
+    initToastHook();
+    watchScratchReveal();
   });
-}
+})();
