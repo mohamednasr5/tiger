@@ -412,15 +412,51 @@ function initScratchCanvas() {
 function shareGcCardWhatsapp(cardId) {
   const card = gcMyCards.find((c) => c.id === cardId);
   if (!card) return;
+  
   const occasion = card.occasion || "مناسبة سعيدة";
   const recipient = card.recipientName || "";
-  let msg = `🎁 ${occasion} ${recipient ? "يا " + recipient : ""}!\n\n`;
-  msg += `لم أجد شيئًا يعبّر عن سعادتي بهذه المناسبة أكثر من إهدائك بطاقة هدايا من متجر Tiger.\n`;
-  msg += `يمكنك استخدام البطاقة لشراء أفضل الملابس والماركات العالمية.\n\n`;
-  msg += `رقم البطاقة: ${card.cardNumber}\n`;
-  msg += `الرصيد: ${fmtPrice(card.balance)}\n\n`;
-  msg += `رابط المتجر: https://tiger-jeans.com/gift-cards.html`;
+  const senderName = card.senderName || "صديقك";
+  const message = card.message || "";
+  
+  // Generate occasion-specific greeting
+  let occasionGreeting = "";
+  if (occasion.includes("عيد ميلاد") || occasion.includes("مولد")) {
+    occasionGreeting = `🎂 عيد ميلاد سعيد${recipient ? " يا " + recipient : ""}! 🎉\n`;
+  } else if (occasion.includes("زفاف") || occasion.includes("عرس") || occasion.includes("جواز")) {
+    occasionGreeting = `💒 زفاف سعيد${recipient ? " يا " + recipient : ""}! 💕\n`;
+  } else if (occasion.includes("تخرج")) {
+    occasionGreeting = `🎓 تخرج سعيد${recipient ? " يا " + recipient : ""}! 📚\n`;
+  } else if (occasion.includes("عام جديد") || occasion.includes("سنة جديدة")) {
+    occasionGreeting = `🎊 كل عام وأنت بخير${recipient ? " يا " + recipient : ""}! 🌟\n`;
+  } else if (occasion.includes("أم") || occasion.includes("ماما") || occasion.includes("يوم الأم")) {
+    occasionGreeting = `🌸 كل سنة وأنت طيبة يا أغلى أم${recipient ? " " + recipient : ""}! 💐\n`;
+  } else if (occasion.includes("أب") || occasion.includes("بابا") || occasion.includes("يوم الأب")) {
+    occasionGreeting = `👨 كل سنة وأنت طيب يا أعظم أب${recipient ? " " + recipient : ""}! 🏆\n`;
+  } else {
+    occasionGreeting = `🎁 ${occasion} سعيد${recipient ? " يا " + recipient : ""}! ✨\n`;
+  }
+  
+  // Build the WhatsApp message
+  let msg = `${occasionGreeting}\n`;
+  msg += `${message ? `\"${message}\"\n\n` : ''}`;
+  msg += `💌 من: ${senderName}\n\n`;
+  msg += `━━━━━━━━━━━━━━━\n`;
+  msg += `🎫 **بطاقة هدايا Tiger Jeans**\n`;
+  msg += `━━━━━━━━━━━━━━━\n\n`;
+  msg += `رقم بطاقة الهدايا: ${card.cardNumber}\n`;
+  msg += `الرقم السري: ${card.pin}\n`;
+  msg += `مبلغ البطاقة: ${fmtPrice(card.originalAmount || card.balance)}\n`;
+  msg += `تاريخ الصلاحية: ${card.expiresAt ? new Date(card.expiresAt).toLocaleDateString('ar-EG') : 'غير محدد'}\n\n`;
+  msg += `🔗 رابط الحصول على البطاقة:\n`;
+  msg += `https://tiger-jeans.com/gift-card/${card.id}\n\n`;
+  msg += `_افتح الرابط لمشاهدة بطاقتك الفخمة!_`;
+  
   window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+}
+
+// Generate unique public link for each gift card
+function getGiftCardPublicUrl(cardId) {
+  return `https://tiger-jeans.com/gift-card/${cardId}`;
 }
 
 function copyToClipboard(text, btn) {

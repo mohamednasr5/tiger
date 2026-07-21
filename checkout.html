@@ -23,7 +23,8 @@
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 
 /* Payment Options */
-.pay-options{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.3rem}
+.pay-options{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;margin-bottom:1.3rem}
+@media(max-width:600px){.pay-options{grid-template-columns:repeat(2,1fr)}}
 .pay-option{
   border:2px solid var(--line);
   border-radius:12px;
@@ -229,39 +230,80 @@
         </div>
         <div class="pay-option" data-method="cod" onclick="selectPay('cod', this)">
           <img src="images/payments/cash-on-delivery.png" alt="الدفع عند الاستلام" class="pay-option-icon" />
-          <div>الدفع عند الاستلام</div>
+          <div>عند الاستلام</div>
+        </div>
+        <div class="pay-option" data-method="giftcard" onclick="selectPay('giftcard', this)">
+          <img src="images/payments/gift-card.png" alt="بطاقة هدايا" class="pay-option-icon" />
+          <div>بطاقة هدايا</div>
         </div>
       </div>
 
       <!-- Payment Details (Dynamic) -->
       <div class="pay-number-box" id="payNumberBox">
-        <div class="pay-number-header">
-          <span class="pay-number-label" id="payLabel">حوّل المبلغ على رقم فودافون كاش:</span>
+        <!-- Vodafone / Instapay / COD Details -->
+        <div id="traditionalPayDetails">
+          <div class="pay-number-header">
+            <span class="pay-number-label" id="payLabel">حوّل المبلغ على رقم فودافون كاش:</span>
+          </div>
+          <div class="pay-number-value">
+            <b id="payNumberVal">جاري التحميل...</b>
+            <button class="copy-btn" id="copyPhoneBtn" onclick="copyToClipboard(document.getElementById('payNumberVal').textContent, this)">
+              <i class='bx bx-copy'></i> نسخ
+            </button>
+          </div>
+          
+          <!-- Owner Name Display -->
+          <div id="ownerNameDisplay" style="margin-top:.7rem;padding:.6rem .8rem;background:rgba(212,175,55,.08);border-radius:8px;display:none">
+            <span style="font-size:.82rem;color:var(--text-dim)">اسم صاحب الحساب: </span>
+            <b id="ownerNameText" style="font-size:.9rem;color:var(--gold);font-family:'Cairo',sans-serif"></b>
+          </div>
+          
+          <!-- Instapay Link (shown when instapay selected) -->
+          <div id="instapaySection" style="display:none;margin-top:1rem;padding-top:1rem;border-top:1px dashed var(--line)">
+            <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:.6rem">أو اضغط للدفع مباشرة عبر إنستاباي:</p>
+            <a href="#" target="_blank" class="instapay-link" id="instapayLink">
+              <i class='bx bx-link-external'></i> فتح رابط الدفع
+            </a>
+          </div>
         </div>
-        <div class="pay-number-value">
-          <b id="payNumberVal">جاري التحميل...</b>
-          <button class="copy-btn" id="copyPhoneBtn" onclick="copyToClipboard(document.getElementById('payNumberVal').textContent, this)">
-            <i class='bx bx-copy'></i> نسخ
-          </button>
-        </div>
-        
-        <!-- Owner Name Display -->
-        <div id="ownerNameDisplay" style="margin-top:.7rem;padding:.6rem .8rem;background:rgba(212,175,55,.08);border-radius:8px;display:none">
-          <span style="font-size:.82rem;color:var(--text-dim)">اسم صاحب الحساب: </span>
-          <b id="ownerNameText" style="font-size:.9rem;color:var(--gold);font-family:'Cairo',sans-serif"></b>
-        </div>
-        
-        <!-- Instapay Link (shown when instapay selected) -->
-        <div id="instapaySection" style="display:none;margin-top:1rem;padding-top:1rem;border-top:1px dashed var(--line)">
-          <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:.6rem">أو اضغط للدفع مباشرة عبر إنستاباي:</p>
-          <a href="#" target="_blank" class="instapay-link" id="instapayLink">
-            <i class='bx bx-link-external'></i> فتح رابط الدفع
-          </a>
+
+        <!-- Gift Card Payment Details -->
+        <div id="giftCardPayDetails" style="display:none">
+          <div class="gc-pay-inputs">
+            <div class="field">
+              <label><i class='bx bx-credit-card' style="color:var(--gold)"></i> رقم البطاقة</label>
+              <input type="text" id="gcCardNumberInput" placeholder="TG9A-KD82-XP91-LQW7" style="direction:ltr;text-align:center;font-family:'Cairo',sans-serif;letter-spacing:1px" maxlength="19" />
+            </div>
+            <div class="field">
+              <label><i class='bx bx-lock' style="color:var(--gold)"></i> الرقم السري (PIN)</label>
+              <input type="password" id="gcPinInput" placeholder="••••••" style="direction:ltr;text-align:center;letter-spacing:4px" maxlength="6" />
+            </div>
+          </div>
+          <div id="gcPayStatusMsg" style="font-size:.85rem;margin-top:.6rem;padding:.5rem .8rem;border-radius:8px;display:none"></div>
+          
+          <!-- Partial Payment Section (shown when card doesn't cover full amount) -->
+          <div id="partialPaymentSection" style="display:none;margin-top:1.2rem;padding:1rem;background:rgba(212,175,55,.06);border:1px dashed var(--gold);border-radius:12px">
+            <h4 style="margin:0 0 .8rem;color:var(--gold);font-family:'Cairo',sans-serif;display:flex;align-items:center;gap:.5rem">
+              <i class='bx bx-info-circle'></i> دفع المتبقي
+            </h4>
+            <div id="partialPaymentInfo" style="margin-bottom:1rem;font-size:.9rem"></div>
+            <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:.8rem">اختر طريقة الدفع لاستكمال المبلغ:</p>
+            <div class="partial-pay-options" style="display:flex;gap:.6rem;flex-wrap:wrap">
+              <button class="btn-secondary partial-pay-btn active" data-pmethod="vodafone" onclick="selectPartialPay('vodafone',this)">
+                <img src="images/payments/vodafone-cash.png" style="width:20px;height:20px;margin-left:4px" /> فودافون كاش
+              </button>
+              <button class="btn-secondary partial-pay-btn" data-pmethod="instapay" onclick="selectPartialPay('instapay',this)">
+                <img src="images/payments/instapay.png" style="width:20px;height:20px;margin-left:4px" /> انستاباي
+              </button>
+            </div>
+            <div id="partialPayDetails" style="margin-top:1rem"></div>
+          </div>
         </div>
       </div>
 
-      <div class="field">
-        <label>ارفع صورة إيصال التحويل (اختياري للدفع عند الاستلام)</label>
+      <!-- Receipt Upload (hidden for giftcard payment method) -->
+      <div class="field" id="receiptField">
+        <label id="receiptLabel">ارفع صورة إيصال التحويل (اختياري للدفع عند الاستلام)</label>
         <div class="upload-area" onclick="document.getElementById('receiptInput').click()">
           <img id="receiptPreview" style="display:none" alt="" />
           <div id="receiptPlaceholder">
@@ -273,7 +315,7 @@
         <input type="file" id="receiptInput" accept="image/*" style="display:none" onchange="onReceiptChange()" />
       </div>
 
-      <button class="btn-primary full-width" style="margin-top:1.5rem" onclick="submitOrder()" id="submitBtn">تأكيد الطلب <i class='bx bx-check-double'></i></button>
+      <button class="btn-primary full-width" style="margin-top:1.5rem" onclick="submitOrder()" id="submitBtn">تأكيد الدفع <i class='bx bx-check-double'></i></button>
     </div>
 
     <!-- Right Column - Order Summary -->
@@ -393,7 +435,7 @@ db.ref("settings/payment").once("value").then((snap) => {
 });
 
 // Load payment methods status (enabled/disabled) from admin
-let availablePaymentMethods = ['vodafone', 'instapay', 'cod']; // default all enabled
+let availablePaymentMethods = ['vodafone', 'instapay', 'cod', 'giftcard']; // default all enabled
 db.ref("settings/paymentMethods").once("value").then((snap) => {
   const methodsStatus = snap.val() || {};
   
@@ -460,6 +502,9 @@ function getShippingCost() {
   return 0;
 }
 
+let partialPayMethod = "vodafone"; // for partial payment when gift card doesn't cover full amount
+let gcPaymentData = null; // stores validated gift card data when used as primary payment
+
 function selectPay(m, el) {
   method = m;
   document.querySelectorAll(".pay-option").forEach((p) => p.classList.remove("active"));
@@ -469,6 +514,9 @@ function selectPay(m, el) {
 }
 
 function updatePayNumber() {
+  const traditionalDetails = document.getElementById("traditionalPayDetails");
+  const gcDetails = document.getElementById("giftCardPayDetails");
+  const receiptField = document.getElementById("receiptField");
   const label = document.getElementById("payLabel");
   const val = document.getElementById("payNumberVal");
   const instapaySec = document.getElementById("instapaySection");
@@ -480,34 +528,179 @@ function updatePayNumber() {
   instapaySec.style.display = "none";
   ownerNameDisplay.style.display = "none";
   
-  if (method === "vodafone") {
-    label.textContent = "حوّل المبلغ على رقم فودافون كاش:";
-    val.textContent = paySettings.vodafone || "01012345678";
-    copyBtn.style.display = "inline-flex";
-    // Show Vodafone owner name if available
-    if (paySettings.vodafoneName) {
-      ownerNameText.textContent = paySettings.vodafoneName;
-      ownerNameDisplay.style.display = "block";
-    }
-  } else if (method === "instapay") {
-    label.textContent = "حوّل المبلغ على انستاباي للمستخدم:";
-    val.textContent = "@" + (paySettings.instapay || "engmohamednasr");
-    copyBtn.style.display = "inline-flex";
-    // Show Instapay section with link
-    instapaySec.style.display = "block";
-    // Update the link from admin settings
-    document.getElementById("instapayLink").href = paySettings.instapayLink || "#";
-    // Show InstaPay owner name if available
-    if (paySettings.instapayOwner) {
-      ownerNameText.textContent = paySettings.instapayOwner;
-      ownerNameDisplay.style.display = "block";
-    }
+  // Reset gift card payment data when switching methods
+  if (method !== "giftcard") {
+    gcPaymentData = null;
+  }
+  
+  if (method === "giftcard") {
+    // Show gift card input fields, hide traditional payment details
+    traditionalDetails.style.display = "none";
+    gcDetails.style.display = "block";
+    receiptField.style.display = "none";
+    // Reset partial payment section
+    document.getElementById("partialPaymentSection").style.display = "none";
+    document.getElementById("gcPayStatusMsg").style.display = "none";
   } else {
-    label.textContent = "الدفع عند الاستلام:";
-    const city = document.getElementById("cCity").value;
-    const cost = getShippingCost();
-    val.textContent = city ? `مصاريف الشحن: ${fmtPrice(cost)}` : "اختر المحافظة لمعرفة مصاريف الشحن";
-    copyBtn.style.display = "none";
+    // Show traditional payment details, hide gift card
+    traditionalDetails.style.display = "block";
+    gcDetails.style.display = "none";
+    receiptField.style.display = "block";
+    
+    if (method === "vodafone") {
+      label.textContent = "حوّل المبلغ على رقم فودافون كاش:";
+      val.textContent = paySettings.vodafone || "01012345678";
+      copyBtn.style.display = "inline-flex";
+      // Show Vodafone owner name if available
+      if (paySettings.vodafoneName) {
+        ownerNameText.textContent = paySettings.vodafoneName;
+        ownerNameDisplay.style.display = "block";
+      }
+    } else if (method === "instapay") {
+      label.textContent = "حوّل المبلغ على انستاباي للمستخدم:";
+      val.textContent = "@" + (paySettings.instapay || "engmohamednasr");
+      copyBtn.style.display = "inline-flex";
+      // Show Instapay section with link
+      instapaySec.style.display = "block";
+      // Update the link from admin settings
+      document.getElementById("instapayLink").href = paySettings.instapayLink || "#";
+      // Show InstaPay owner name if available
+      if (paySettings.instapayOwner) {
+        ownerNameText.textContent = paySettings.instapayOwner;
+        ownerNameDisplay.style.display = "block";
+      }
+    } else {
+      label.textContent = "الدفع عند الاستلام:";
+      const city = document.getElementById("cCity").value;
+      const cost = getShippingCost();
+      val.textContent = city ? `مصاريف الشحن: ${fmtPrice(cost)}` : "اختر المحافظة لمعرفة مصاريف الشحن";
+      copyBtn.style.display = "none";
+    }
+  }
+}
+
+// ====== Gift Card as Primary Payment Method ======
+async function validateGiftCardForPayment() {
+  const rawNumber = document.getElementById("gcCardNumberInput").value.trim().toUpperCase();
+  const pin = document.getElementById("gcPinInput").value.trim();
+  const msgEl = document.getElementById("gcPayStatusMsg");
+  const key = rawNumber.replace(/-/g, "");
+  const partialSection = document.getElementById("partialPaymentSection");
+  const partialInfo = document.getElementById("partialPaymentInfo");
+  
+  if (!key || !pin) {
+    showGcPayMsg("warning", "أدخل رقم البطاقة والرقم السري");
+    return null;
+  }
+  
+  showGcPayMsg("", "جاري التحقق من البطاقة...");
+  
+  try {
+    const snap = await db.ref("giftCards/" + key).once("value");
+    const card = snap.val();
+    
+    if (!card) { showGcPayMsg("error", "رقم البطاقة غير صحيح"); return null; }
+    if (String(card.pin) !== pin) { showGcPayMsg("error", "الرقم السري غير صحيح"); return null; }
+    if (card.status === "expired" || (card.expiresAt && card.expiresAt < Date.now())) { showGcPayMsg("error", "انتهت صلاحية هذه البطاقة"); return null; }
+    if (card.status === "frozen") { showGcPayMsg("error", "هذه البطاقة موقوفة مؤقتًا"); return null; }
+    if (card.status === "used" || card.balance <= 0) { showGcPayMsg("error", "تم استخدام رصيد هذه البطاقة بالكامل"); return null; }
+    if (card.status !== "active") { showGcPayMsg("error", "هذه البطاقة غير مفعّلة"); return null; }
+    
+    // Card is valid - calculate coverage
+    const orderTotal = Math.max(0, cartTotal() + getShippingCost() - discountAmount);
+    const cardBalance = card.balance;
+    const remaining = Math.max(0, orderTotal - cardBalance);
+    
+    gcPaymentData = { key, cardNumber: card.cardNumber, balance: cardBalance, pin, remaining, orderTotal, coversFull: remaining <= 0 };
+    
+    if (remaining <= 0) {
+      // Card covers full amount
+      showGcPayMsg("success", `✓ البطاقة تغطي المبلغ بالكامل! الرصيد المتاح: ${fmtPrice(cardBalance)}`);
+      partialSection.style.display = "none";
+    } else {
+      // Partial payment needed
+      showGcPayMsg("info`, `البطاقة تغطي ${fmtPrice(cardBalance)} - يتبقى ${fmtPrice(remaining)}`);
+      partialInfo.innerHTML = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:.4rem">
+          <span>إجمالي الطلب:</span><b>${fmtPrice(orderTotal)}</b>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:.4rem;color:var(--success)">
+          <span>مدفوع بالبطاقة:</span><b>- ${fmtPrice(cardBalance)}</b>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding-top:.4rem;border-top:1px solid var(--line);color:var(--danger)">
+          <span>المتبقي للدفع:</span><b>${fmtPrice(remaining)}</b>
+        </div>
+      `;
+      partialSection.style.display = "block";
+      updatePartialPayDetails();
+    }
+    
+    return gcPaymentData;
+  } catch (err) {
+    console.error(err);
+    showGcPayMsg("error", "تعذر التحقق من البطاقة الآن");
+    return null;
+  }
+}
+
+function showGcPayMsg(type, text) {
+  const el = document.getElementById("gcPayStatusMsg");
+  el.style.display = "block";
+  el.textContent = text;
+  el.className = ""; // reset
+  if (type === "error") el.style.color = "var(--danger)";
+  else if (type === "success") el.style.color = "var(--success)";
+  else if (type === "warning") el.style.color = "#e6a000";
+  else el.style.color = "var(--text-dim)";
+}
+
+// Auto-validate when user finishes entering card details
+document.addEventListener("DOMContentLoaded", () => {
+  const gcCardInput = document.getElementById("gcCardNumberInput");
+  const gcPinInput = document.getElementById("gcPinInput");
+  if (gcCardInput) {
+    gcCardInput.addEventListener("blur", () => { if (method === "giftcard" && gcCardInput.value && gcPinInput.value) validateGiftCardForPayment(); });
+  }
+  if (gcPinInput) {
+    gcPinInput.addEventListener("blur", () => { if (method === "giftcard" && gcCardInput.value && gcPinInput.value) validateGiftCardForPayment(); });
+  }
+});
+
+// ====== Partial Payment Methods ======
+function selectPartialPay(m, el) {
+  partialPayMethod = m;
+  document.querySelectorAll(".partial-pay-btn").forEach((b) => b.classList.remove("active"));
+  el.classList.add("active");
+  updatePartialPayDetails();
+}
+
+function updatePartialPayDetails() {
+  const container = document.getElementById("partialPayDetails");
+  if (!container || !gcPaymentData) return;
+  
+  if (partialPayMethod === "vodafone") {
+    container.innerHTML = `
+      <div style="padding:.8rem;background:var(--surface);border-radius:8px;border:1px solid var(--line)">
+        <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:.4rem">حوّل المتبقي (${fmtPrice(gcPaymentData.remaining)}) على:</p>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <b style="font-family:'Cairo',sans-serif;direction:ltr">${paySettings.vodafone || "01012345678"}</b>
+          <button class="copy-btn" style="padding:.4rem .8rem;font-size:.8rem" onclick="copyToClipboard('${paySettings.vodafone || "01012345678"}', this)"><i class='bx bx-copy'></i> نسخ</button>
+        </div>
+        ${paySettings.vodafoneName ? `<p style="font-size:.8rem;color:var(--gold);margin-top:.4rem">اسم الحساب: ${paySettings.vodafoneName}</p>` : ''}
+      </div>
+    `;
+  } else if (partialPayMethod === "instapay") {
+    container.innerHTML = `
+      <div style="padding:.8rem;background:var(--surface);border-radius:8px;border:1px solid var(--line)">
+        <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:.4rem">حوّل المتبقي (${fmtPrice(gcPaymentData.remaining)}) عبر إنستاباي:</p>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <b style="font-family:'Cairo',sans-serif;direction:ltr">@${paySettings.instapay || "engmohamednasr"}</b>
+          <button class="copy-btn" style="padding:.4rem .8rem;font-size:.8rem" onclick="copyToClipboard('@${paySettings.instapay || "engmohamednasr"}', this)"><i class='bx bx-copy'></i> نسخ</button>
+        </div>
+        ${paySettings.instapayOwner ? `<p style="font-size:.8rem;color:var(--gold);margin-top:.4rem">اسم الحساب: ${paySettings.instapayOwner}</p>` : ''}
+        ${paySettings.instapayLink ? `<a href="${paySettings.instapayLink}" target="_blank" style="display:inline-flex;align-items:center gap:.3rem;margin-top:.6rem;color:var(--gold);font-size:.85rem"><i class='bx bx-link-external'></i> فتح رابط الدفع المباشر</a>` : ''}
+      </div>
+    `;
   }
 }
 
@@ -652,7 +845,7 @@ function generateWhatsAppLink(orderData) {
 }
 
 function getPaymentMethodName(method) {
-  const names = { vodafone: "فودافون كاش", instapay: "إنستاباي", cod: "الدفع عند الاستلام" };
+  const names = { vodafone: "فودافون كاش", instapay: "إنستاباي", cod: "الدفع عند الاستلام", giftcard: "بطاقة هدايا" };
   return names[method] || method;
 }
 
@@ -704,10 +897,42 @@ async function submitOrder() {
     showToast("رقم الموبايل غير صحيح");
     return;
   }
+  
+  // Special validation for gift card payment method
+  if (method === "giftcard") {
+    if (!gcPaymentData) {
+      const valid = await validateGiftCardForPayment();
+      if (!valid) return;
+    }
+    // If partial payment needed, require receipt
+    if (gcPaymentData && gcPaymentData.remaining > 0 && !receiptUrl) {
+      showToast(`من فضلك ارفع إيصال تحويل المتبقي (${fmtPrice(gcPaymentData.remaining)})`);
+      // Show receipt field temporarily
+      document.getElementById("receiptField").style.display = "block";
+      document.getElementById("receiptLabel").textContent = `ارفع إيصال تحويل المتبقي (${fmtPrice(gcPaymentData.remaining)}) via ${partialPayMethod === 'vodafone' ? 'فودافون كاش' : 'انستاباي'}`;
+      return;
+    }
+  }
+  
   const preGiftTotal = Math.max(0, cartTotal() + getShippingCost() - discountAmount);
-  const giftDeduction = appliedGiftCard ? Math.min(appliedGiftCard.balance, preGiftTotal) : 0;
+  
+  // Calculate gift card deduction (from optional gift card field OR primary payment method)
+  let giftDeduction = 0;
+  let primaryGcData = null;
+  
+  if (method === "giftcard" && gcPaymentData) {
+    // Gift card is the primary payment method
+    giftDeduction = Math.min(gcPaymentData.balance, preGiftTotal);
+    primaryGcData = gcPaymentData;
+  } else if (appliedGiftCard) {
+    // Optional gift card applied in summary
+    giftDeduction = Math.min(appliedGiftCard.balance, preGiftTotal);
+  }
+  
   const remainingAfterGift = Math.max(0, preGiftTotal - giftDeduction);
-  if (remainingAfterGift > 0 && method !== "cod" && !receiptUrl) {
+  
+  // For non-giftcard methods (and non-COD), require receipt if there's remaining amount
+  if (method !== "giftcard" && method !== "cod" && remainingAfterGift > 0 && !receiptUrl) {
     showToast("من فضلك ارفع صورة إيصال التحويل");
     return;
   }
