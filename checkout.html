@@ -272,6 +272,7 @@
       <div class="summary-row"><span>المجموع الفرعي</span><span id="sSub">0 ج.م</span></div>
       <div class="summary-row"><span>الشحن</span><span id="sShip">يحدد لاحقاً</span></div>
       <div id="discountRow" class="summary-row" style="display:none"><span>الخصم</span><span id="sDiscount" style="color:var(--success)">-0 ج.م</span></div>
+      <div id="giftCardRow" class="summary-row" style="display:none"><span>بطاقة الهدايا</span><span id="sGiftCard" style="color:var(--success)">-0 ج.م</span></div>
       <div class="summary-row total"><span>الإجمالي</span><span id="sTotal">0 ج.م</span></div>
       
       <div class="field" style="margin-top:1.3rem">
@@ -280,6 +281,16 @@
           <input id="promoCode" placeholder="أدخل الكود" style="flex:1" />
           <button class="btn-primary" style="padding:0 1.2rem" onclick="applyPromo()">تطبيق</button>
         </div>
+      </div>
+
+      <div class="field" id="giftCardField">
+        <label><i class='bx bx-gift' style="color:var(--gold)"></i> ادفع ببطاقة هدايا (اختياري)</label>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+          <input id="giftCardNumberInput" placeholder="TG9A-KD82-XP91-LQW7" style="flex:1;min-width:140px;direction:ltr" />
+          <input id="giftCardPinInput" placeholder="PIN" style="width:90px;direction:ltr" maxlength="6" />
+          <button class="btn-secondary" style="padding:0 1.1rem" onclick="applyGiftCardAtCheckout()">تطبيق</button>
+        </div>
+        <div id="giftCardStatusMsg" style="font-size:.8rem;margin-top:.4rem"></div>
       </div>
     </div>
   </div>
@@ -333,6 +344,7 @@ let method = "vodafone";
 let receiptUrl = "";
 let paySettings = {};
 let discountAmount = 0;
+let appliedGiftCard = null; // { key, cardNumber, deduction }
 
 const cart = getCart();
 if (!cart.length) location.href = "cart.html";
@@ -491,7 +503,16 @@ function updatePayNumber() {
 function updateTotals() {
   let subtotal = cartTotal();
   let shippingCost = getShippingCost();
-  let total = subtotal + shippingCost - discountAmount;
+  let preGiftTotal = Math.max(0, subtotal + shippingCost - discountAmount);
+
+  // Recompute gift card deduction against the current total (in case cart/promo changed after applying)
+  let giftDeduction = 0;
+  if (appliedGiftCard) {
+    giftDeduction = Math.min(appliedGiftCard.balance, preGiftTotal);
+    appliedGiftCard.deduction = giftDeduction;
+  }
+
+  let total = preGiftTotal - giftDeduction;
   const city = document.getElementById("cCity").value;
   
   document.getElementById("sSub").textContent = fmtPrice(subtotal);
@@ -503,6 +524,52 @@ function updateTotals() {
     document.getElementById("sDiscount").textContent = "-" + fmtPrice(discountAmount);
   } else {
     document.getElementById("discountRow").style.display = "none";
+  }
+
+  const giftRow = document.getElementById("giftCardRow");
+  if (appliedGiftCard && giftDeduction > 0) {
+    giftRow.style.display = "flex";
+    document.getElementById("sGiftCard").textContent = "-" + fmtPrice(giftDeduction);
+  } else {
+    giftRow.style.display = "none";
+  }
+}
+
+// ====== Gift Card redemption at checkout ======
+async function applyGiftCardAtCheckout() {
+  const rawNumber = document.getElementById("giftCardNumberInput").value.trim().toUpperCase();
+  const pin = document.getElementById("giftCardPinInput").value.trim();
+  const msgEl = document.getElementById("giftCardStatusMsg");
+  const key = rawNumber.replace(/-/g, "");
+
+  if (!key || !pin) {
+    msgEl.style.color = "var(--danger)";
+    msgEl.textContent = "أدخل رقم البطاقة والرقم السري";
+    return;
+  }
+
+  msgEl.style.color = "var(--text-dim)";
+  msgEl.textContent = "جاري التحقق...";
+
+  try {
+    const snap = await db.ref("giftCards/" + key).once("value");
+    const card = snap.val();
+
+    if (!card) { msgEl.style.color = "var(--danger)"; msgEl.textContent = "رقم البطاقة غير صحيح"; return; }
+    if (String(card.pin) !== pin) { msgEl.style.color = "var(--danger)"; msgEl.textContent = "الرقم السري غير صحيح"; return; }
+    if (card.status === "expired" || (card.expiresAt && card.expiresAt < Date.now())) { msgEl.style.color = "var(--danger)"; msgEl.textContent = "انتهت صلاحية هذه البطاقة"; return; }
+    if (card.status === "frozen") { msgEl.style.color = "var(--danger)"; msgEl.textContent = "هذه البطاقة موقوفة مؤقتًا"; return; }
+    if (card.status === "used" || card.balance <= 0) { msgEl.style.color = "var(--danger)"; msgEl.textContent = "تم استخدام رصيد هذه البطاقة بالكامل"; return; }
+    if (card.status !== "active") { msgEl.style.color = "var(--danger)"; msgEl.textContent = "هذه البطاقة غير مفعّلة"; return; }
+
+    appliedGiftCard = { key, cardNumber: card.cardNumber, balance: card.balance };
+    updateTotals();
+    msgEl.style.color = "var(--success)";
+    msgEl.textContent = `تم تطبيق البطاقة ✓ الرصيد المتاح: ${fmtPrice(card.balance)}`;
+  } catch (err) {
+    console.error(err);
+    msgEl.style.color = "var(--danger)";
+    msgEl.textContent = "تعذر التحقق من البطاقة الآن";
   }
 }
 
@@ -626,7 +693,10 @@ async function submitOrder() {
     showToast("رقم الموبايل غير صحيح");
     return;
   }
-  if (method !== "cod" && !receiptUrl) {
+  const preGiftTotal = Math.max(0, cartTotal() + getShippingCost() - discountAmount);
+  const giftDeduction = appliedGiftCard ? Math.min(appliedGiftCard.balance, preGiftTotal) : 0;
+  const remainingAfterGift = Math.max(0, preGiftTotal - giftDeduction);
+  if (remainingAfterGift > 0 && method !== "cod" && !receiptUrl) {
     showToast("من فضلك ارفع صورة إيصال التحويل");
     return;
   }
@@ -637,7 +707,43 @@ async function submitOrder() {
 
   const code = genOrderCode();
   const shippingCost = getShippingCost();
-  let total = cartTotal() + shippingCost - discountAmount;
+  let total = remainingAfterGift;
+
+  // ✅ خصم رصيد بطاقة الهدايا فورًا وبشكل ذرّي (transaction) لمنع استخدام نفس الرصيد مرتين
+  let giftCardResult = null;
+  if (appliedGiftCard && giftDeduction > 0) {
+    try {
+      const balanceRef = db.ref(`giftCards/${appliedGiftCard.key}/balance`);
+      const txResult = await balanceRef.transaction((current) => {
+        if (typeof current !== "number" || current <= 0) return current; // abort, nothing to deduct
+        return Math.max(0, current - giftDeduction);
+      });
+      if (!txResult.committed) {
+        showToast("تعذر تطبيق رصيد بطاقة الهدايا الآن، حاول مرة أخرى");
+        btn.disabled = false;
+        btn.innerHTML = "تأكيد الطلب <i class='bx bx-check-double'></i>";
+        return;
+      }
+      const newBalance = txResult.snapshot.val();
+      const actualUsed = appliedGiftCard.balance - newBalance;
+      giftCardResult = { cardNumber: appliedGiftCard.cardNumber, amountUsed: actualUsed, remainingBalance: newBalance };
+      total = Math.max(0, preGiftTotal - actualUsed);
+
+      if (newBalance <= 0) {
+        await db.ref(`giftCards/${appliedGiftCard.key}`).update({ status: "used" });
+      }
+      // Redemption log (best-effort, not blocking order creation)
+      db.ref(`giftCards/${appliedGiftCard.key}/redemptions`).push({
+        orderId: code, amount: actualUsed, ts: Date.now()
+      }).catch((e) => console.error("gift card redemption log error", e));
+    } catch (e) {
+      console.error("gift card transaction failed", e);
+      showToast("حدث خطأ أثناء تطبيق بطاقة الهدايا");
+      btn.disabled = false;
+      btn.innerHTML = "تأكيد الطلب <i class='bx bx-check-double'></i>";
+      return;
+    }
+  }
   
   const order = {
     code,
@@ -651,7 +757,8 @@ async function submitOrder() {
     payment: { 
       method, 
       receiptImage: receiptUrl || null,
-      status: method === "cod" ? "pending_payment" : "pending_verification"
+      status: (total <= 0) ? "paid" : (method === "cod" ? "pending_payment" : "pending_verification"),
+      giftCard: giftCardResult
     },
     status: "pending",
     statusHistory: [{ 

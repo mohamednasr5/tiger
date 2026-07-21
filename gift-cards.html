@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+<title>بطاقات الهدايا | Tiger Jeans</title>
+<meta name="description" content="بطاقة هدايا متجر Tiger Jeans - أفضل وأسهل وأسرع هدية لأي مناسبة. اختر القيمة، وابعتها فورًا لمن تحب." />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://tiger-jeans.com/gift-cards.html" />
+<meta name="theme-color" content="#d4af37" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png" />
+<link rel="shortcut icon" href="images/favicon-32x32.png" type="image/png" />
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@300;400;500;700&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+<style>
+/* ===== Gift Cards Page — scoped styles ===== */
+.gc-hero{
+  position:relative;overflow:hidden;
+  padding:4.5rem 0 5rem;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(212,175,55,.18), transparent 45%),
+    radial-gradient(circle at 85% 15%, rgba(212,175,55,.12), transparent 40%),
+    linear-gradient(160deg, var(--bg-alt) 0%, var(--bg) 70%);
+  text-align:center;
+  isolation:isolate;
+}
+.gc-hero-glow{position:absolute;inset:0;z-index:-1;pointer-events:none}
+.gc-float-box{
+  position:absolute;font-size:2rem;opacity:.35;
+  animation:gcFloat 7s ease-in-out infinite;filter:drop-shadow(0 0 10px rgba(212,175,55,.5));
+}
+@keyframes gcFloat{
+  0%,100%{transform:translateY(0) rotate(0deg)}
+  50%{transform:translateY(-26px) rotate(8deg)}
+}
+.gc-ribbon{position:absolute;width:2px;height:120px;background:linear-gradient(var(--gold),transparent);opacity:.25;animation:gcRibbon 5s ease-in-out infinite}
+@keyframes gcRibbon{0%,100%{transform:translateY(-10px) scaleY(1)}50%{transform:translateY(10px) scaleY(1.15)}}
+.gc-particle{position:absolute;width:5px;height:5px;border-radius:50%;background:var(--gold-soft);opacity:.5;animation:gcParticle 6s linear infinite}
+@keyframes gcParticle{0%{transform:translateY(0) scale(1);opacity:.6}100%{transform:translateY(-160px) scale(.3);opacity:0}}
+
+.gc-eyebrow{display:inline-flex;align-items:center;gap:.4rem;background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.3);color:var(--gold);padding:.4rem 1rem;border-radius:30px;font-size:.82rem;font-weight:700;margin-bottom:1.4rem}
+.gc-hero h1{font-family:'Cairo',sans-serif;font-size:2.4rem;font-weight:900;line-height:1.35;margin-bottom:1rem}
+.gc-hero .gc-lines{color:var(--gold-soft);font-weight:700;display:block;font-size:1.15rem;margin-bottom:.15rem}
+.gc-hero p.gc-desc{max-width:640px;margin:1.2rem auto 2rem;color:var(--text-dim);font-size:1.02rem;line-height:1.9}
+.gc-cta{
+  display:inline-flex;align-items:center;gap:.6rem;
+  background:linear-gradient(135deg,var(--gold-light),var(--gold-deep));
+  color:#1a1400;font-weight:800;font-family:'Cairo',sans-serif;
+  padding:1rem 2.4rem;border-radius:50px;font-size:1.05rem;
+  box-shadow:0 10px 30px rgba(212,175,55,.35);
+  transition:.3s;border:none;cursor:pointer;
+}
+.gc-cta:hover{transform:translateY(-3px) scale(1.03);box-shadow:0 16px 40px rgba(212,175,55,.5)}
+
+.gc-occasions{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin-top:2rem;max-width:720px;margin-inline:auto}
+.gc-occasion-chip{background:var(--surface);border:1px solid var(--line);color:var(--text-dim);padding:.5rem 1rem;border-radius:20px;font-size:.82rem}
+
+.gc-section{padding:3.5rem 0}
+.gc-section h2{font-family:'Cairo',sans-serif;font-size:1.6rem;font-weight:800;text-align:center;margin-bottom:.5rem}
+.gc-section .gc-sub{text-align:center;color:var(--text-dim);margin-bottom:2.2rem;font-size:.92rem}
+
+/* Templates grid */
+.gc-templates{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.4rem}
+.gc-template{
+  position:relative;border-radius:18px;padding:1.6rem;cursor:pointer;overflow:hidden;
+  border:2px solid transparent;transition:.3s;
+  background:linear-gradient(135deg,#1c1a12,#2a2210 60%, #171512);
+  min-height:170px;display:flex;flex-direction:column;justify-content:space-between;
+}
+.gc-template::before{
+  content:"";position:absolute;inset:0;border-radius:18px;padding:2px;
+  background:linear-gradient(135deg,var(--gold-soft),transparent 40%,var(--gold-deep));
+  -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;opacity:.55;
+}
+.gc-template:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(0,0,0,.4)}
+.gc-template.active{border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.25),0 18px 40px rgba(0,0,0,.4)}
+.gc-template .gc-tpl-top{display:flex;align-items:center;justify-content:space-between}
+.gc-template .gc-tpl-logo{font-family:'Cairo',sans-serif;font-weight:900;color:var(--gold-soft);font-size:1rem;letter-spacing:1px}
+.gc-template i.gc-ribbon-icon{color:var(--gold);font-size:1.4rem}
+.gc-template .gc-tpl-amount{font-family:'Cairo',sans-serif;font-weight:900;font-size:1.9rem;color:#fff;margin-top:1rem}
+.gc-template .gc-tpl-amount small{font-size:1rem;color:var(--gold-soft);font-weight:700}
+.gc-template .gc-tpl-label{color:rgba(255,255,255,.55);font-size:.78rem;margin-top:.2rem}
+
+/* Custom amount + live preview */
+.gc-custom-wrap{display:grid;grid-template-columns:.9fr 1.1fr;gap:2.2rem;align-items:center}
+@media(max-width:860px){.gc-custom-wrap{grid-template-columns:1fr}}
+.gc-amount-input{
+  display:flex;align-items:center;gap:.8rem;background:var(--surface);border:1.5px solid var(--line);
+  border-radius:14px;padding:.9rem 1.2rem;
+}
+.gc-amount-input input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-size:1.3rem;font-weight:800;font-family:'Cairo',sans-serif}
+.gc-amount-input span{color:var(--text-dim);font-weight:700}
+.gc-range{width:100%;margin-top:1rem;accent-color:var(--gold)}
+.gc-minmax{display:flex;justify-content:space-between;color:var(--text-dim);font-size:.8rem;margin-top:.4rem}
+
+/* Live preview card */
+.gc-preview-card{
+  position:relative;border-radius:22px;padding:2rem;min-height:230px;
+  background:linear-gradient(135deg,#241d0d,#3a2c10 45%,#181310);
+  box-shadow:0 25px 60px rgba(0,0,0,.5), inset 0 0 0 1px rgba(212,175,55,.25);
+  overflow:hidden;transition:.35s;
+}
+.gc-preview-card::after{
+  content:"";position:absolute;inset:-40%;
+  background:conic-gradient(from 0deg, transparent 0 300deg, rgba(212,175,55,.35) 340deg, transparent 360deg);
+  animation:gcSpin 4s linear infinite;
+}
+@keyframes gcSpin{to{transform:rotate(360deg)}}
+.gc-preview-inner{position:relative;z-index:1;display:flex;flex-direction:column;height:100%;justify-content:space-between}
+.gc-preview-top{display:flex;justify-content:space-between;align-items:flex-start}
+.gc-preview-logo{font-family:'Cairo',sans-serif;font-weight:900;font-size:1.15rem;color:var(--gold-soft)}
+.gc-preview-badge{background:rgba(212,175,55,.15);border:1px solid var(--gold-deep);color:var(--gold-soft);font-size:.72rem;padding:.25rem .7rem;border-radius:20px}
+.gc-preview-amount{font-family:'Cairo',sans-serif;font-weight:900;font-size:2.6rem;color:#fff;margin:1.2rem 0 .2rem;transition:.15s}
+.gc-preview-amount small{font-size:1.2rem;color:var(--gold-soft)}
+.gc-preview-bottom{display:flex;justify-content:space-between;align-items:center;color:rgba(255,255,255,.6);font-size:.78rem}
+
+/* Buy form */
+.gc-form-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:1.8rem;max-width:820px;margin:0 auto}
+.gc-field{margin-bottom:1.1rem}
+.gc-field label{display:block;margin-bottom:.45rem;font-size:.86rem;font-weight:700;color:var(--text-dim)}
+.gc-field input,.gc-field select,.gc-field textarea{
+  width:100%;padding:.8rem 1rem;border-radius:10px;border:1.5px solid var(--line);
+  background:var(--bg-alt);color:var(--text);font-family:inherit;font-size:.95rem;
+}
+.gc-row2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:640px){.gc-row2{grid-template-columns:1fr}}
+.gc-pay-options{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.2rem}
+@media(max-width:640px){.gc-pay-options{grid-template-columns:1fr}}
+.gc-pay-option{border:2px solid var(--line);border-radius:12px;padding:1rem;text-align:center;cursor:pointer;transition:.25s;background:var(--surface)}
+.gc-pay-option:hover{border-color:var(--gold-deep)}
+.gc-pay-option.active{border-color:var(--gold);background:rgba(212,175,55,.08)}
+.gc-pay-option img{height:26px;object-fit:contain;margin-bottom:.5rem}
+.gc-pay-option i{font-size:1.6rem;color:var(--gold);display:block;margin-bottom:.4rem}
+.gc-pay-number-box{background:var(--surface-2);border:1.5px dashed var(--gold-deep);border-radius:10px;padding:1rem 1.2rem;margin-bottom:1.2rem}
+.gc-upload-area{border:2px dashed var(--line);border-radius:12px;padding:1.3rem;text-align:center;cursor:pointer;transition:.25s}
+.gc-upload-area:hover{border-color:var(--gold-deep)}
+.gc-upload-area img{max-width:100%;max-height:140px;border-radius:8px}
+.gc-copy-btn{background:var(--surface);border:1px solid var(--gold-deep);color:var(--gold);border-radius:8px;padding:.4rem .8rem;font-size:.8rem;cursor:pointer}
+
+/* Tabs (My Gift Cards) */
+.gc-tabs{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;margin-bottom:1.6rem}
+.gc-tab-btn{background:var(--surface);border:1px solid var(--line);color:var(--text-dim);padding:.55rem 1.2rem;border-radius:20px;font-size:.85rem;font-weight:700;cursor:pointer}
+.gc-tab-btn.active{background:var(--gold);color:#1a1400;border-color:var(--gold)}
+.gc-my-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:1.4rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+.gc-status-pill{font-size:.72rem;padding:.25rem .7rem;border-radius:20px;font-weight:700}
+.gc-status-pending{background:rgba(224,166,60,.15);color:var(--warn)}
+.gc-status-approved,.gc-status-active{background:rgba(62,207,142,.15);color:var(--success)}
+.gc-status-rejected{background:rgba(224,85,75,.15);color:var(--danger)}
+.gc-status-used,.gc-status-expired{background:rgba(154,154,165,.15);color:var(--text-dim)}
+
+/* Scratch card */
+.gc-scratch-wrap{max-width:420px;margin:0 auto;position:relative;border-radius:18px;overflow:hidden}
+.gc-scratch-reveal{padding:1.6rem;background:linear-gradient(135deg,#241d0d,#3a2c10);border-radius:18px;text-align:center}
+.gc-scratch-canvas{position:absolute;inset:0;cursor:grab;touch-action:none}
+
+.gc-login-note{text-align:center;color:var(--text-dim);padding:2.5rem 1rem}
+.gc-login-note a{color:var(--gold)}
+
+.gc-empty{text-align:center;color:var(--text-dim);padding:2rem}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <div class="header-main">
+      <a href="/" class="logo">
+        <img src="images/logo-icon.png" class="logo-icon" width="128" height="128" alt="Tiger Jeans" />
+        <div class="logo-text"><strong>TIGER JEANS</strong><small>متجر فخم</small></div>
+      </a>
+      <nav class="main-nav">
+        <a href="/">الرئيسية</a>
+        <a href="/#products">المتجر</a>
+        <a href="gift-cards.html" style="color:var(--gold)">بطاقات الهدايا</a>
+        <a href="track.html">تتبع الطلب</a>
+      </nav>
+      <div class="header-actions">
+        <a href="orders.html" class="action-btn" title="طلباتي" aria-label="طلباتي"><i class='bx bx-receipt'></i></a>
+        <a href="cart.html" class="action-btn cart-btn" aria-label="سلة المشتريات"><i class='bx bx-cart-alt'></i><span class="cart-badge" style="display:none">0</span></a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="gc-hero">
+  <div class="gc-hero-glow" id="gcHeroGlow"></div>
+  <div class="container">
+    <span class="gc-eyebrow"><i class='bx bx-gift'></i> هدية مضمونة لكل المناسبات</span>
+    <h1>
+      <span class="gc-lines">هل لديك صديق؟ زوجة؟ أم؟ أخت؟ حبيبة؟</span>
+      <span class="gc-lines">أو أي شخص عزيز عليك؟</span>
+    </h1>
+    <p class="gc-desc">بطاقة هدايا متجر Tiger هي أفضل وأسهل وأسرع هدية لأي مناسبة — اختر القيمة، خصّصها، وابعتها في ثوانٍ.</p>
+    <button class="gc-cta" onclick="document.getElementById('gcTemplates').scrollIntoView({behavior:'smooth'})">
+      <i class='bx bx-gift'></i> اختر بطاقتك الآن
+    </button>
+    <div class="gc-occasions">
+      <span class="gc-occasion-chip">🎂 عيد ميلاد</span>
+      <span class="gc-occasion-chip">💍 زفاف</span>
+      <span class="gc-occasion-chip">🎓 تخرج</span>
+      <span class="gc-occasion-chip">🌸 عيد الأم</span>
+      <span class="gc-occasion-chip">👔 عيد الأب</span>
+      <span class="gc-occasion-chip">❤️ فالنتاين</span>
+      <span class="gc-occasion-chip">🌙 رمضان</span>
+      <span class="gc-occasion-chip">🎉 العيد</span>
+      <span class="gc-occasion-chip">🎊 مبروك</span>
+    </div>
+  </div>
+</section>
+
+<!-- TEMPLATES -->
+<section class="gc-section" id="gcTemplates">
+  <div class="container">
+    <h2>اختر قيمة البطاقة</h2>
+    <p class="gc-sub">قوالب جاهزة بتصميم فاخر — أو حدد مبلغك الخاص بالأسفل</p>
+    <div class="gc-templates" id="gcTemplatesGrid"></div>
+  </div>
+</section>
+
+<!-- CUSTOM AMOUNT + LIVE PREVIEW -->
+<section class="gc-section" style="background:var(--bg-alt)">
+  <div class="container">
+    <h2>حدد مبلغك الخاص</h2>
+    <p class="gc-sub">من 100 إلى 50,000 جنيه — التصميم يتحدث لحظيًا</p>
+    <div class="gc-custom-wrap">
+      <div>
+        <div class="gc-amount-input">
+          <span>ج.م</span>
+          <input type="number" id="gcCustomAmount" min="100" max="50000" step="50" value="500" oninput="onCustomAmountInput()" />
+        </div>
+        <input type="range" class="gc-range" id="gcRange" min="100" max="50000" step="50" value="500" oninput="onRangeInput()" />
+        <div class="gc-minmax"><span>100 ج.م</span><span>50,000 ج.م</span></div>
+      </div>
+      <div class="gc-preview-card" id="gcPreviewCard">
+        <div class="gc-preview-inner">
+          <div class="gc-preview-top">
+            <span class="gc-preview-logo">TIGER JEANS</span>
+            <span class="gc-preview-badge"><i class='bx bx-gift'></i> Gift Card</span>
+          </div>
+          <div class="gc-preview-amount"><span id="gcPreviewAmount">500</span> <small>ج.م</small></div>
+          <div class="gc-preview-bottom">
+            <span id="gcPreviewOccasion">مناسبة سعيدة 🎉</span>
+            <span>•••• •••• ••••</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BUY FORM -->
+<section class="gc-section" id="gcBuySection">
+  <div class="container">
+    <h2>إتمام شراء البطاقة</h2>
+    <p class="gc-sub">هتوصلك أو للشخص اللي هتهديها له فورًا بعد التأكيد</p>
+    <div class="gc-form-card">
+
+      <div class="gc-row2">
+        <div class="gc-field"><label>اسمك</label><input id="gcSenderName" placeholder="مثال: أحمد محمد" /></div>
+        <div class="gc-field"><label>رقم موبايلك</label><input id="gcSenderPhone" placeholder="01xxxxxxxxx" /></div>
+      </div>
+      <div class="gc-field"><label>بريدك الإلكتروني (اختياري)</label><input id="gcSenderEmail" type="email" placeholder="example@mail.com" /></div>
+
+      <div class="gc-row2">
+        <div class="gc-field">
+          <label>المناسبة</label>
+          <select id="gcOccasion" onchange="onOccasionChange()">
+            <option value="عيد ميلاد">🎂 عيد ميلاد</option>
+            <option value="زفاف">💍 زفاف</option>
+            <option value="تخرج">🎓 تخرج</option>
+            <option value="مبروك">🎉 مبروك</option>
+            <option value="رمضان">🌙 رمضان</option>
+            <option value="العيد">🎊 العيد</option>
+            <option value="أخرى">✨ مناسبة أخرى</option>
+          </select>
+        </div>
+        <div class="gc-field"><label>اسم المستلم (اختياري)</label><input id="gcRecipientName" placeholder="مثال: محمد" /></div>
+      </div>
+      <div class="gc-field"><label>رسالة شخصية (اختياري)</label><textarea id="gcMessage" rows="2" placeholder="اكتب رسالتك هنا..."></textarea></div>
+
+      <h3 style="margin:1.6rem 0 1rem;font-family:'Cairo',sans-serif;font-size:1.05rem">طريقة الدفع</h3>
+      <div class="gc-pay-options">
+        <div class="gc-pay-option active" data-method="vodafone" onclick="gcSelectPay('vodafone', this)">
+          <i class='bx bx-mobile-alt'></i><div>فودافون كاش</div>
+        </div>
+        <div class="gc-pay-option" data-method="instapay" onclick="gcSelectPay('instapay', this)">
+          <i class='bx bx-transfer'></i><div>انستاباي</div>
+        </div>
+        <div class="gc-pay-option" data-method="cod" onclick="gcSelectPay('cod', this)">
+          <i class='bx bx-money'></i><div>عند الاستلام (نقدًا)</div>
+        </div>
+      </div>
+
+      <div class="gc-pay-number-box" id="gcPayNumberBox">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem">
+          <span style="font-size:.85rem;color:var(--text-dim)" id="gcPayLabel">حوّل المبلغ على رقم فودافون كاش:</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:.6rem;margin-top:.5rem;flex-wrap:wrap">
+          <b id="gcPayNumberVal" style="color:var(--gold);font-family:'Cairo',sans-serif;font-size:1.1rem;direction:ltr">جاري التحميل...</b>
+          <button class="gc-copy-btn" onclick="copyToClipboard(document.getElementById('gcPayNumberVal').textContent, this)"><i class='bx bx-copy'></i> نسخ</button>
+        </div>
+      </div>
+
+      <div class="gc-field" id="gcReceiptField">
+        <label>ارفع صورة إيصال التحويل</label>
+        <div class="gc-upload-area" onclick="document.getElementById('gcReceiptInput').click()">
+          <img id="gcReceiptPreview" style="display:none" alt="" />
+          <div id="gcReceiptPlaceholder">
+            <i class='bx bx-cloud-upload' style="font-size:2rem;color:var(--gold)"></i>
+            <p style="margin-top:.5rem;color:var(--text-dim);font-size:.85rem">اضغط لرفع صورة الإيصال</p>
+          </div>
+          <div id="gcReceiptStatus"></div>
+        </div>
+        <input type="file" id="gcReceiptInput" accept="image/*" style="display:none" onchange="onGcReceiptChange()" />
+      </div>
+
+      <div style="background:var(--bg-alt);border-radius:10px;padding:1rem 1.2rem;margin:1rem 0;display:flex;justify-content:space-between;align-items:center">
+        <span style="color:var(--text-dim);font-size:.9rem">إجمالي البطاقة</span>
+        <b id="gcFinalAmount" style="font-family:'Cairo',sans-serif;font-size:1.3rem;color:var(--gold)">500 ج.م</b>
+      </div>
+
+      <button class="btn-primary full-width" onclick="submitGiftCardOrder()" id="gcSubmitBtn">إرسال طلب الشراء <i class='bx bx-check-double'></i></button>
+      <p style="text-align:center;color:var(--text-dim);font-size:.78rem;margin-top:.6rem">سيقوم فريقنا بمراجعة الدفع وتفعيل البطاقة خلال وقت قصير</p>
+    </div>
+  </div>
+</section>
+
+<!-- MY GIFT CARDS -->
+<section class="gc-section" style="background:var(--bg-alt)">
+  <div class="container">
+    <h2>بطاقاتي</h2>
+    <p class="gc-sub">تابع حالة البطاقات التي اشتريتها</p>
+    <div id="gcMyCardsWrap">
+      <div class="gc-login-note">
+        <i class='bx bx-lock-alt' style="font-size:2rem;color:var(--gold)"></i>
+        <p style="margin-top:.5rem">سجّل دخولك لعرض بطاقات الهدايا الخاصة بك</p>
+        <p><a href="#" onclick="if(typeof openAuthModal==='function')openAuthModal();return false;">تسجيل الدخول</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Card Detail Modal (scratch reveal) -->
+<div class="modal-backdrop" id="gcCardModal" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.7);z-index:2000">
+  <div style="background:var(--bg-alt);border-radius:20px;padding:1.6rem;max-width:440px;width:92%;max-height:90vh;overflow:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+      <h3 style="font-family:'Cairo',sans-serif">بطاقة الهدية</h3>
+      <button onclick="closeGcModal()" style="background:none;border:none;color:var(--text-dim);font-size:1.4rem;cursor:pointer">&times;</button>
+    </div>
+    <div id="gcModalBody"></div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="container footer-bottom">
+    <div class="footer-legal-links">
+      <a href="about.html">من نحن</a>
+      <a href="contact.html">اتصل بنا</a>
+      <a href="privacy-policy.html">سياسة الخصوصية</a>
+      <a href="terms.html">الشروط والأحكام</a>
+      <a href="return-policy.html">سياسة الاسترجاع والاستبدال</a>
+    </div>
+    <p>جميع الحقوق محفوظة © Tiger Jeans 2026 | تطوير
+        <a href="https://www.facebook.com/en.mohamed.nasr" target="_blank" rel="noopener" class="credit-link">
+          <i class='bx bxs-code-alt'></i> المهندس محمد حماد
+        </a>
+      </p>
+  </div>
+</footer>
+
+<nav class="bottom-nav" aria-label="التنقل السفلي">
+  <div class="bottom-nav-inner">
+    <a href="/" data-nav="home"><i class='bx bx-home-alt'></i><span>الرئيسية</span></a>
+    <a href="/#products" data-nav="search"><i class='bx bx-search'></i><span>بحث</span></a>
+    <a href="gift-cards.html" data-nav="gift" class="active"><i class='bx bx-gift'></i><span>الهدايا</span></a>
+    <a href="cart.html" data-nav="cart"><i class='bx bx-cart-alt'></i><span>السلة</span><span class="bn-badge cart-badge" style="display:none">0</span></a>
+    <a href="orders.html" id="bottomAccountLink" data-nav="account"><i class='bx bx-user'></i><span>طلباتي</span></a>
+  </div>
+</nav>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="js/config.js"></script>
+<script src="js/upload.js"></script>
+<script src="js/gift-cards.js"></script>
+</body>
+</html>
