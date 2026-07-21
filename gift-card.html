@@ -795,18 +795,95 @@ document.addEventListener('DOMContentLoaded', () => {
   setupEnvelope();
 });
 
-// ====== LOAD GIFT CARD DATA ======
+// ====== LOAD GIFT CARD DATA (WITH FALLBACK) ======
 async function loadGiftCardData() {
   try {
-    const snap = await db.ref('giftCards/' + cardId).once('value');
-    const card = snap.val();
+    let card = null;
+    let source = ''; // 'giftCards' or 'giftCardRequests'
     
+    // === ATTEMPT 1: Try giftCards collection (primary) ===
+    const snap1 = await db.ref('giftCards/' + cardId).once('value');
+    card = snap1.val();
+    
+    if (card) {
+      source = 'giftCards';
+      console.log('✅ Card found in giftCards collection');
+    } else {
+      // === ATTEMPT 2: Search in giftCardRequests (fallback) ===
+      console.log('⚠️ Not in giftCards, searching giftCardRequests...');
+      
+      // Normalize cardId - could be with or without dashes
+      const normalizedId = cardId.replace(/-/g, '').toUpperCase();
+      
+      // Query all requests and find matching cardNumber
+      const requestsSnap = await db.ref('giftCardRequests').once('value');
+      const requests = requestsSnap.val();
+      
+      if (requests) {
+        for (const reqId of Object.keys(requests)) {
+          const req = requests[reqId];
+          const reqCardNum = (req.cardNumber || '').replace(/-/g, '').toUpperCase();
+          
+          // Match by normalized card number
+          if (reqCardNum === normalizedId) {
+            console.log(`✅ Found matching request: ${reqId}`);
+            
+            // Check if request is approved
+            if (req.status === 'approved' || req.status === 'activated') {
+              // Construct card object from request data
+              const now = Date.now();
+              const oneYearFromNow = now + (365 * 24 * 60 * 60 * 1000);
+              
+              card = {
+                cardNumber: req.cardNumber,
+                originalAmount: req.amount,
+                balance: req.amount,
+                pin: generatePINForDisplay(),
+                recipientName: req.recipientName,
+                senderName: req.senderName,
+                message: req.message,
+                occasion: req.occasion,
+                status: 'active',
+                createdAt: req.createdAt || now,
+                activatedAt: req.approvedAt || now,
+                expiresAt: oneYearFromNow,
+                ownerPhone: req.senderPhone,
+                ownerUid: req.uid,
+                requestId: reqId,
+                _fromRequest: true, // Flag indicating this came from requests
+                timeline: [
+                  { event: 'created', ts: req.createdAt || now },
+                  { event: 'approved', ts: req.approvedAt || now },
+                  { event: 'activated', ts: req.approvedAt || now }
+                ]
+              };
+              
+              source = 'giftCardRequests';
+              break;
+            } else if (req.status === 'pending') {
+              // Request exists but not approved yet
+              showPendingApproval(req);
+              return;
+            }
+          }
+        }
+      }
+    }
+    
+    // === FINAL CHECK ===
     if (!card) {
-      showError('بطاقة غير موجودة');
+      showError('بطاقة غير موجودة أو تم إلغاؤها');
       return;
     }
     
-    giftCardData = { ...card, key: cardId };
+    giftCardData = { ...card, key: cardId, _source: source };
+    
+    // Log source for debugging
+    if (source === 'giftCardRequests') {
+      console.log('📦 Card loaded from giftCardRequests (fallback mode)');
+      // Show subtle notification that this is from fallback
+      showFallbackNotice();
+    }
     
     // Hide loading screen
     setTimeout(() => {
@@ -820,6 +897,74 @@ async function loadGiftCardData() {
     console.error(err);
     showError('حدث خطأ أثناء تحميل البطاقة');
   }
+}
+
+// Generate a placeholder PIN display for fallback cards
+function generatePINForDisplay() {
+  return '------';
+}
+
+// Show notice when card loaded from fallback
+function showFallbackNotice() {
+  const notice = document.createElement('div');
+  notice.style.cssText = `
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg, #d4af37, #b8962e); color: #000;
+    padding: 12px 24px; border-radius: 12px; font-family: 'Cairo', sans-serif;
+    font-size: 0.9rem; font-weight: 700; z-index: 10000;
+    box-shadow: 0 10px 40px rgba(212,175,55,0.4);
+    animation: slideDown 0.5s ease;
+  `;
+  notice.innerHTML = '🎁 بطاقتك محملة بنجاح! <span style="font-size:0.8rem;font-weight:400">(جاري التحقق)';
+  document.body.appendChild(notice);
+  
+  setTimeout(() => {
+    notice.style.animation = 'slideUp 0.5s ease forwards';
+    setTimeout(() => notice.remove(), 500);
+  }, 3000);
+  
+  // Add animations
+  if (!document.getElementById('fallbackStyles')) {
+    const style = document.createElement('style');
+    style.id = 'fallbackStyles';
+    style.textContent = `
+      @keyframes slideDown { from{opacity:0;top:-50px;} to{opacity:1;top:20px;} }
+      @keyframes slideUp { from{opacity:1;top:20px;} to{opacity:0;top:-50px;} }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+// Show pending approval message
+function showPendingApproval(req) {
+  document.getElementById('loadingScreen').classList.add('hidden');
+  
+  const container = document.querySelector('.gc-page') || document.body;
+  container.innerHTML = `
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;text-align:center;">
+      <div style="max-width:450px;">
+        <div style="font-size:80px;margin-bottom:1.5rem;">⏳</div>
+        <h1 style="font-family:'Cairo',sans-serif;font-size:1.8rem;color:#d4af37;margin-bottom:1rem;">
+          البطاقة قيد المراجعة!
+        </h1>
+        <p style="color:#9ca3af;font-size:1.05rem;line-height:1.9;margin-bottom:1.5rem;">
+          بطاقة هدايا برقم <strong style="color:#fff">${req.cardNumber}</strong><br>
+          لـ <strong style="color:#d4af37">${req.recipientName}</strong> لا تزال تنتظر الموافقة.
+        </p>
+        <p style="color:#9ca3af;font-size:0.95rem;margin-bottom:2rem;">
+          سيتم تفعيلها بمجرد تأكيد الدفع من الإدارة.
+        </p>
+        <a href="https://tiger-jeans.com/" style="
+          display:inline-flex;align-items:center;gap:.5rem;
+          padding:1rem 2rem;background:linear-gradient(135deg,#d4af37,#b8962e);
+          color:#000;text-decoration:none;border-radius:12px;
+          font-family:'Cairo',sans-serif;font-weight:700;
+        ">
+          <i class='bx bx-home'></i> العودة للمتجر
+        </a>
+      </div>
+    </div>
+  `;
 }
 
 // ====== POPULATE UI ======
