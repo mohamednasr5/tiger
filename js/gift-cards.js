@@ -355,8 +355,10 @@ function openGcCardModal(cardId) {
       <canvas class="gc-scratch-canvas" id="gcScratchCanvas"></canvas>
     </div>
     <div style="display:flex;gap:.6rem;margin-top:1.2rem;flex-wrap:wrap">
-      <button class="btn-secondary" style="flex:1" onclick="copyToClipboard('${card.cardNumber}', this)"><i class='bx bx-copy'></i> نسخ الرقم</button>
-      <button class="btn-primary" style="flex:1" onclick="shareGcCardWhatsapp('${card.id}')"><i class='bx bxl-whatsapp'></i> مشاركة واتساب</button>
+      <button class="btn-secondary" style="flex:1;min-width:130px" onclick="copyToClipboard('${card.cardNumber}', this)"><i class='bx bx-copy'></i> نسخ الرقم</button>
+      <button class="btn-secondary" style="flex:1;min-width:130px" onclick="copyGcCardLink('${card.id}', this)"><i class='bx bx-link'></i> نسخ الرابط</button>
+      <button class="btn-primary" style="flex:1;min-width:130px" onclick="shareGcCardWhatsapp('${card.id}')"><i class='bx bxl-whatsapp'></i> مشاركة واتساب</button>
+      <button class="btn-primary" style="flex:1;min-width:130px" onclick="shareGcCardGeneral('${card.id}')"><i class='bx bx-share-alt'></i> مشاركة</button>
     </div>
   `;
   modal.style.display = "flex";
@@ -457,6 +459,36 @@ function shareGcCardWhatsapp(cardId) {
 // Generate unique public link for each gift card
 function getGiftCardPublicUrl(cardId) {
   return `https://tiger-jeans.com/gift-card.html?id=${cardId}`;
+}
+
+// Copy the gift card's public link to clipboard
+function copyGcCardLink(cardId, btn) {
+  const url = getGiftCardPublicUrl(cardId);
+  navigator.clipboard.writeText(url).then(() => {
+    showToast("تم نسخ الرابط ✓");
+    if (btn) {
+      const original = btn.innerHTML;
+      btn.innerHTML = "<i class='bx bx-check'></i> تم النسخ";
+      setTimeout(() => (btn.innerHTML = original), 1500);
+    }
+  }).catch(() => showToast("تعذر نسخ الرابط"));
+}
+
+// Share the gift card via the device's native share sheet (any app),
+// falling back to copying the link if the Web Share API isn't available
+function shareGcCardGeneral(cardId) {
+  const card = gcMyCards.find((c) => c.id === cardId);
+  const url = getGiftCardPublicUrl(cardId);
+  const title = "بطاقة هدايا Tiger Jeans";
+  const text = card
+    ? `🎁 بطاقة هدايا Tiger Jeans بقيمة ${fmtPrice(card.originalAmount || card.balance)}`
+    : "🎁 بطاقة هدايا Tiger Jeans";
+
+  if (navigator.share) {
+    navigator.share({ title, text, url }).catch(() => {});
+  } else {
+    copyGcCardLink(cardId);
+  }
 }
 
 function copyToClipboard(text, btn) {
