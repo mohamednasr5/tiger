@@ -577,12 +577,17 @@ function updatePayNumber() {
     // Show gift card input fields, hide traditional payment details
     traditionalDetails.style.display = "none";
     gcDetails.style.display = "block";
-    receiptField.style.display = "none";
-    // Reset partial payment section
     const partialSection = document.getElementById("partialPaymentSection");
-    const gcStatusMsg = document.getElementById("gcPayStatusMsg");
-    if (partialSection) partialSection.style.display = "none";
-    if (gcStatusMsg) gcStatusMsg.style.display = "none";
+    if (gcPaymentData && gcPaymentData.remaining > 0) {
+      // Partial payment already in progress — keep the section and the mandatory receipt field visible
+      if (partialSection) partialSection.style.display = "block";
+      showReceiptFieldForPartialGiftCard();
+    } else {
+      receiptField.style.display = "none";
+      const gcStatusMsg = document.getElementById("gcPayStatusMsg");
+      if (partialSection) partialSection.style.display = "none";
+      if (gcStatusMsg) gcStatusMsg.style.display = "none";
+    }
   } else {
     // Show traditional payment details, hide gift card
     traditionalDetails.style.display = "block";
@@ -678,6 +683,8 @@ async function validateGiftCardForPayment() {
       `;
       partialSection.style.display = "block";
       updatePartialPayDetails();
+      // Receipt upload is mandatory to complete the remaining amount — open it right away
+      showReceiptFieldForPartialGiftCard();
     }
     
     return gcPaymentData;
@@ -717,6 +724,19 @@ function selectPartialPay(m, el) {
   document.querySelectorAll(".partial-pay-btn").forEach((b) => b.classList.remove("active"));
   el.classList.add("active");
   updatePartialPayDetails();
+  showReceiptFieldForPartialGiftCard();
+}
+
+// Opens the receipt-upload field and sets a clear mandatory label when
+// a gift card only partially covers the order and the customer must
+// complete the remaining amount via Vodafone Cash / InstaPay
+function showReceiptFieldForPartialGiftCard() {
+  if (!gcPaymentData || gcPaymentData.remaining <= 0) return;
+  const receiptField = document.getElementById("receiptField");
+  const receiptLabel = document.getElementById("receiptLabel");
+  const methodName = partialPayMethod === "vodafone" ? "فودافون كاش" : "انستاباي";
+  if (receiptField) receiptField.style.display = "block";
+  if (receiptLabel) receiptLabel.textContent = `ارفع صورة إيصال تحويل المتبقي (${fmtPrice(gcPaymentData.remaining)}) عبر ${methodName} — إلزامي`;
 }
 
 function updatePartialPayDetails() {
@@ -743,7 +763,7 @@ function updatePartialPayDetails() {
           <button class="copy-btn" style="padding:.4rem .8rem;font-size:.8rem" onclick="copyToClipboard('@${paySettings.instapay || "engmohamednasr"}', this)"><i class='bx bx-copy'></i> نسخ</button>
         </div>
         ${paySettings.instapayOwner ? `<p style="font-size:.8rem;color:var(--gold);margin-top:.4rem">اسم الحساب: ${paySettings.instapayOwner}</p>` : ''}
-        ${paySettings.instapayLink ? `<a href="${paySettings.instapayLink}" target="_blank" style="display:inline-flex;align-items:center gap:.3rem;margin-top:.6rem;color:var(--gold);font-size:.85rem"><i class='bx bx-link-external'></i> فتح رابط الدفع المباشر</a>` : ''}
+        ${paySettings.instapayLink ? `<a href="${paySettings.instapayLink}" target="_blank" class="instapay-link" style="margin-top:.8rem;padding:.65rem 1.2rem;font-size:.85rem"><i class='bx bx-link-external'></i> فتح رابط الدفع المباشر</a>` : ''}
       </div>
     `;
   }
@@ -991,10 +1011,12 @@ async function submitOrder() {
   let total = remainingAfterGift;
 
   // ✅ خصم رصيد بطاقة الهدايا فورًا وبشكل ذرّي (transaction) لمنع استخدام نفس الرصيد مرتين
+  // يشمل الحالتين: البطاقة كوسيلة دفع أساسية (primaryGcData) أو مطبقة اختياريًا (appliedGiftCard)
+  const giftCardToCharge = primaryGcData || appliedGiftCard;
   let giftCardResult = null;
-  if (appliedGiftCard && giftDeduction > 0) {
+  if (giftCardToCharge && giftDeduction > 0) {
     try {
-      const balanceRef = db.ref(`giftCards/${appliedGiftCard.key}/balance`);
+      const balanceRef = db.ref(`giftCards/${giftCardToCharge.key}/balance`);
       const txResult = await balanceRef.transaction((current) => {
         if (typeof current !== "number" || current <= 0) return current; // abort, nothing to deduct
         return Math.max(0, current - giftDeduction);
@@ -1006,15 +1028,15 @@ async function submitOrder() {
         return;
       }
       const newBalance = txResult.snapshot.val();
-      const actualUsed = appliedGiftCard.balance - newBalance;
-      giftCardResult = { cardNumber: appliedGiftCard.cardNumber, amountUsed: actualUsed, remainingBalance: newBalance };
+      const actualUsed = giftCardToCharge.balance - newBalance;
+      giftCardResult = { cardNumber: giftCardToCharge.cardNumber, amountUsed: actualUsed, remainingBalance: newBalance };
       total = Math.max(0, preGiftTotal - actualUsed);
 
       if (newBalance <= 0) {
-        await db.ref(`giftCards/${appliedGiftCard.key}`).update({ status: "used" });
+        await db.ref(`giftCards/${giftCardToCharge.key}`).update({ status: "used" });
       }
       // Redemption log (best-effort, not blocking order creation)
-      db.ref(`giftCards/${appliedGiftCard.key}/redemptions`).push({
+      db.ref(`giftCards/${giftCardToCharge.key}/redemptions`).push({
         orderId: code, amount: actualUsed, ts: Date.now()
       }).catch((e) => console.error("gift card redemption log error", e));
     } catch (e) {

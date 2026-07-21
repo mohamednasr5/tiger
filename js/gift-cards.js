@@ -320,15 +320,17 @@ function renderGcMyCards() {
         </div>`;
     }
     const cls = "gc-status-" + (d.status || "active");
-    const labels = { active: "متاحة", used: "مستخدمة بالكامل", expired: "منتهية", frozen: "موقوفة" };
+    const labels = { active: "متاحة", used: "تم استخدام كامل رصيد البطاقة", expired: "منتهية", frozen: "موقوفة" };
+    const isDepleted = d.status === "used" || d.status === "expired" || d.balance <= 0;
     return `
       <div class="gc-my-card">
         <div>
-          <b style="font-family:'Cairo',sans-serif">${fmtPrice(d.balance)}</b>
+          <b style="font-family:'Cairo',sans-serif;${isDepleted ? 'color:var(--danger)' : ''}">${fmtPrice(d.balance)}</b>
           <div style="color:var(--text-dim);font-size:.82rem;margin-top:.2rem">من أصل ${fmtPrice(d.originalAmount)} · تنتهي ${d.expiresAt ? new Date(d.expiresAt).toLocaleDateString("ar-EG") : "-"}</div>
         </div>
-        <div style="display:flex;align-items:center;gap:.6rem">
+        <div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap">
           <span class="gc-status-pill ${cls}">${labels[d.status] || d.status}</span>
+          ${d.status === "used" ? `<span class="gc-status-pill gc-status-expired">منتهية</span>` : ""}
           <button class="btn-secondary" style="padding:.5rem 1rem;font-size:.8rem" onclick="openGcCardModal('${d.id}')">عرض</button>
         </div>
       </div>`;
@@ -341,6 +343,7 @@ function openGcCardModal(cardId) {
   if (!card) return;
   const modal = document.getElementById("gcCardModal");
   const body = document.getElementById("gcModalBody");
+  const isDepleted = card.status === "used" || card.balance <= 0;
 
   body.innerHTML = `
     <div class="gc-scratch-wrap" id="gcScratchWrap">
@@ -350,7 +353,8 @@ function openGcCardModal(cardId) {
         <div style="color:var(--text-dim);font-size:.8rem">الرقم السري (PIN)</div>
         <div style="font-family:'Cairo',sans-serif;font-size:1.4rem;color:#fff;letter-spacing:4px;margin:.3rem 0 .8rem">${card.pin}</div>
         <div style="color:var(--text-dim);font-size:.8rem">الرصيد المتبقي</div>
-        <div style="font-family:'Cairo',sans-serif;font-size:1.6rem;color:var(--success);margin:.3rem 0">${fmtPrice(card.balance)}</div>
+        <div style="font-family:'Cairo',sans-serif;font-size:1.6rem;color:${isDepleted ? 'var(--danger)' : 'var(--success)'};margin:.3rem 0">${fmtPrice(card.balance)}</div>
+        ${isDepleted ? `<div style="color:var(--danger);font-size:.85rem;font-weight:700;margin-top:.3rem">تم استخدام كامل رصيد البطاقة — منتهية</div>` : ""}
       </div>
       <canvas class="gc-scratch-canvas" id="gcScratchCanvas"></canvas>
     </div>

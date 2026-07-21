@@ -2404,6 +2404,15 @@ function viewOrder(id) {
       <span>×${i.qty || 1}</span>
     </div>`).join("") || "<p style='color:var(--text-dim)'>لا توجد منتجات</p>";
 
+  const paymentMethodNames = { vodafone: "فودافون كاش", instapay: "إنستاباي", cod: "الدفع عند الاستلام", giftcard: "بطاقة هدايا" };
+  const paymentStatusNames = { paid: "مدفوع بالكامل", pending_payment: "في انتظار الدفع", pending_verification: "في انتظار مراجعة الإيصال" };
+  const paymentHtml = o.payment ? `
+    <div style="margin-top:1rem;padding:.9rem 1rem;border-radius:10px;background:var(--surface-2,rgba(255,255,255,.03));border:1px solid var(--line)">
+      <b><i class='bx bx-credit-card'></i> وسيلة الدفع: ${paymentMethodNames[o.payment.method] || o.payment.method}</b>
+      <div style="font-size:.85rem;margin-top:.4rem;color:var(--text-dim)">حالة الدفع: <span style="color:var(--text)">${paymentStatusNames[o.payment.status] || o.payment.status || "-"}</span></div>
+      ${o.payment.receiptImage ? `<a href="${o.payment.receiptImage}" target="_blank" style="display:inline-flex;align-items:center;gap:.4rem;margin-top:.6rem;color:var(--gold);font-size:.85rem"><i class='bx bx-image'></i> عرض صورة إيصال التحويل</a>` : `<div style="font-size:.85rem;margin-top:.4rem;color:var(--warn)">لا يوجد إيصال مرفق${o.payment.method === "cod" ? " (غير مطلوب للدفع عند الاستلام)" : ""}</div>`}
+    </div>` : "";
+
   const giftCardHtml = o.giftCard ? `
     <div style="margin-top:1rem;padding:.9rem 1rem;border-radius:10px;background:rgba(224,166,60,.1);border:1px solid var(--gold)">
       <b style="color:var(--gold)"><i class='bx bx-gift'></i> تم استخدام بطاقة هدايا فى هذا الطلب</b>
@@ -2437,6 +2446,7 @@ function viewOrder(id) {
       ${itemsHtml}
     </div>
     ${giftCardHtml}
+    ${paymentHtml}
     ${returnHtml}
   `;
   document.getElementById("orderDetailModal").classList.add("show");
