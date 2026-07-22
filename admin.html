@@ -490,6 +490,7 @@
       <a href="#" data-tab="returns" onclick="switchTab('returns')"><i class='bx bx-undo'></i> طلبات الاسترجاع <span class="nav-badge" id="navReturnsBadge" style="display:none;background:var(--danger)">0</span></a>
       <a href="#" data-tab="visitors" onclick="switchTab('visitors')"><i class='bx bx-globe'></i> الزوار والتتبع</a>
       <a href="#" data-tab="telegram" onclick="switchTab('telegram')"><i class='bx bx-telegram'></i> بوت تليجرام <span class="nav-badge" id="navTelegramStatus" style="display:none;background:var(--success)">●</span></a>
+      <a href="#" data-tab="ai" onclick="switchTab('ai')"><i class='bx bx-bot'></i> مساعد AI <span class="nav-badge" id="navAiStatus" style="display:none;background:var(--success)">●</span></a>
     </nav>
     <div style="margin-top:auto;padding:1rem">
       <button class="btn-secondary full-width" onclick="doLogout()" style="font-size:.85rem"><i class='bx bx-log-out'></i> تسجيل الخروج</button>
@@ -563,6 +564,11 @@
         <i class='bx bx-telegram'></i>
         <div><b>بوت تليجرام</b><small>إشعارات فورية وأوامر</small></div>
         <span class="bn-badge" id="navTelegramStatusMobile" style="display:none;background:var(--success)">●</span>
+      </a>
+      <a href="#" onclick="closeMoreMenu();switchTab('ai')" class="more-menu-item">
+        <i class='bx bx-bot'></i>
+        <div><b>مساعد AI الذكي</b><small>إعدادات NVIDIA NIM</small></div>
+        <span class="bn-badge" id="navAiStatusMobile" style="display:none;background:var(--success)">●</span>
       </a>
     </div>
   </div>
@@ -1512,6 +1518,231 @@
       </div>
     </div>
 
+    <!-- AI Assistant Tab -->
+    <div class="tab-content hidden" id="tab-ai">
+      <div class="admin-top">
+        <h2><i class='bx bx-bot' style='margin-left:.5rem;color:var(--gold)'></i> مساعد AI الذكي</h2>
+        <span id="aiStatusPill" class="ai-status-pill pending">
+          <i class='bx bx-loader-alt bx-spin'></i> جاري التحميل...
+        </span>
+      </div>
+
+      <!-- Introduction Card -->
+      <div class="card" style="margin-bottom:1.5rem;border-radius:12px;background:linear-gradient(135deg,rgba(212,175,55,.08),rgba(184,148,46,.03));border:1px solid rgba(212,175,55,.2)">
+        <div style="display:flex;align-items:flex-start;gap:1rem;flex-wrap:wrap">
+          <div style="width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#b8942e);display:flex;align-items:center;justify-content:center;font-size:1.7rem;color:#0a0a0c;flex-shrink:0">
+            <i class='bx bx-bot'></i>
+          </div>
+          <div style="flex:1;min-width:280px">
+            <h3 style="margin:0 0 .3rem;font-family:'Cairo',sans-serif;color:var(--gold)">Tiger AI — مساعد المتجر الذكي</h3>
+            <p style="margin:0;color:var(--text-dim);font-size:.88rem;line-height:1.7">
+              فعّل مساعد ذكاء اصطناعي يعمل بـ <b style="color:var(--text)">NVIDIA NIM API</b> على متجرك.
+              المساعد يقرأ المنتجات والمخزون والطلبات تلقائياً، ويرد على العملاء بدون مغادرة الموقع.
+              يدعم: <b style="color:var(--gold)">نصي</b>، <b style="color:var(--gold)">رؤية الصور</b>، و<b style="color:var(--gold)">التفكير المنطقي</b>.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Enable / Disable Card -->
+      <div class="card" style="margin-bottom:1.5rem;border-radius:12px">
+        <h4 style="margin-bottom:1rem;display:flex;align-items:center;gap:.5rem">
+          <i class='bx bx-toggle-left' style='color:var(--gold)'></i> تفعيل المساعد
+        </h4>
+        <label style="display:flex;align-items:center;gap:.8rem;padding:.8rem 1rem;background:var(--surface);border-radius:10px;cursor:pointer">
+          <input type="checkbox" id="aiEnabled" style="width:20px;height:20px;accent-color:var(--gold)" />
+          <div style="flex:1">
+            <b style="font-size:.95rem;font-family:'Cairo',sans-serif">تفعيل مساعد AI على الموقع</b>
+            <small style="display:block;color:var(--text-dim);font-size:.8rem;margin-top:.2rem">عند التفعيل، سيظهر زر المساعد الذكي في كل صفحات الموقع للعملاء.</small>
+          </div>
+        </label>
+      </div>
+
+      <!-- API Key Card -->
+      <div class="card" style="margin-bottom:1.5rem;border-radius:12px">
+        <h4 style="margin-bottom:1rem;display:flex;align-items:center;gap:.5rem">
+          <i class='bx bx-key' style='color:var(--gold)'></i> مفتاح NVIDIA API
+        </h4>
+        <p style="color:var(--text-dim);font-size:.82rem;margin-bottom:1rem">
+          احصل على مفتاحك المجاني من <a href="https://build.nvidia.com/settings/integrations" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none">
+          <i class='bx bx-link-external' style='font-size:.85rem'></i> NVIDIA build.nvidia.com</a> — قسم Integrations / API Keys.
+        </p>
+        <div class="field" style="margin:0">
+          <input type="password" id="aiApiKey" placeholder="nvapi-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                 style="direction:ltr;text-align:left;font-family:monospace;font-size:.85rem" />
+          <button type="button" class="btn-secondary" style="margin-top:.5rem" onclick="toggleAiKeyVisibility()">
+            <i class='bx bx-show' id="aiKeyVisibilityIcon"></i> إظهار/إخفاء المفتاح
+          </button>
+        </div>
+      </div>
+
+      <!-- Text Models -->
+      <div class="card" style="margin-bottom:1.5rem;border-radius:12px">
+        <h4 style="margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem">
+          <i class='bx bx-message-rounded-dots' style='color:var(--gold)'></i> النموذج النصي (للمحادثات العادية)
+        </h4>
+        <p style="color:var(--text-dim);font-size:.82rem;margin-bottom:1rem">يُستخدم لكل رسائل العملاء النصية (بحث، استفسار، خدمة عملاء).</p>
+        <input type="hidden" id="aiTextModel" value="meta/llama-3.1-70b-instruct" />
+        <div class="ai-model-grid" id="aiTextModels"></div>
+      </div>
+
+      <!-- Vision Models -->
+      <div class="card" style="margin-bottom:1.5rem;border-radius:12px">
+        <h4 style="margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem">
+          <i class='bx bx-image' style='color:var(--gold)'></i> نموذج الرؤية (للبحث بالصور)
+        </h4>
+        <p style="color:var(--text-dim);font-size:.82rem;margin-bottom:1rem">يُستخدم تلقائياً عندما يرفع العميل صورة (تحليل الصورة وإيجاد منتجات مشابهة).</p>
+        <input type="hidden" id="aiVisionModel" value="meta/llama-3.2-90b-vision-instruct" />
+        <div class="ai-model-grid" id="aiVisionModels"></div>
+      </div>
+
+      <!-- Reasoning Models -->
+      <div class="card" style="margin-bottom:1.5rem;border-radius:12px">
+        <h4 style="margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem">
+          <i class='bx bx-brain' style='color:var(--gold)'></i> نموذج التفكير المنطقي (للتحليل العميق)
+        </h4>
+        <p style="color:var(--text-dim);font-size:.82rem;margin-bottom:1rem">يُستخدم للأدمن عند طلب تحليلات معقدة (مقارنات، استراتيجيات، تقارير).</p>
+        <input type="hidden" id="aiReasoningModel" value="deepseek-ai/deepseek-r1" />
+        <div class="ai-model-grid" id="aiReasoningModels"></div>
+      </div>
+
+      <!-- Advanced Params -->
+      <div class="card" style="margin-bottom:1.5rem;border-radius:12px">
+        <h4 style="margin-bottom:1rem;display:flex;align-items:center;gap:.5rem">
+          <i class='bx bx-slider-alt' style='color:var(--gold)'></i> إعدادات متقدمة
+        </h4>
+        <div class="row2">
+          <div class="field">
+            <label>أقصى عدد كلمات في الرد (max_tokens)</label>
+            <input type="number" id="aiMaxTokens" value="1500" min="100" max="8000" step="100" />
+          </div>
+          <div class="field">
+            <label>درجة الإبداع (temperature: 0 = دقيق، 1 = مبدع)</label>
+            <input type="number" id="aiTemperature" value="0.6" min="0" max="2" step="0.1" />
+          </div>
+        </div>
+      </div>
+
+      <!-- System Prompts -->
+      <div class="card" style="margin-bottom:1.5rem;border-radius:12px">
+        <h4 style="margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem">
+          <i class='bx bx-message-alt-edit' style='color:var(--gold)'></i> تعليمات المساعد للعملاء
+        </h4>
+        <p style="color:var(--text-dim);font-size:.82rem;margin-bottom:1rem">
+          هذا هو الـ System Prompt الذي يحدد شخصية وقواعد المساعد عند التعامل مع العملاء.
+          اتركه فارغاً لاستخدام الافتراضي.
+        </p>
+        <div class="field">
+          <textarea id="aiSystemPrompt" rows="6" style="font-size:.85rem;line-height:1.7"></textarea>
+          <button type="button" class="btn-secondary" style="margin-top:.5rem" onclick="TigerAIAdmin.resetCustomerPrompt()">
+            <i class='bx bx-refresh'></i> استعادة الافتراضي
+          </button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.5rem;border-radius:12px">
+        <h4 style="margin-bottom:.4rem;display:flex;align-items:center;gap:.5rem">
+          <i class='bx bx-shield-quarter' style='color:var(--gold)'></i> تعليمات المساعد للأدمن
+        </h4>
+        <p style="color:var(--text-dim);font-size:.82rem;margin-bottom:1rem">
+          تعليمات منفصلة تعمل عندما تستخدم المساعد داخل لوحة التحكم. لها صلاحية رؤية كل البيانات.
+        </p>
+        <div class="field">
+          <textarea id="aiAdminSystemPrompt" rows="6" style="font-size:.85rem;line-height:1.7"></textarea>
+          <button type="button" class="btn-secondary" style="margin-top:.5rem" onclick="TigerAIAdmin.resetAdminPrompt()">
+            <i class='bx bx-refresh'></i> استعادة الافتراضي
+          </button>
+        </div>
+      </div>
+
+      <!-- Features Toggles -->
+      <div class="card" style="margin-bottom:1.5rem;border-radius:12px">
+        <h4 style="margin-bottom:1rem;display:flex;align-items:center;gap:.5rem">
+          <i class='bx bx-list-check' style='color:var(--gold)'></i> مزايا المساعد
+        </h4>
+        <div class="ai-feature-row">
+          <div class="ai-feature-info">
+            <b><i class='bx bx-search-alt' style='color:var(--gold);margin-left:.3rem'></i> البحث الذكي عن المنتجات</b>
+            <span>العميل يكتب طلب الطبيعي، والمساعد يرشح المنتجات المناسبة.</span>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" id="aiFeatSmartSearch" checked /><span class="toggle-slider"></span></label>
+        </div>
+        <div class="ai-feature-row">
+          <div class="ai-feature-info">
+            <b><i class='bx bx-image-add' style='color:var(--gold);margin-left:.3rem'></i> البحث بالصور</b>
+            <span>العميل يرفع صورة، والمساعد يحللها ويجد منتجات مشابهة في المتجر.</span>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" id="aiFeatImageSearch" checked /><span class="toggle-slider"></span></label>
+        </div>
+        <div class="ai-feature-row">
+          <div class="ai-feature-info">
+            <b><i class='bx bx-t-shirt' style='color:var(--gold);margin-left:.3rem'></i> منسق الإطلالات</b>
+            <span>اقتراح لوك كامل (بنطلون + قميص + حذاء) من المنتجات المتوفرة.</span>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" id="aiFeatStylist" checked /><span class="toggle-slider"></span></label>
+        </div>
+        <div class="ai-feature-row">
+          <div class="ai-feature-info">
+            <b><i class='bx bx-ruler' style='color:var(--gold);margin-left:.3rem'></i> مستشار المقاسات</b>
+            <span>اقتراح المقاس المناسب بناءً على الطول والوزن والعمر.</span>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" id="aiFeatSizeAdvisor" checked /><span class="toggle-slider"></span></label>
+        </div>
+        <div class="ai-feature-row">
+          <div class="ai-feature-info">
+            <b><i class='bx bx-cart-add' style='color:var(--gold);margin-left:.3rem'></i> اقتراح منتجات للسلة</b>
+            <span>عند إضافة منتج، يقترح منتجات مكملة لرفع قيمة الطلب.</span>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" id="aiFeatCartSuggest" checked /><span class="toggle-slider"></span></label>
+        </div>
+        <div class="ai-feature-row">
+          <div class="ai-feature-info">
+            <b><i class='bx bx-support' style='color:var(--gold);margin-left:.3rem'></i> خدمة العملاء</b>
+            <span>الرد على أسئلة الشحن، الدفع، الاسترجاع، تتبع الطلب.</span>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" id="aiFeatCustomerService" checked /><span class="toggle-slider"></span></label>
+        </div>
+        <div class="ai-feature-row">
+          <div class="ai-feature-info">
+            <b><i class='bx bx-line-chart' style='color:var(--gold);margin-left:.3rem'></i> تحليلات الأدمن</b>
+            <span>دعم الأسئلة التحليلية داخل لوحة التحكم (الأكثر مبيعاً، الطلبات المتأخرة، إلخ).</span>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" id="aiFeatAdminAnalytics" checked /><span class="toggle-slider"></span></label>
+        </div>
+        <div class="ai-feature-row">
+          <div class="ai-feature-info">
+            <b><i class='bx bx-pencil' style='color:var(--gold);margin-left:.3rem'></i> مولد أوصاف SEO</b>
+            <span>توليد أوصاف احترافية وميتا للمنتجات داخل لوحة التحكم.</span>
+          </div>
+          <label class="toggle-switch"><input type="checkbox" id="aiFeatSeoGenerator" checked /><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+
+      <!-- Test Connection -->
+      <div class="card" style="margin-bottom:1.5rem;border-radius:12px">
+        <h4 style="margin-bottom:1rem;display:flex;align-items:center;gap:.5rem">
+          <i class='bx bx-plug' style='color:var(--gold)'></i> اختبار الاتصال
+        </h4>
+        <p style="color:var(--text-dim);font-size:.82rem;margin-bottom:1rem">
+          قبل الحفظ، اختبر أن المفتاح والنموذج يعملان بشكل صحيح.
+        </p>
+        <div style="display:flex;gap:.7rem;flex-wrap:wrap">
+          <button class="btn-secondary" onclick="TigerAIAdmin.test()">
+            <i class='bx bx-send'></i> اختبار الاتصال بـ NVIDIA
+          </button>
+        </div>
+        <div class="ai-test-result" id="aiTestResult"></div>
+      </div>
+
+      <!-- Save Button -->
+      <div class="card" style="border-radius:12px">
+        <button class="btn-primary" onclick="TigerAIAdmin.save()" style="width:100%;padding:1rem;font-size:1rem">
+          <i class='bx bx-save' style='margin-left:.5rem'></i> حفظ إعدادات المساعد الذكي
+        </button>
+      </div>
+
+    </div>
+
   </main>
 </div>
 
@@ -1669,6 +1900,23 @@
 <script src="js/admin-returns.js"></script>
 <script src="js/admin-visitors.js"></script>
 <script src="js/telegram-bot.js"></script>
+<script src="js/tiger-ai.js"></script>
+<script src="js/tiger-ai-admin.js"></script>
+<script>
+// Toggle API key visibility
+function toggleAiKeyVisibility() {
+  const input = document.getElementById('aiApiKey');
+  const icon = document.getElementById('aiKeyVisibilityIcon');
+  if (!input) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    if (icon) icon.className = 'bx bx-hide';
+  } else {
+    input.type = 'password';
+    if (icon) icon.className = 'bx bx-show';
+  }
+}
+</script>
 <script>
 // ====== State ======
 let currentTab = "dashboard";
