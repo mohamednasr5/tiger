@@ -277,7 +277,8 @@
 .tj-ai-msg-bubble ol{margin:.4rem 0;padding-right:1.2rem}
 .tj-ai-msg-bubble li{margin-bottom:.25rem}
 .tj-ai-msg-bubble strong{color:var(--gold,#d4af37);font-weight:700}
-.tj-ai-msg-bubble a{color:var(--gold,#d4af37);text-decoration:underline}
+.tj-ai-msg-bubble a{color:#2f8fff;text-decoration:underline;font-weight:600}
+.tj-ai-msg-bubble a:hover{color:#1a73e8}
 .tj-ai-msg-bubble code{
   background:rgba(0,0,0,.3);
   padding:.1rem .35rem;

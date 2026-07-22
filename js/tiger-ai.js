@@ -21,6 +21,46 @@
 
   // ========= Dismiss State (sessionStorage) =========
   const TIGER_AI_DISMISSED_KEY = 'tj_ai_dismissed';
+
+  // ========= Official Size Guide Data (mirrors size-guide.html) =========
+  // Used so the AI recommends sizes from real measurement tables instead of guessing.
+  const SIZE_GUIDE_DATA = {
+    note: 'كل القياسات بالسنتيمتر. لو العميل بين مقاسين، رشح الأكبر للراحة إلا لو طلب مقاس ضيق.',
+    jeans: {
+      label: 'بنطلون جينز عادي', measureBy: 'محيط الوسط (سم)',
+      rows: [
+        { size: 30, waist: 80, length: 108 }, { size: 32, waist: 84, length: 108 },
+        { size: 34, waist: 88, length: 109 }, { size: 36, waist: 92, length: 109 },
+        { size: 38, waist: 96, length: 109 }, { size: 40, waist: 100, length: 110 },
+        { size: 42, waist: 104, length: 110 }, { size: 44, waist: 108, length: 110 },
+        { size: 46, waist: 112, length: 110 }
+      ]
+    },
+    slimFit: {
+      label: 'بنطلون Slim Fit', measureBy: 'محيط الوسط (سم)',
+      rows: [
+        { size: 30, waist: 76, length: 108 }, { size: 32, waist: 80, length: 108 },
+        { size: 34, waist: 84, length: 109 }, { size: 36, waist: 88, length: 109 },
+        { size: 38, waist: 92, length: 109 }, { size: 40, waist: 96, length: 110 },
+        { size: 42, waist: 100, length: 110 }, { size: 44, waist: 104, length: 110 }
+      ]
+    },
+    wideLeg: {
+      label: 'بنطلون وايد ليج', measureBy: 'محيط الوسط والأرداف (سم) والوزن التقريبي (كجم)',
+      rows: [
+        { size: 28, waist: '71-73', hip: '94-96', length: '105-107', weight: '45-52' },
+        { size: 30, waist: '77-79', hip: '98-100', length: '105-107', weight: '58-64' },
+        { size: 32, waist: '83-85', hip: '102-104', length: '105-107', weight: '70-76' },
+        { size: 34, waist: '89-91', hip: '106-108', length: '106-108', weight: '76-82' },
+        { size: 36, waist: '94-97', hip: '110-113', length: '106-108', weight: '88-95' },
+        { size: 38, waist: '100-103', hip: '116-119', length: '106-108', weight: '95-103' },
+        { size: 40, waist: '106-109', hip: '122-125', length: '106-108', weight: '106-112' },
+        { size: 42, waist: '112-115', hip: '128-131', length: '106-108', weight: '112-120' },
+        { size: 44, waist: '118-121', hip: '134-137', length: '106-108', weight: '120-130' }
+      ]
+    },
+    fullGuideUrl: '/size-guide.html'
+  };
   let aiConfig = null;            // { enabled, apiKey, textModel, visionModel, reasoningModel, systemPrompt, adminSystemPrompt, features }
   let chatHistory = [];           // [{role, content}]
   let isWaiting = false;
@@ -358,6 +398,7 @@
       storeName: 'Tiger Jeans',
       storeUrl: location.origin,
       currentPage: location.pathname,
+      sizeGuide: SIZE_GUIDE_DATA,
       cart: cart.map(c => ({
         name: c.name,
         price: c.price,
@@ -467,32 +508,44 @@
     return `أنت "تايجر AI" — المساعد الذكي الرسمي لمتجر Tiger Jeans (تايجر جينز) — متجر بناطيل جينز وملابس عصرية في مصر.
 
 ## مهمتك:
-مساعدة العميل في:
-1. البحث عن المنتجات والترشيح الذكي حسب احتياجه (مقاس، لون، مناسبة، ميزانية، أسلوب).
+1. البحث عن المنتجات والترشيح الذكي حسب احتياج العميل (مقاس، لون، مناسبة، ميزانية، أسلوب).
 2. الإجابة عن أسئلة المنتجات (المواصفات، المقاسات، الألوان، التوفر، السعر).
-3. اقتراح إطلالات كاملة (بنطلون + قميص + حذاء + إكسسوار) من المنتجات المتوفرة فقط.
-4. خدمة العملاء: الشحن، الدفع، الاستبدال والاسترجاع، تتبع الطلب، طرق الدفع المتاحة.
-5. اقتراح المقاس المناسب بناءً على الطول والوزن والعمر وشكل الجسم.
-6. مقارنة المنتجات إذا طلب العميل ذلك.
-7. ترشيح منتجات مكملة للسلة لزيادة قيمة الطلب (Cross-sell).
+3. اقتراح إطلالات كاملة من المنتجات المتوفرة فقط.
+4. خدمة العملاء: الشحن، الدفع، الاستبدال والاسترجاع، تتبع الطلب.
+5. اقتراح المقاس المناسب بناءً على جدول sizeGuide الموجود في السياق (وليس تخمينًا).
+6. مقارنة المنتجات وترشيح منتجات مكملة عند الحاجة.
 
-## القواعد الصارمة:
+## أسلوب الرد (مهم جداً):
+- كن مختصراً ومباشراً. رد بقد ما يحتاج السؤال بالظبط، بدون حشو أو مقدمات أو تكرار.
+- نظّم الرد بوضوح: نقاط أو قوائم قصيرة بدل فقرات طويلة، خصوصاً عند ترشيح أكثر من منتج.
+- لا تكرر نفس المعلومة مرتين، ولا تضيف جملة ختامية عامة إلا لو فيها فايدة فعلية (مثل سؤال متابعة قصير).
+- ردودك بالعربية المصرية الواضحة، ودودة ومهنية، بدون رموز تعبيرية زايدة.
+- لا تفترض جنس العميل أبداً. خاطبه بصيغة عامة محايدة (زي "حضرتك")، وتجنب صيغ الفعل أو الصفة المخصصة لجنس معين (مثل "عايز/عايزة"، "تقدر/تقدري"، "متأكد/متأكدة"). لو محتاج فعل مضارع للمخاطب، اختار صياغة تصلح للجميع أو أعد صياغة الجملة بدون توجيه مباشر للجنس.
+
+## قواعد المقاسات (إلزامية):
+- اعتمد فقط على بيانات sizeGuide في السياق (جداول جينز عادي، Slim Fit، وايد ليج) لتحديد المقاس المناسب حسب محيط الوسط/الأرداف أو الوزن اللي يذكره العميل.
+- لا تخترع أرقام مقاسات أو قياسات غير موجودة في sizeGuide.
+- اربط المقاس المقترح بما هو متاح فعلاً في stockAvailable لنفس المنتج، ولو مش متوفر بلغ العميل واقترح مقاس بديل متاح.
+- لو العميل عايز تفاصيل أدق، وجّهه لرابط دليل المقاسات الكامل: ${location.origin}/size-guide.html
+
+## قواعد الروابط (إلزامية — لا استثناء):
+- لكل منتج تترشحه، لازم تكتب رابط قابل للنقر بصيغة Markdown بالظبط: [اسم المنتج](${location.origin}/product.html?id=ID)
+- استخدم فقط قيمة id الحقيقية الموجودة في بيانات المنتج بالسياق (products[].id). ممنوع اختراع id أو كتابة رابط بدون id أو كتابة رابط كنص عادي بدون صيغة [نص](رابط).
+- ممنوع نهائياً كتابة أي رابط لمنتج غير موجود في السياق.
+
+## القواعد العامة:
 - ابحث دائماً في products الموجودة في السياق ولا تخترع منتجات غير موجودة.
-- اذكر السعر بصيغة: "X ج.م" فقط من بيانات المنتج.
-- لا تذكر أبداً: تكلفة المنتج (costPrice)، أرباح المتجر، بيانات العملاء الآخرين، معلومات الطلبات الداخلية، إعدادات الأدمن، أو أي بيانات إدارية.
-- إذا لم تجد المنتج المطلوب، اعتذر بأدب واعرض بدائل متوفرة.
-- إذا سأل العميل عن شيء غير متوفر في السياق، اعتذر بصدق ولا تخمن.
-- لكل منتج تترشحه، اذكر: الاسم + السعر + المقاسات المتاحة + الألوان + رابط المنتج product.html?id=ID.
-- ردودك يجب أن تكون بالعربية المصرية الواضحة، ودودة ومهنية.
-- استخدم Markdown (عناوين، قوائم، تنسيق) لجعل الرد مقروءاً.
+- اذكر السعر بصيغة "X ج.م" فقط من بيانات المنتج.
+- لا تذكر أبداً: تكلفة المنتج (costPrice)، أرباح المتجر، بيانات العملاء الآخرين، معلومات الطلبات الداخلية، إعدادات الأدمن.
+- إذا لم تجد المنتج المطلوب أو المعلومة، اعتذر بإيجاز واعرض بديل متاح إن وجد، ولا تخمن.
+- استخدم Markdown بسيط (قوائم، **تركيز**) لتنظيم الرد فقط عند الحاجة الفعلية.
 - لا تذكر أبداً أنك نموذج لغوي أو AI — أنت مساعد المتجر.
 - إذا أرفق العميل صورة، حللها وابحث عن منتجات مشابهة في المتجر.
 
 ## معلومات المتجر:
-- الاسم: Tiger Jeans (تايجر جينز)
-- الدولة: مصر
+- الاسم: Tiger Jeans (تايجر جينز) — مصر
 - الشحن: لجميع محافظات مصر
-- طرق الدفع: فودافون كاش، انستاباي، الدفع عند الاستلام، بطاقات الهدايا
+- طرق الدفع (اذكرها دائماً بهذا الترتيب وبدون إضافة أو حذف): الدفع عند الاستلام، الدفع بإنستاباي، الدفع بفودافون كاش، الدفع ببطاقة الهدايا.
 - سياسة الاسترجاع: 14 يوم من الاستلام`;
 
   }
@@ -547,7 +600,7 @@
 ${JSON.stringify(context).slice(0, 50000)}
 \`\`\`
 
-استخدم هذا السياق للإجابة على سؤال العميل. إذا كنت ستذكر منتج، اذكر id الخاص به لإنشاء رابط صحيح.`
+استخدم هذا السياق فقط للإجابة. لأي منتج تذكره اكتب رابطه بصيغة [اسم المنتج](${location.origin}/product.html?id=ID) باستخدام id الحقيقي من products، ولأي سؤال عن المقاس ارجع لبيانات sizeGuide.`
     };
 
     // User message
@@ -959,6 +1012,13 @@ ${JSON.stringify(context).slice(0, 50000)}
     html = html.replace(/^\d+\.\s+(.+)$/gm, '<li class="ol-item">$1</li>');
     // Links [text](url)
     html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+    // Fallback: autolink any remaining bare URLs (not already inside an <a> tag)
+    html = html.replace(/(^|[^"'>])(https?:\/\/[^\s<]+)/g, (m, pre, url) => {
+      // Trim trailing punctuation that isn't part of the URL
+      const clean = url.replace(/[).,;:!?]+$/, '');
+      const trail = url.slice(clean.length);
+      return `${pre}<a href="${clean}" target="_blank" rel="noopener">${clean}</a>${trail}`;
+    });
     // Paragraphs
     html = html.split(/\n\n+/).map(block => {
       if (block.startsWith('<') || block.trim() === '') return block;
@@ -1087,6 +1147,20 @@ ${JSON.stringify(context).slice(0, 50000)}
   }
 
   // ========= Send Message =========
+  // ========= Fixed Payment-Methods Reply =========
+  function isPaymentMethodsQuestion(text) {
+    if (!text) return false;
+    return /طرق\s*الدفع|وسائل\s*الدفع|وسيلة\s*الدفع|طريقة\s*الدفع|إزاي\s*(ا)?دفع|ازاي\s*(ا)?دفع|إمكانية\s*الدفع|امكانية\s*الدفع|الدفع\s*متاح|بتقبلوا\s*ايه|هدفع\s*ازاي/i.test(text);
+  }
+
+  function getPaymentMethodsReply() {
+    return `**طرق الدفع المتاحة في Tiger Jeans:**
+- الدفع عند الاستلام
+- الدفع بإنستاباي
+- الدفع بفودافون كاش
+- الدفع ببطاقة الهدايا`;
+  }
+
   async function sendMessage() {
     if (isWaiting) return;
     const text = textarea.value.trim();
@@ -1121,6 +1195,19 @@ ${JSON.stringify(context).slice(0, 50000)}
     if (text) {
       chatHistory.push({ role: 'user', content: text });
       saveHistory();
+    }
+
+    // Fixed canned answer for payment-method questions (customer mode only)
+    if (!isAdminMode && !attachedImage && isPaymentMethodsQuestion(text)) {
+      textarea.value = '';
+      autoResize();
+      attachedImage = null;
+      renderAttachRow();
+      const fixedReply = getPaymentMethodsReply();
+      chatHistory.push({ role: 'assistant', content: fixedReply });
+      saveHistory();
+      addAiMessage(fixedReply, false);
+      return;
     }
 
     textarea.value = '';
