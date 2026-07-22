@@ -567,10 +567,11 @@
 - كتابة أوصاف منتجات و SEO، واقتراح أسعار وعروض وتحسينات لزيادة الأرباح.
 
 ## قواعد استدعاء الوظائف (إلزامية):
-- أي طلب لتنفيذ عملية فعلية (تعديل، حذف، تفعيل/تعطيل، إرسال، إنشاء) يجب أن يتم فقط عن طريق استدعاء الأداة (tool) المناسبة، وليس بمجرد كتابة أنك نفذتها.
-- لو المعلومة الناقصة لتنفيذ العملية غير موجودة (مثل id منتج غير معروف)، اسأل الأدمن يحددها أو ابحث عنها في products/orders الموجودة بالسياق أولاً.
+- أي طلب لتنفيذ عملية فعلية (تعديل، حذف، تفعيل/تعطيل، إرسال، إنشاء) يجب أن يتم فقط عن طريق استدعاء الأداة (tool) المناسبة فعلياً في نفس الرد — وليس بمجرد كتابة أنك نفذتها.
+- ممنوع منعاً باتاً كتابة عبارات مثل "تم التنفيذ" أو "تم الحذف" أو "تم التعديل" أو أي جملة توحي بحدوث تغيير في قاعدة البيانات إلا إذا استدعيت الأداة الحقيقية المطابقة في نفس الرد. الرد النصي فقط بدون استدعاء أداة = العملية لم تحدث إطلاقاً ولازم تقولها صراحة كده.
+- لو الأدمن طلب عملية تنفيذية، استدعِ الأداة المناسبة فوراً في هذا الرد بدل ما ترد بجملة تصف إنك هتنفذ أو نفذت.
+- لو المعلومة الناقصة لتنفيذ العملية غير موجودة (مثل id منتج غير معروف)، اسأل الأدمن يحددها أو ابحث عنها في products/orders الموجودة بالسياق أولاً، ولا تستدعِ الأداة بمعطيات ناقصة أو مخترعة.
 - بعض العمليات (الحذف والإجراءات النهائية) تتطلب تأكيد صريح من الأدمن قبل التنفيذ — هذا مُدار تلقائياً بواسطة النظام بعد استدعائك للأداة، فلا داعي تطلب التأكيد بنفسك نصياً.
-- لا تخترع بيانات أو نتائج عمليات لم تُنفذ فعلياً عبر tool.
 - لو العملية المطلوبة مش من ضمن الأدوات المتاحة لك، أخبر الأدمن بصراحة إنها غير مدعومة حالياً بدل ما تتظاهر بالتنفيذ.
 
 ## قواعد عامة:
@@ -1529,6 +1530,27 @@ ${JSON.stringify(context).slice(0, 50000)}
 - الدفع ببطاقة الهدايا`;
   }
 
+  // ========= Admin Action-Intent Guard =========
+  // Detects if the admin's message is asking for an actual write/delete/toggle
+  // action (as opposed to a question or report request), so we can force the
+  // model to use a real tool call instead of just describing it in text.
+  function looksLikeAdminActionRequest(text) {
+    if (!text) return false;
+    return /احذف|امسح|إحذف|عدّل|عدل|غيّر|غير سعر|غير حالة|حدّث|حدث السعر|فعّل|فعل|عطّل|عطل|أوقف|وقف تشغيل|شغّل|شغل|ابعت اشعار|ارسل اشعار|أرسل إشعار|أضف كود|ضيف كود|انشئ كود|أنشئ كود|جمّد|جمد|فك تجميد|إخفاء المنتج|اخفاء المنتج|إظهار المنتج|اظهار المنتج|زود المخزون|قلل المخزون|عدل المخزون|حدث المخزون/i.test(text);
+  }
+
+  // If the model claims an action happened ("تم التنفيذ"/"تم الحذف"/...) without
+  // actually calling a tool, that claim is false — the DB was never touched.
+  const FALSE_COMPLETION_RE = /تم\s*(التنفيذ|الحذف|التعديل|التحديث|التفعيل|التعطيل|الإرسال|الارسال|الإنشاء|الانشاء|التغيير|الإخفاء|الاخفاء|الإظهار|الاظهار|التجميد)/;
+
+  function guardFalseCompletion(text, wasActionRequest, hadToolCalls) {
+    if (!wasActionRequest || hadToolCalls) return text;
+    if (FALSE_COMPLETION_RE.test(text)) {
+      return 'لسه محصلش أي تغيير فعلي في قاعدة البيانات. حاول تحدد العملية بشكل أوضح (مثلاً: اسم/id المنتج، القيمة الجديدة بالظبط) وهنفذها فعلياً عن طريق الأداة المناسبة.';
+    }
+    return text;
+  }
+
   // Runs after the model requests one or more tool calls in admin mode.
   // Safe/reversible tools execute immediately and the result is fed back to
   // the model for a final natural-language reply. Dangerous tools (delete
@@ -1729,17 +1751,40 @@ ${JSON.stringify(context).slice(0, 50000)}
 
     try {
       const { messages } = await buildMessages(text, currentImage);
+      const isActionRequest = isAdminMode && looksLikeAdminActionRequest(text);
 
-      const result = await callNvidiaAPI({
-        apiKey: aiConfig.apiKey,
-        model,
-        messages,
-        temperature: 0.6,
-        maxTokens: 1500,
-        topP: 0.95,
-        stream: false,
-        tools: isAdminMode ? ADMIN_TOOLS : null
-      });
+      let result;
+      try {
+        result = await callNvidiaAPI({
+          apiKey: aiConfig.apiKey,
+          model,
+          messages,
+          temperature: 0.6,
+          maxTokens: 1500,
+          topP: 0.95,
+          stream: false,
+          tools: isAdminMode ? ADMIN_TOOLS : null,
+          // Force an actual tool call for clear action requests instead of
+          // letting the model just describe doing it in text.
+          toolChoice: isActionRequest ? 'required' : null
+        });
+      } catch (forceErr) {
+        // Some hosted models reject tool_choice:"required" — retry with "auto".
+        if (isActionRequest) {
+          result = await callNvidiaAPI({
+            apiKey: aiConfig.apiKey,
+            model,
+            messages,
+            temperature: 0.6,
+            maxTokens: 1500,
+            topP: 0.95,
+            stream: false,
+            tools: ADMIN_TOOLS
+          });
+        } else {
+          throw forceErr;
+        }
+      }
 
       hideTyping();
 
@@ -1750,6 +1795,7 @@ ${JSON.stringify(context).slice(0, 50000)}
         if (!content) {
           content = 'معلش، ماقدرتش أجيب رد. حاول مرة تانية بصيغة مختلفة.';
         }
+        content = guardFalseCompletion(content, isActionRequest, false);
         addAiMessage(content, true, result.reasoning || '');
       }
     } catch (err) {
