@@ -199,7 +199,7 @@
   // Docs: https://docs.api.nvidia.com/nim/reference
   // OpenAI-compatible endpoint at https://integrate.api.nvidia.com/v1/chat/completions
 
-  const NVIDIA_BASE = 'https://integrate.api.nvidia.com/v1';
+  const NVIDIA_BASE = 'https://tigerorder.studegy10.workers.dev/v1';
 
   /**
    * Calls NVIDIA NIM chat completions API.
