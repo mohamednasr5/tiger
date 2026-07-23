@@ -1186,7 +1186,7 @@ ${JSON.stringify(context).slice(0, 50000)}
   }
 
   // ========= UI: Render =========
-  let root, launcher, panel, messagesEl, textarea, sendBtn, attachInput, attachRow;
+  let root, launcher, panel, messagesEl, textarea, sendBtn, attachInput, attachRow, modeRow;
   let dropZone = null; // the × drop target shown on long-press
 
   function injectStylesheet() {
@@ -1240,6 +1240,7 @@ ${JSON.stringify(context).slice(0, 50000)}
         <div class="tj-ai-messages" id="tjAiMessages"></div>
 
         <div class="tj-ai-input-wrap">
+          <div class="tj-ai-mode-row" id="tjAiModeRow"></div>
           <div class="tj-ai-input-attach-row" id="tjAiAttachRow"></div>
           <div class="tj-ai-input-row">
             <textarea id="tjAiTextarea" placeholder="اكتب سؤالك أو ارفع صورة..." rows="1"></textarea>
@@ -1261,6 +1262,7 @@ ${JSON.stringify(context).slice(0, 50000)}
     sendBtn = root.querySelector('#tjAiSend');
     attachInput = root.querySelector('#tjAiFile');
     attachRow = root.querySelector('#tjAiAttachRow');
+    modeRow = root.querySelector('#tjAiModeRow');
     dropZone = root.querySelector('#tjAiDropZone');
 
     // Customize quick prompts for admin mode
@@ -1274,6 +1276,25 @@ ${JSON.stringify(context).slice(0, 50000)}
         <button class="tj-ai-quick-chip" data-prompt="احسبلي إجمالي الأرباح وصافي الربح"><i class='bx bx-wallet'></i> الأرباح</button>
         <button class="tj-ai-quick-chip" data-prompt="اكتبلي وصف SEO لمنتج جينز رجالي كلاسيك"><i class='bx bx-pencil'></i> توليد وصف</button>
       `;
+
+      // Two ready-made mode buttons: "سؤال" just fills the box with a
+      // question prefix (plain text answer, no DB access). "نفذ" fills it
+      // with the exact word the Explicit Execute Gate looks for, which is
+      // what actually unlocks real tool calls for that message (see
+      // hasExplicitExecuteCommand / EXECUTE_WORDS above). Neither button
+      // sends the message — the admin types the rest, then sends manually.
+      modeRow.innerHTML = `
+        <button type="button" class="tj-ai-mode-btn tj-ai-mode-question" id="tjAiModeQuestion" title="سؤال بدون أي تعديل على البيانات">
+          <i class='bx bx-help-circle'></i> سؤال
+        </button>
+        <button type="button" class="tj-ai-mode-btn tj-ai-mode-execute" id="tjAiModeExecute" title="طلب تنفيذ عملية فعلية على قاعدة البيانات">
+          <i class='bx bx-bolt-circle'></i> نفذ
+        </button>
+      `;
+      const modeQuestionBtn = modeRow.querySelector('#tjAiModeQuestion');
+      const modeExecuteBtn = modeRow.querySelector('#tjAiModeExecute');
+      modeQuestionBtn.addEventListener('click', () => setModePrefix('سؤال', modeQuestionBtn));
+      modeExecuteBtn.addEventListener('click', () => setModePrefix('نفذ', modeExecuteBtn));
     }
 
     bindEvents();
@@ -1526,6 +1547,26 @@ ${JSON.stringify(context).slice(0, 50000)}
   function autoResize() {
     textarea.style.height = 'auto';
     textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+  }
+
+  // Puts "سؤال: " or "نفذ: " at the start of the textarea so the admin can
+  // type the request right after it, then send manually. If the box already
+  // has one of these prefixes (or the admin switches from one mode to the
+  // other), it's swapped out instead of stacked, and whatever the admin had
+  // already typed after it is preserved.
+  const MODE_PREFIX_RE = /^(?:سؤال|نفذ)\s*:\s*/;
+  function setModePrefix(word, btn) {
+    const rest = textarea.value.replace(MODE_PREFIX_RE, '');
+    textarea.value = word + ': ' + rest;
+    autoResize();
+    textarea.focus();
+    const pos = textarea.value.length;
+    textarea.setSelectionRange(pos, pos);
+
+    if (modeRow) {
+      modeRow.querySelectorAll('.tj-ai-mode-btn').forEach(b => b.classList.remove('active'));
+    }
+    if (btn) btn.classList.add('active');
   }
 
   async function showWelcomeMessage() {
@@ -2013,6 +2054,7 @@ ${JSON.stringify(context).slice(0, 50000)}
 
     textarea.value = '';
     autoResize();
+    clearModeActive();
     const currentImage = attachedImage;
     attachedImage = null;
     renderAttachRow();
@@ -2094,7 +2136,12 @@ ${JSON.stringify(context).slice(0, 50000)}
     chatHistory = [];
     sessionStorage.removeItem(TIGER_AI_HISTORY_KEY);
     messagesEl.innerHTML = '';
+    clearModeActive();
     showWelcomeMessage();
+  }
+
+  function clearModeActive() {
+    if (modeRow) modeRow.querySelectorAll('.tj-ai-mode-btn').forEach(b => b.classList.remove('active'));
   }
 
   function saveHistory() {

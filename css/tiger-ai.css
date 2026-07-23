@@ -450,6 +450,35 @@
   flex-wrap:wrap;
 }
 .tj-ai-input-attach-row.show{display:flex}
+
+/* Admin-only "سؤال" / "نفذ" mode buttons above the input box */
+.tj-ai-mode-row{
+  display:flex;
+  gap:.5rem;
+  margin-bottom:.6rem;
+}
+.tj-ai-mode-row:empty{display:none;margin-bottom:0}
+.tj-ai-mode-btn{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.35rem;
+  padding:.5rem .7rem;
+  border-radius:10px;
+  border:1px solid var(--line,#2a2a30);
+  background:var(--surface,#161619);
+  color:var(--text,#fff);
+  font-size:.8rem;
+  font-weight:700;
+  cursor:pointer;
+  transition:.2s;
+}
+.tj-ai-mode-btn i{font-size:1.05rem}
+.tj-ai-mode-question:hover{border-color:#4da3ff;color:#4da3ff;background:rgba(77,163,255,.12)}
+.tj-ai-mode-question.active{border-color:#4da3ff;color:#4da3ff;background:rgba(77,163,255,.15)}
+.tj-ai-mode-execute:hover{border-color:var(--gold,#d4af37);color:var(--gold,#d4af37);background:rgba(212,175,55,.12)}
+.tj-ai-mode-execute.active{border-color:var(--gold,#d4af37);color:var(--gold,#d4af37);background:rgba(212,175,55,.15)}
 .tj-ai-attach-pill{
   display:flex;
   align-items:center;
