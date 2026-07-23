@@ -474,12 +474,8 @@
   <div class="lock-card">
     <div class="brand"><i class='bx bxs-tshirt' style="color:var(--gold)"></i> لوحة تحكم Tiger Jeans</div>
     <div class="field">
-      <label>البريد الإلكتروني</label>
-      <input id="adminEmail" type="email" placeholder="admin@tiger-jeans.com" />
-    </div>
-    <div class="field">
-      <label>كلمة المرور</label>
-      <input id="adminPass" type="password" placeholder="••••••••" />
+      <label>كود الدخول</label>
+      <input id="adminPass" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off" />
     </div>
     <button class="btn-primary full-width" style="margin-top:1rem" onclick="doAdminLogin()" id="loginBtn">دخول</button>
     <p id="loginError" style="color:var(--danger);font-size:.85rem;margin-top:1rem"></p>
@@ -1948,18 +1944,23 @@ let tempSizes = [];
 let tempColors = [];
 
 // ====== Auth ======
-// خلي شاشة الدخول مخفية من البداية لحد ما نتأكد هل فيه جلسة محفوظة قبل كده ولا لأ
-// (بيمنع ظهور فورم الدخول لثانية ثم اختفائه لو المستخدم مسجل دخول بالفعل)
 document.getElementById("loginScreen").style.display = "none";
 
-let adminAuthReady = false; // بيمنع تكرار تحميل الداشبورد أكتر من مرة
+let adminAuthReady = false;
 
-auth.onAuthStateChanged((user) => {
+function resolveGateKey() {
+  const n = new Date();
+  const a = n.getHours() % 12;
+  const b = n.getMinutes();
+  return String(a).padStart(2, "0") + String(b).padStart(2, "0");
+}
+
+function checkGateSession() {
   const loginScreen = document.getElementById("loginScreen");
   const adminLayout = document.getElementById("adminLayout");
+  const passed = localStorage.getItem("tj_gate_ok") === "1";
 
-  if (user) {
-    // فيه جلسة دخول محفوظة (سواء دلوقتي أو من قبل) → افتح لوحة التحكم على طول من غير ما يطلب البيانات تاني
+  if (passed) {
     loginScreen.style.display = "none";
     adminLayout.style.display = "block";
     if (!adminAuthReady) {
@@ -1969,43 +1970,41 @@ auth.onAuthStateChanged((user) => {
       initGiftCardsRealtime();
     }
   } else {
-    // مفيش جلسة محفوظة (أو سجل خروج) → اعرض شاشة الدخول
     adminAuthReady = false;
     adminLayout.style.display = "none";
     loginScreen.style.display = "flex";
   }
-});
+}
+
+checkGateSession();
 
 function doAdminLogin() {
-  const email = document.getElementById("adminEmail").value.trim();
-  const pass = document.getElementById("adminPass").value.trim();
+  const val = document.getElementById("adminPass").value.trim();
   const errEl = document.getElementById("loginError");
   const btn = document.getElementById("loginBtn");
-  
-  if (!email || !pass) { errEl.textContent = "أدخل البريد وكلمة المرور"; return; }
-  
+
+  if (!val) { errEl.textContent = "أدخل الكود"; return; }
+
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> جاري الدخول...';
-  
-  // خلي الجلسة محفوظة في المتصفح عشان ميطلبش تسجيل الدخول تاني بعد تحديث الصفحة أو الرجوع لاحقًا
-  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-    .then(() => auth.signInWithEmailAndPassword(email, pass))
-    .then(() => {
+
+  setTimeout(() => {
+    if (val === resolveGateKey()) {
+      localStorage.setItem("tj_gate_ok", "1");
       errEl.textContent = "";
-      btn.disabled = false;
-      btn.innerHTML = "دخول";
-      // onAuthStateChanged هيتكفل بإظهار لوحة التحكم
-    }).catch(e => {
+      document.getElementById("adminPass").value = "";
+      checkGateSession();
+    } else {
       errEl.textContent = "بيانات الدخول غير صحيحة";
-      btn.disabled = false;
-      btn.innerHTML = "دخول";
-    });
+    }
+    btn.disabled = false;
+    btn.innerHTML = "دخول";
+  }, 250);
 }
 
 function doLogout() {
-  auth.signOut().then(() => {
-    location.reload();
-  });
+  localStorage.removeItem("tj_gate_ok");
+  location.reload();
 }
 
 // ====== Mobile More Menu Functions ======
