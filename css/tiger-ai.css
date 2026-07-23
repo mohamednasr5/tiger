@@ -277,34 +277,7 @@
 .tj-ai-msg-bubble ol{margin:.4rem 0;padding-right:1.2rem}
 .tj-ai-msg-bubble li{margin-bottom:.25rem}
 .tj-ai-msg-bubble strong{color:var(--gold,#d4af37);font-weight:700}
-.tj-ai-msg-bubble a{color:#2f8fff;text-decoration:underline;font-weight:600}
-.tj-ai-msg-bubble a:hover{color:#1a73e8}
-
-/* Admin tool confirmation card */
-.tj-ai-confirm-card{
-  display:flex;flex-direction:column;gap:.6rem;
-  background:rgba(255,145,0,.08);
-  border:1px solid rgba(255,145,0,.35);
-  border-radius:12px;
-  padding:.9rem 1rem;
-}
-.tj-ai-confirm-card.tj-ai-confirm-done{background:rgba(46,204,113,.08);border-color:rgba(46,204,113,.35)}
-.tj-ai-confirm-card.tj-ai-confirm-cancelled{background:rgba(150,150,150,.08);border-color:rgba(150,150,150,.3)}
-.tj-ai-confirm-icon{font-size:1.4rem;color:#ff9100;line-height:1}
-.tj-ai-confirm-card.tj-ai-confirm-done .tj-ai-confirm-icon{color:#2ecc71}
-.tj-ai-confirm-card.tj-ai-confirm-cancelled .tj-ai-confirm-icon{color:#9a9a9a}
-.tj-ai-confirm-text b{display:block;margin-bottom:.2rem;font-size:.92rem}
-.tj-ai-confirm-text p{margin:0;font-size:.85rem;opacity:.85;line-height:1.6}
-.tj-ai-confirm-actions{display:flex;gap:.6rem}
-.tj-ai-confirm-btn{
-  flex:1;padding:.55rem .8rem;border-radius:8px;border:none;cursor:pointer;
-  font-size:.85rem;font-weight:700;transition:.15s;
-}
-.tj-ai-confirm-yes{background:#e04545;color:#fff}
-.tj-ai-confirm-yes:hover{background:#c93a3a}
-.tj-ai-confirm-no{background:rgba(255,255,255,.08);color:inherit}
-.tj-ai-confirm-no:hover{background:rgba(255,255,255,.14)}
-.tj-ai-confirm-btn:disabled{opacity:.5;cursor:not-allowed}
+.tj-ai-msg-bubble a{color:var(--gold,#d4af37);text-decoration:underline}
 .tj-ai-msg-bubble code{
   background:rgba(0,0,0,.3);
   padding:.1rem .35rem;
