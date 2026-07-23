@@ -883,7 +883,7 @@ ${JSON.stringify(SIZE_GUIDE_DATA, null, 2)}
   function togglePanel() {
     if (!panel || !launcher) return;
     
-    const isOpen = panel.classList.contains('tj-ai-open');
+    const isOpen = panel.classList.contains('show');
     if (isOpen) {
       closePanel();
     } else {
@@ -894,7 +894,7 @@ ${JSON.stringify(SIZE_GUIDE_DATA, null, 2)}
   function openPanel() {
     if (!panel || !launcher) return;
     
-    panel.classList.add('tj-ai-open');
+    panel.classList.add('show');
     launcher.classList.add('tj-ai-active');
     sessionStorage.setItem(TIGER_AI_OPEN_KEY, '1');
     
@@ -907,7 +907,7 @@ ${JSON.stringify(SIZE_GUIDE_DATA, null, 2)}
   function closePanel() {
     if (!panel || !launcher) return;
     
-    panel.classList.remove('tj-ai-open');
+    panel.classList.remove('show');
     launcher.classList.remove('tj-ai-active');
     sessionStorage.setItem(TIGER_AI_OPEN_KEY, '0');
   }
