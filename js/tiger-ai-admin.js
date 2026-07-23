@@ -314,8 +314,11 @@ async function generateProductDescriptionAI() {
     return;
   }
 
-  if (!AI_CONFIG.nvidiaApiKey) {
-    if (typeof showToast === 'function') showToast('⚠️ فعّل ذكاء Tiger AI وأدخل مفتاح NVIDIA من إعدادات الذكاء الاصطناعي أولاً');
+  // Reuse the same NVIDIA calling helper the customer-facing chat assistant
+  // uses (js/tiger-ai.js) instead of hitting the Worker directly — it already
+  // knows the correct Worker URL and handles non-JSON/error responses safely.
+  if (!window.TigerAI || typeof window.TigerAI.callNvidiaAPI !== 'function') {
+    if (typeof showToast === 'function') showToast('⚠️ وحدة الذكاء الاصطناعي لم تُحمَّل بعد، حدّث الصفحة وحاول مرة أخرى');
     return;
   }
 
@@ -339,30 +342,19 @@ async function generateProductDescriptionAI() {
 - لا تكرر اسم المنتج أكثر من مرتين.`;
 
   try {
-    const response = await fetch(`${getWorkerUrl()}/v1/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${AI_CONFIG.nvidiaApiKey}`
-      },
-      body: JSON.stringify({
-        model: AI_CONFIG.textModel || AI_DEFAULTS.textModel,
-        messages: [
-          { role: 'system', content: 'أنت خبير كتابة محتوى تسويقي وتحسين محركات البحث (SEO) لمتاجر الملابس الإلكترونية باللغة العربية.' },
-          { role: 'user', content: prompt }
-        ],
-        max_tokens: 350,
-        temperature: 0.7
-      })
+    const result = await window.TigerAI.callNvidiaAPI({
+      apiKey: AI_CONFIG.nvidiaApiKey || undefined, // optional — the Worker falls back to its own secret key if omitted
+      model: AI_CONFIG.textModel || AI_DEFAULTS.textModel,
+      messages: [
+        { role: 'system', content: 'أنت خبير كتابة محتوى تسويقي وتحسين محركات البحث (SEO) لمتاجر الملابس الإلكترونية باللغة العربية.' },
+        { role: 'user', content: prompt }
+      ],
+      maxTokens: 350,
+      temperature: 0.7,
+      stream: false
     });
 
-    if (!response.ok) throw new Error(`فشل الاتصال بخدمة الذكاء الاصطناعي (${response.status})`);
-
-    const data = await response.json();
-    const text = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content
-      ? data.choices[0].message.content.trim()
-      : '';
-
+    const text = (result && result.content ? result.content : '').trim();
     if (!text) throw new Error('لم يتم توليد أي نص، حاول مرة أخرى');
 
     descEl.value = text.replace(/^["'«»\s]+|["'«»\s]+$/g, '');
