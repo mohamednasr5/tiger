@@ -1569,6 +1569,16 @@ function closeAuthModal() {
   document.body.style.overflow = "";
 }
 
+// Other pages (e.g. gift-cards.html "تسجيل الدخول" link) redirect here with
+// ?auth=login when they need the login modal but don't have it themselves.
+document.addEventListener("DOMContentLoaded", () => {
+  if (new URLSearchParams(location.search).get("auth") === "login") {
+    openAuthModal();
+    // Clean the URL so a refresh doesn't keep forcing the modal open.
+    history.replaceState(null, "", location.pathname);
+  }
+});
+
 // Auth tabs
 document.querySelectorAll(".auth-tab").forEach(tab => {
   tab.addEventListener("click", () => {

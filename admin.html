@@ -50,7 +50,21 @@
   bottom:0;
   width:260px;
   z-index:200;
+  overflow:hidden;
 }
+.sidebar-brand{flex-shrink:0}
+.sidebar-nav{
+  flex:1 1 auto;
+  overflow-y:auto;
+  overflow-x:hidden;
+  scrollbar-width:thin;
+  scrollbar-color:var(--line) transparent;
+  padding-bottom:.5rem;
+}
+.sidebar-nav::-webkit-scrollbar{width:5px}
+.sidebar-nav::-webkit-scrollbar-thumb{background:var(--line);border-radius:10px}
+.sidebar-nav::-webkit-scrollbar-track{background:transparent}
+.admin-sidebar > div[style*="margin-top:auto"]{flex-shrink:0}
 .admin-main{
   margin-right:260px;
   padding:2rem;
@@ -145,7 +159,11 @@
 .kpi-card .kpi-value{font-size:1.8rem;font-weight:800;font-family:'Cairo',sans-serif;color:var(--gold)}
 
 /* Tables */
+.table-scroll{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .data-table{width:100%;border-collapse:collapse;margin-top:1rem}
+@media(max-width:1024px){
+  .data-table{min-width:720px}
+}
 .data-table th{
   text-align:right;
   color:var(--text-dim);
@@ -3766,6 +3784,17 @@ function addTelegramLog(message) {
 document.addEventListener('DOMContentLoaded', () => {
   loadTelegramSettings().then(() => {
     console.log('🐯 Telegram Bot settings loaded:', TELEGRAM_CONFIG);
+  });
+
+  // Wrap every data table in a horizontally-scrollable container so on
+  // mobile portrait users can swipe sideways to reach action buttons /
+  // receipt links instead of needing to rotate the phone to landscape.
+  document.querySelectorAll('table.data-table').forEach(table => {
+    if (table.parentElement && table.parentElement.classList.contains('table-scroll')) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'table-scroll';
+    table.parentNode.insertBefore(wrap, table);
+    wrap.appendChild(table);
   });
 });
 </script>
