@@ -593,6 +593,8 @@
 - كتابة أوصاف منتجات و SEO، واقتراح أسعار وعروض وتحسينات لزيادة الأرباح.
 
 ## قواعد استدعاء الوظائف (إلزامية):
+- استخدم الأدوات (function calling) فقط لتنفيذ عملية كتابة/تعديل/حذف/تفعيل فعلية صريحة طلبها الأدمن (مثال: "غيّر سعر..."، "احذف..."، "فعّل..."، "ابعت إشعار...").
+- ممنوع نهائياً استدعاء أي أداة لمجرد سؤال استرجاعي أو تحليلي أو تقرير (مثال: "اعرض ملخص الأداء"، "إيه أكتر المنتجات مبيعاً"، "قد إيه المخزون المتبقي"، "قارن بين..."). الأسئلة دي تُجاب فورًا بنص مباشر ومنظم (Markdown) من بيانات context الموجودة بالفعل (products/orders/stats/settings) — بدون أي استدعاء أداة إطلاقاً، حتى لو السؤال يبدأ بفعل أمر زي "اعرض" أو "وضّح".
 - أي طلب لتنفيذ عملية فعلية (تعديل، حذف، تفعيل/تعطيل، إرسال، إنشاء) يجب أن يتم فقط عن طريق استدعاء الأداة (tool) المناسبة فعلياً في نفس الرد — وليس بمجرد كتابة أنك نفذتها.
 - ممنوع منعاً باتاً كتابة عبارات مثل "تم التنفيذ" أو "تم الحذف" أو "تم التعديل" أو أي جملة توحي بحدوث تغيير في قاعدة البيانات إلا إذا استدعيت الأداة الحقيقية المطابقة في نفس الرد. الرد النصي فقط بدون استدعاء أداة = العملية لم تحدث إطلاقاً ولازم تقولها صراحة كده.
 - لو الأدمن طلب عملية تنفيذية، استدعِ الأداة المناسبة فوراً في هذا الرد بدل ما ترد بجملة تصف إنك هتنفذ أو نفذت.
@@ -1663,13 +1665,30 @@ ${JSON.stringify(context).slice(0, 50000)}
       });
     });
 
+    const followupMessages = [...priorMessages, assistantMsg, ...toolResultMsgs];
+
     if (depth >= 2) {
-      addAiMessage('تم تنفيذ العمليات المطلوبة.', true);
+      // Stop calling more tools and force a plain-text summary of whatever
+      // was gathered so far, instead of a hollow "تم التنفيذ" with no content.
+      try {
+        const finalCall = await callNvidiaAPI({
+          apiKey: aiConfig.apiKey,
+          model,
+          messages: followupMessages,
+          temperature: 0.6,
+          maxTokens: 1500,
+          topP: 0.95,
+          stream: false,
+          tools: null
+        });
+        addAiMessage((finalCall.content || '').trim() || 'تم تنفيذ العمليات المطلوبة.', true, finalCall.reasoning || '');
+      } catch (e) {
+        addAiMessage('تم تنفيذ العمليات المطلوبة.', true);
+      }
       return;
     }
 
     try {
-      const followupMessages = [...priorMessages, assistantMsg, ...toolResultMsgs];
       const followup = await callNvidiaAPI({
         apiKey: aiConfig.apiKey,
         model,
