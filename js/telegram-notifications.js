@@ -112,13 +112,17 @@ async function sendTelegramNotification(type, data) {
  * @param {object} orderData - بيانات الطلب
  */
 function notifyNewOrder(orderData) {
+  const customer = orderData.customer || {};
+  const payment = orderData.payment || {};
+  const paymentMethodValue = typeof orderData.payment === 'string' ? orderData.payment : payment.method;
+
   return sendTelegramNotification(TELEGRAM_NOTIFICATIONS.types.NEW_ORDER, {
-    orderId: orderData.id || orderData.orderId || `TJ-${Date.now()}`,
-    customerName: orderData.customerName || orderData.name || orderData.customer || 'عميل',
-    phone: orderData.phone || orderData.customerPhone || '',
-    city: orderData.city || orderData.governorate || '-',
+    orderId: orderData.orderCode || orderData.code || orderData.id || orderData.orderId || `TJ-${Date.now()}`,
+    customerName: orderData.customerName || orderData.name || customer.name || 'عميل',
+    phone: orderData.phone || orderData.customerPhone || customer.phone || '-',
+    city: orderData.city || orderData.governorate || customer.city || '-',
     total: orderData.total || orderData.amount || orderData.totalPrice || 0,
-    paymentMethod: orderData.paymentMethod || orderData.payment || '-',
+    paymentMethod: orderData.paymentMethod || paymentMethodValue || '-',
     items: orderData.items || orderData.products || [],
     notes: orderData.notes || orderData.comment || ''
   });
