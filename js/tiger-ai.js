@@ -1342,11 +1342,11 @@ ${JSON.stringify(SIZE_GUIDE_DATA, null, 2)}
 
     if (!currentUser) {
       // Not logged in - prompt to login
-      addBotMessage('🔐 **يرجى تسجيل الدخول أولاً**
+      addBotMessage(`🔐 **يرجى تسجيل الدخول أولاً**
 
 لتتبع طلباتك، يجب تسجيل الدخول إلى المتجر أولاً.
 
-هل تريد تسجيل الدخول الآن؟');
+هل تريد تسجيل الدخول الآن؟`);
       
       // Add login button suggestion
       setTimeout(() => {
@@ -1383,11 +1383,11 @@ ${JSON.stringify(SIZE_GUIDE_DATA, null, 2)}
     }
 
     if (!phoneNumber) {
-      addBotMessage('📱 **لم يتم العثور على رقم هاتف**
+      addBotMessage(`📱 **لم يتم العثور على رقم هاتف**
 
 لم نتمكن من العثور على رقم هاتف مربح بحسابك.
 
-يرجى إدخال رقم هاتفك لتتبع الطلبات:');
+يرجى إدخال رقم هاتفك لتتبع الطلبات:`);
       
       // Wait for user to enter phone
       waitForPhoneNumber();
@@ -1413,9 +1413,9 @@ ${JSON.stringify(SIZE_GUIDE_DATA, null, 2)}
  addUserMessage(phone);
         await searchAndDisplayOrders(phone);
       } else if (phone) {
-        addBotMessage('❌ **رقم هاتف غير صحيح**
+        addBotMessage(`❌ **رقم هاتف غير صحيح**
 
-يرجى إدخال رقم مصري صحيح (يبدأ بـ 01)');
+يرجى إدخال رقم مصري صحيح (يبدأ بـ 01)`);
       }
     };
     
@@ -1430,9 +1430,9 @@ ${JSON.stringify(SIZE_GUIDE_DATA, null, 2)}
     
     const db = getDb();
     if (!db) {
-      addBotMessage('❌ **خطأ في الاتصال بقاعدة البيانات**
+      addBotMessage(`❌ **خطأ في الاتصال بقاعدة البيانات**
 
-حاول مرة أخرى لاحقاً.');
+حاول مرة أخرى لاحقاً.`);
       return;
     }
 
@@ -1511,9 +1511,9 @@ ${JSON.stringify(SIZE_GUIDE_DATA, null, 2)}
       
     } catch (error) {
       console.error('[TigerAI] Error searching orders:', error);
-      addBotMessage('❌ **حدث خطأ أثناء البحث عن الطلبات**
+      addBotMessage(`❌ **حدث خطأ أثناء البحث عن الطلبات**
 
-حاول مرة أخرى لاحقاً.');
+حاول مرة أخرى لاحقاً.`);
     }
   }
 
@@ -1633,9 +1633,9 @@ ${JSON.stringify(SIZE_GUIDE_DATA, null, 2)}
         // Still build UI but show error state
         buildUI();
         if (messagesEl) {
-          addBotMessage('⚠️ **مشكلة في الاتصال**
+          addBotMessage(`⚠️ **مشكلة في الاتصال**
 
-تعذر الاتصال بخادم البيانات. تحقق من اتصال الإنترنت وحاول مرة أخرى.', true);
+تعذر الاتصال بخادم البيانات. تحقق من اتصال الإنترنت وحاول مرة أخرى.`, true);
         }
         return;
       }
