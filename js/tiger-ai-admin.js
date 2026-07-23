@@ -143,8 +143,8 @@
           seoGenerator: true
         },
         apiKey: sec.apiKey || '',
-        systemPrompt: sec.systemPrompt || DEFAULT_CUSTOMER_PROMPT,
-        adminSystemPrompt: sec.adminSystemPrompt || DEFAULT_ADMIN_PROMPT
+        systemPrompt: pub.systemPrompt || DEFAULT_CUSTOMER_PROMPT,
+        adminSystemPrompt: pub.adminSystemPrompt || DEFAULT_ADMIN_PROMPT
       };
 
       renderAiSettings(currentConfig);
@@ -159,12 +159,9 @@
     // Status pill
     const statusEl = document.getElementById('aiStatusPill');
     if (statusEl) {
-      if (cfg.enabled && cfg.apiKey) {
+      if (cfg.enabled) {
         statusEl.className = 'ai-status-pill ok';
         statusEl.innerHTML = '<i class=\'bx bx-check-circle\'></i> مُفعّل';
-      } else if (cfg.enabled && !cfg.apiKey) {
-        statusEl.className = 'ai-status-pill pending';
-        statusEl.innerHTML = '<i class=\'bx bx-error\'></i> يحتاج مفتاح API';
       } else {
         statusEl.className = 'ai-status-pill err';
         statusEl.innerHTML = '<i class=\'bx bx-x-circle\'></i> معطّل';
@@ -263,12 +260,9 @@
       }
     };
 
-    if (cfg.enabled && !cfg.apiKey) {
-      if (typeof showToast === 'function') showToast('أدخل مفتاح NVIDIA API أولاً');
-      return;
-    }
-
-    // Public part — no secrets, safe for all clients to read
+    // Public part — no real secrets, safe for all clients (including
+    // anonymous customers) to read. System prompts live here now so a
+    // customized customer-facing prompt actually reaches customers.
     const publicPart = {
       enabled: cfg.enabled,
       textModel: cfg.textModel,
@@ -277,14 +271,17 @@
       maxTokens: cfg.maxTokens,
       temperature: cfg.temperature,
       features: cfg.features,
+      systemPrompt: cfg.systemPrompt,
+      adminSystemPrompt: cfg.adminSystemPrompt,
       updatedAt: Date.now()
     };
 
-    // Secret part — admin only
+    // Secret part — admin-only. The API key here is optional and only used
+    // when testing a key from this panel; the key actually used for every
+    // real customer/admin chat lives server-side as a Worker secret
+    // (NVIDIA_API_KEY), never in Firebase.
     const secretPart = {
       apiKey: cfg.apiKey,
-      systemPrompt: cfg.systemPrompt,
-      adminSystemPrompt: cfg.adminSystemPrompt,
       updatedAt: Date.now()
     };
 
@@ -316,11 +313,6 @@
     const apiKey = (getVal('aiApiKey') || '').trim();
     const model = getVal('aiTextModel') || 'meta/llama-3.1-70b-instruct';
     const resultEl = document.getElementById('aiTestResult');
-
-    if (!apiKey) {
-      if (typeof showToast === 'function') showToast('أدخل مفتاح API أولاً');
-      return;
-    }
 
     resultEl.classList.remove('ok', 'err');
     resultEl.classList.add('show');

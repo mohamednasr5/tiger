@@ -17,10 +17,14 @@
   // (see images/logo.svg) plus a small "AI" badge, so the assistant reads
   // as "the brand + AI" instead of a generic bot icon everywhere it appears
   // (launcher, header avatar, message avatars).
-  const TIGER_AI_ICON_SVG = `<svg class="tj-ai-icon" viewBox="-3 -3 41 42" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-    <path d="M31.1473 13.5602L31.1255 13.5386C31.1238 13.5374 31.1224 13.5358 31.1215 13.5339L17.5006 0L3.87983 13.5335C3.87826 13.5351 3.8758 13.5382 3.8758 13.5382L3.85333 13.5599C1.77053 15.6409 0.447586 18.354 0.0948177 21.2679C-0.25795 24.1819 0.379698 27.1293 1.90639 29.6418C3.43309 32.1543 5.76122 34.0877 8.52069 35.1345C11.2802 36.1812 14.3126 36.2815 17.136 35.4191C17.3735 35.347 17.6275 35.347 17.8651 35.4191C20.6882 36.2812 23.7205 36.1809 26.4798 35.134C29.2391 34.087 31.567 32.1538 33.0936 29.6415C34.6202 27.1291 35.2579 24.1819 34.9053 21.2681C34.5526 18.3544 33.2299 15.6413 31.1473 13.5602ZM8.7232 22.4847C8.65689 22.5506 8.6043 22.6289 8.56844 22.7148C8.53256 22.8008 8.5141 22.8931 8.51412 22.9862C8.53835 25.3749 9.21776 27.7116 10.4792 29.7451C10.5079 29.7912 10.5211 29.8452 10.517 29.8992C10.513 29.9532 10.4918 30.0046 10.4566 30.046C10.4213 30.0874 10.3738 30.1166 10.3209 30.1295C10.2679 30.1425 10.2122 30.1385 10.1616 30.118C9.21332 29.7217 8.35182 29.1455 7.62531 28.4219C6.13646 26.9423 5.29946 24.9361 5.2981 22.8438C5.29675 20.7516 6.13117 18.7442 7.61812 17.2629L17.5006 7.44468L27.3826 17.2629C28.8698 18.7441 29.7045 20.7514 29.703 22.8438C29.7018 24.9361 28.8647 26.9423 27.3757 28.4219C26.6492 29.1455 25.7877 29.7217 24.8396 30.118C24.7889 30.1385 24.7332 30.1425 24.6802 30.1295C24.6273 30.1166 24.5798 30.0873 24.5445 30.046C24.5093 30.0046 24.488 29.9532 24.484 29.8991C24.4799 29.8451 24.4931 29.7911 24.5218 29.7449C25.7835 27.7116 26.4633 25.3749 26.4879 22.9862C26.4879 22.8931 26.4692 22.8008 26.4332 22.7147C26.3971 22.6285 26.3444 22.5504 26.2779 22.4845L21.6037 17.5584C21.557 17.5198 21.4985 17.4987 21.4378 17.4987C21.3773 17.4987 21.3186 17.5198 21.2721 17.5584C21.2255 17.5969 21.1942 17.6505 21.1833 17.7097C21.1724 17.769 21.1828 17.83 21.2127 17.8824C23.0281 21.1465 21.467 25.835 18.8637 28.4219L18.85 28.4355C18.4907 28.7887 18.0056 28.9867 17.5002 28.9865C16.9948 28.9863 16.5098 28.788 16.1508 28.4347L16.1382 28.4219C13.5339 25.835 11.9736 21.147 13.7893 17.8831C13.8192 17.8307 13.8296 17.7697 13.8187 17.7104C13.8079 17.6512 13.7764 17.5976 13.7299 17.5591C13.6834 17.5205 13.6247 17.4993 13.5642 17.4993C13.5036 17.4993 13.4449 17.5205 13.3984 17.5591L8.7232 22.4847Z" fill="#FF5151"/>
-    <circle cx="27.5" cy="28.5" r="7.6" fill="#0b0b0e" stroke="#FF5151" stroke-width="1.4"/>
-    <text x="27.5" y="31.2" text-anchor="middle" font-size="7.2" font-weight="800" font-family="Arial, Helvetica, sans-serif" fill="#FF5151">AI</text>
+  const TIGER_AI_ICON_SVG = `<svg class="tj-ai-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <circle cx="20" cy="20" r="18.6" fill="var(--surface,#161619)" stroke="var(--gold,#d4af37)" stroke-width="1.3"/>
+    <g stroke="var(--gold,#d4af37)" stroke-width="3" stroke-linecap="round" opacity="0.5">
+      <path d="M8.5 5 L13 35"/>
+      <path d="M17 4 L21.5 36"/>
+      <path d="M25.5 5 L30 35"/>
+    </g>
+    <text x="20" y="24.5" text-anchor="middle" font-size="12.5" font-weight="800" font-family="Arial, Helvetica, sans-serif" fill="var(--gold,#d4af37)" stroke="var(--bg,#0a0a0c)" stroke-width="2.4" paint-order="stroke" stroke-linejoin="round">AI</text>
   </svg>`;
   // Public path: readable by all clients (just enabled flag + model names + features)
   const TIGER_AI_PUBLIC_PATH = 'aiConfig/public';
@@ -174,22 +178,24 @@
         return null;
       }
 
-      // Try to read secret config (will only succeed if authenticated as admin)
+      // Try to read secret config (only ever holds the optional API key used
+      // for admin "test connection" — the real key used for every actual
+      // chat call lives server-side in the Cloudflare Worker, so this is
+      // allowed to fail for anonymous customers with no effect on them).
       let secretCfg = {};
       try {
         const secretSnap = await db.ref(TIGER_AI_SECRET_PATH).once('value');
         secretCfg = secretSnap.val() || {};
       } catch (e) {
-        // Customer without permission — that's fine, just no API key on client side
         secretCfg = {};
       }
 
-      // Merge: secret fields are only available when admin
+      // System prompts live in the public config now (they're not secrets),
+      // so a store owner's customized customer-facing prompt actually reaches
+      // anonymous visitors instead of only ever applying to logged-in admins.
       aiConfig = {
         ...publicCfg,
-        apiKey: secretCfg.apiKey || '',
-        systemPrompt: secretCfg.systemPrompt || '',
-        adminSystemPrompt: secretCfg.adminSystemPrompt || ''
+        apiKey: secretCfg.apiKey || ''
       };
       return aiConfig;
     } catch (e) {
@@ -269,7 +275,6 @@
       toolChoice = null
     } = params;
 
-    if (!apiKey) throw new Error('مفتاح NVIDIA API غير مُدخل. فضلاً اضبطه من لوحة التحكم.');
     if (!model) throw new Error('لم يتم اختيار نموذج. فضلاً اضبطه من لوحة التحكم.');
 
     const body = {
@@ -285,13 +290,20 @@
       body.tool_choice = toolChoice || 'auto';
     }
 
+    // The NVIDIA API key itself is no longer required on the client: the
+    // Cloudflare Worker (NVIDIA_BASE) holds it server-side as a secret env var.
+    // We still forward one here if the caller has it (e.g. admin testing a
+    // key from the panel before saving it), which lets the Worker use that
+    // specific key instead of its own default for this one request.
+    const headers = {
+      'Content-Type': 'application/json',
+      'Accept': stream ? 'text/event-stream' : 'application/json'
+    };
+    if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+
     const resp = await fetch(`${NVIDIA_BASE}/chat/completions`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-        'Accept': stream ? 'text/event-stream' : 'application/json'
-      },
+      headers,
       body: JSON.stringify(body)
     });
 
@@ -549,6 +561,10 @@
 - لكل منتج تترشحه، لازم تكتب رابط قابل للنقر بصيغة Markdown بالظبط: [اسم المنتج](${location.origin}/product.html?id=ID)
 - استخدم فقط قيمة id الحقيقية الموجودة في بيانات المنتج بالسياق (products[].id). ممنوع اختراع id أو كتابة رابط بدون id أو كتابة رابط كنص عادي بدون صيغة [نص](رابط).
 - ممنوع نهائياً كتابة أي رابط لمنتج غير موجود في السياق.
+
+## نطاق الإجابة (إلزامي):
+- جاوب فقط من بيانات متجرنا الموجودة في السياق (المنتجات، المقاسات، الشحن، الدفع، الاسترجاع) — ممنوع الإجابة من معلومات عامة أو خارجية غير متعلقة بالمتجر.
+- لو السؤال بره نطاق المتجر ومنتجاته وخدماته، اعتذر بجملة قصيرة واحدة واذكر إنك تقدر تساعد فقط في حاجات Tiger Jeans، من غير ما تحاول الإجابة من معلوماتك العامة.
 
 ## القواعد العامة:
 - ابحث دائماً في products الموجودة في السياق ولا تخترع منتجات غير موجودة.
@@ -1739,12 +1755,6 @@ ${JSON.stringify(context).slice(0, 50000)}
         : 'المساعد قيد الصيانة، حاول مرة أخرى لاحقاً.');
       return;
     }
-    if (!aiConfig.apiKey) {
-      addUserMessage(text, attachedImage);
-      showDisabled('مفتاح API غير مُدخل. تواصل مع إدارة المتجر.');
-      return;
-    }
-
     // Choose model
     let model = aiConfig.textModel || 'meta/llama-3.1-70b-instruct';
     if (attachedImage) {

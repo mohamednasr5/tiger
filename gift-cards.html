@@ -494,11 +494,66 @@
       <div class="gc-login-note">
         <i class='bx bx-lock-alt' style="font-size:2rem;color:var(--gold)"></i>
         <p style="margin-top:.5rem">سجّل دخولك لعرض بطاقات الهدايا الخاصة بك</p>
-        <p><a href="index.html?auth=login" onclick="if(typeof openAuthModal==='function'){openAuthModal();return false;}">تسجيل الدخول</a></p>
+        <p><a href="#" onclick="openAuthModal();return false;">تسجيل الدخول</a></p>
       </div>
     </div>
   </div>
 </section>
+
+<!-- ====== Auth Modal (login / signup) — shown in-place, no page navigation ====== -->
+<div class="modal-overlay" id="authModal">
+  <div class="auth-modal">
+    <button class="close-modal" onclick="closeAuthModal()">&times;</button>
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login">تسجيل الدخول</button>
+      <button class="auth-tab" data-tab="signup">إنشاء حساب</button>
+    </div>
+
+    <!-- Login Form -->
+    <div class="auth-form" id="loginForm">
+      <div class="field">
+        <label>البريد الإلكتروني أو رقم الموبايل</label>
+        <input type="text" id="loginEmail" placeholder="أدخل بريدك الإلكتروني أو الموبايل" />
+      </div>
+      <div class="field">
+        <label>كلمة المرور</label>
+        <input type="password" id="loginPass" placeholder="••••••••" />
+      </div>
+      <button class="btn-primary full-width" onclick="doEmailLogin()">دخول</button>
+      <div class="auth-divider">أو</div>
+      <button class="btn-google" onclick="googleLogin()">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        الدخول بحساب Google
+      </button>
+    </div>
+
+    <!-- Signup Form -->
+    <div class="auth-form hidden" id="signupForm">
+      <div class="field">
+        <label>الاسم الكامل</label>
+        <input type="text" id="signupName" placeholder="أدخل اسمك الكامل" />
+      </div>
+      <div class="field">
+        <label>البريد الإلكتروني</label>
+        <input type="email" id="signupEmail" placeholder="example@email.com" />
+      </div>
+      <div class="field">
+        <label>رقم الموبايل</label>
+        <input type="tel" id="signupPhone" placeholder="01xxxxxxxxx" />
+      </div>
+      <div class="field">
+        <label>كلمة المرور</label>
+        <input type="password" id="signupPass" placeholder="••••••••" />
+      </div>
+      <button class="btn-primary full-width" onclick="doEmailSignup()">إنشاء حساب</button>
+      <div class="auth-divider">أو</div>
+      <button class="btn-google" onclick="googleLogin()">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        التسجيل بحساب Google
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- Card Detail Modal (scratch reveal) -->
 <div class="modal-backdrop" id="gcCardModal" style="position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.7);z-index:2000">
@@ -562,6 +617,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="js/config.js"></script>
+<script src="js/auth-modal.js"></script>
 <script src="js/upload.js"></script>
 <script src="js/gift-cards.js"></script>
 <script src="js/gift-cards-fx.js"></script>
