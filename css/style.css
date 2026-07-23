@@ -858,11 +858,16 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
   margin-bottom:1.3rem;
 }
 
-/* ====== Deals/Featured Grid ====== */
+/* ====== Deals/Featured Carousel ====== */
+.deals-carousel{
+  position:relative;
+  overflow:hidden;
+}
 .deals-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
+  display:flex;
   gap:1.5rem;
+  transition:transform .55s cubic-bezier(.4,0,.2,1);
+  will-change:transform;
 }
 .deal-card{
   position:relative;
@@ -870,6 +875,33 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
   overflow:hidden;
   aspect-ratio:3/4;
   background:var(--surface);
+  flex:0 0 calc((100% - 3rem) / 3); /* 3 visible cards, 2 gaps of 1.5rem */
+}
+.deals-arrow{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:46px;height:46px;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(10,10,10,.4);
+  color:#fff;
+  border:1px solid rgba(255,255,255,.25);
+  backdrop-filter:blur(4px);
+  font-size:1.5rem;
+  cursor:pointer;
+  z-index:5;
+  opacity:0;
+  transition:opacity .25s, background .2s, color .2s, border-color .2s, transform .2s;
+}
+.deals-carousel:hover .deals-arrow,
+.deals-arrow:focus-visible{opacity:.9}
+.deals-arrow:hover{background:var(--gold);color:#000;border-color:var(--gold);transform:translateY(-50%) scale(1.06)}
+.deals-arrow-right{right:.6rem}
+.deals-arrow-left{left:.6rem}
+.deals-carousel:not(.has-arrows) .deals-arrow{display:none}
+@media(hover:none){
+  .deals-carousel.has-arrows .deals-arrow{opacity:.7}
 }
 .deal-card img{
   width:100%;height:100%;
@@ -1348,7 +1380,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
 @media(max-width:1024px){
   .products-grid{grid-template-columns:repeat(3,1fr)}
   .features-grid{grid-template-columns:repeat(2,1fr)}
-  .deals-grid{grid-template-columns:repeat(2,1fr)}
+  .deal-card{flex-basis:calc((100% - 1.5rem) / 2)}
 }
 @media(max-width:768px){
   .top-bar{display:none}
@@ -1360,7 +1392,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
   .products-grid{grid-template-columns:repeat(2,1fr)}
   .features-grid{grid-template-columns:1fr}
   .footer-grid{grid-template-columns:1fr 1fr 1fr;gap:2rem}
-  .deals-grid{grid-template-columns:1fr}
+  .deal-card{flex-basis:100%}
 }
 @media(max-width:480px){
   .hero-title{font-size:2rem}

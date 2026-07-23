@@ -276,6 +276,41 @@
 .chip-img-btn{color:var(--text-dim)!important;font-size:.95rem!important}
 .chip-img-btn:hover{color:var(--gold)!important}
 
+/* Category suggestion chips */
+.cat-suggest-chip{
+  background:var(--surface);
+  border:1px solid var(--line);
+  padding:.35rem .85rem;
+  border-radius:999px;
+  font-size:.8rem;
+  color:var(--text-dim);
+  cursor:pointer;
+  transition:.2s;
+}
+.cat-suggest-chip:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-1px)}
+.cat-suggest-chip.active{background:var(--gold);color:#000;border-color:var(--gold)}
+
+/* Field label row (label + action button) */
+.field-label-row{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-bottom:.5rem}
+.field-label-row label{margin-bottom:0}
+.ai-gen-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:.4rem;
+  background:linear-gradient(135deg,rgba(212,175,55,.15),rgba(212,175,55,.05));
+  border:1px solid var(--gold);
+  color:var(--gold);
+  padding:.35rem .9rem;
+  border-radius:999px;
+  font-size:.78rem;
+  font-weight:700;
+  cursor:pointer;
+  transition:.2s;
+  white-space:nowrap;
+}
+.ai-gen-btn:hover{background:var(--gold);color:#000}
+.ai-gen-btn:disabled{opacity:.6;cursor:not-allowed;background:rgba(212,175,55,.1);color:var(--gold)}
+
 /* Spinner */
 .spinner{
   width:18px;height:18px;
@@ -1854,8 +1889,22 @@
       <input id="pCostPrice" type="number" placeholder="سعر الشراء/التكلفة لحساب الأرباح" />
       <small style='color:var(--text-dim);font-size:.75rem;display:block;margin-top:.3rem'>هذا الحقل لا يظهر للعملاء - يُستخدم فقط لحساب صافي الربح</small>
     </div>
-    <div class="field"><label>الوصف</label><textarea id="pDesc" rows="2"></textarea></div>
-    <div class="field"><label>الفئة</label><input id="pCategory" placeholder="مثال: جينز، قمصان..." /></div>
+    <div class="field">
+      <div class="field-label-row">
+        <label>الوصف</label>
+        <button type="button" id="aiDescBtn" class="ai-gen-btn" onclick="generateProductDescriptionAI()">
+          <i class='bx bx-bulb'></i> توليد بالـ AI
+        </button>
+      </div>
+      <textarea id="pDesc" rows="3"></textarea>
+      <small style="color:var(--text-dim);font-size:.75rem;display:block;margin-top:.4rem">اكتب اسم المنتج أولاً، ثم اضغط "توليد بالـ AI" للحصول على وصف احترافي متوافق مع SEO</small>
+    </div>
+    <div class="field">
+      <label>الفئة</label>
+      <input id="pCategory" placeholder="مثال: جينز، قمصان..." oninput="syncCategorySuggestionActive()" />
+      <div class="chips-container" id="categorySuggestions" style="margin-top:.6rem"></div>
+      <small style="color:var(--text-dim);font-size:.75rem;display:block;margin-top:.4rem">اضغط على فئة موجودة لإضافتها تلقائيًا بدون أخطاء كتابة، أو اكتب فئة جديدة يدويًا</small>
+    </div>
     
     <div class="field">
       <label>المقاسات (اكتب المقاس واضغط Enter أو مسطرة)</label>
@@ -1864,6 +1913,8 @@
         <button type="button" onclick="addSizeFromButton()" class="btn-secondary" style="padding:.5rem 1rem;font-size:1.2rem;min-width:44px" title="إضافة">+</button>
       </div>
       <div class="chips-container" id="sizesChips"></div>
+      <div class="chips-container" id="sizeSuggestions" style="margin-top:.6rem"></div>
+      <small style="color:var(--text-dim);font-size:.75rem;display:block;margin-top:.4rem">مقاسات سبق إدخالها في منتجات أخرى — اضغط لإضافتها، أو اضغط مرة أخرى لإزالتها</small>
     </div>
     
     <div class="field">
@@ -1873,6 +1924,8 @@
         <button type="button" onclick="addColorFromButton()" class="btn-secondary" style="padding:.5rem 1rem;font-size:1.2rem;min-width:44px" title="إضافة">+</button>
       </div>
       <div class="chips-container" id="colorsChips"></div>
+      <div class="chips-container" id="colorSuggestions" style="margin-top:.6rem"></div>
+      <small style="color:var(--text-dim);font-size:.75rem;display:block;margin-top:.4rem">ألوان سبق إدخالها في منتجات أخرى — اضغط لإضافتها، أو اضغط مرة أخرى لإزالتها</small>
       <input type="file" id="colorImageInput" accept="image/*" style="display:none" onchange="onColorImageChange(this)" />
     </div>
     
@@ -2193,6 +2246,9 @@ function loadProducts() {
   db.ref("products").on("value", snap => {
     const val = snap.val() || {};
     allProducts = Object.entries(val).map(([id,p]) => ({id,...p}));
+    renderCategorySuggestions();
+    renderSizeSuggestions();
+    renderColorSuggestions();
     
     document.getElementById("productsTable").innerHTML = allProducts.map(p => `
       <tr>
@@ -2209,10 +2265,50 @@ function loadProducts() {
   });
 }
 
+// Renders clickable chips for every distinct category already used across products,
+// so the admin can reuse an existing category with exactly the same spelling instead
+// of retyping it (which avoids typos / extra spaces creating duplicate categories).
+function renderCategorySuggestions() {
+  const container = document.getElementById("categorySuggestions");
+  if (!container) return;
+
+  const cats = [...new Set(
+    allProducts.map(p => (p.category || "").trim()).filter(Boolean)
+  )].sort((a, b) => a.localeCompare(b, "ar"));
+
+  if (!cats.length) {
+    container.innerHTML = "";
+    return;
+  }
+
+  container.innerHTML = cats.map(c => `
+    <button type="button" class="cat-suggest-chip" onclick="selectCategorySuggestion(this,'${c.replace(/'/g, "\\'").replace(/"/g, "&quot;")}')">${c}</button>
+  `).join("");
+
+  syncCategorySuggestionActive();
+}
+
+// Marks the suggestion chip that matches the current input value as active
+function syncCategorySuggestionActive() {
+  const input = document.getElementById("pCategory");
+  const container = document.getElementById("categorySuggestions");
+  if (!input || !container) return;
+  const current = input.value.trim();
+  container.querySelectorAll(".cat-suggest-chip").forEach(chip => {
+    chip.classList.toggle("active", chip.textContent.trim() === current);
+  });
+}
+
+function selectCategorySuggestion(btnEl, cat) {
+  document.getElementById("pCategory").value = cat;
+  syncCategorySuggestionActive();
+}
+
 function openProductModal(id=null) {
   document.getElementById("productModal").classList.add("show");
   document.getElementById("editProductId").value = id || "";
   document.getElementById("productModalTitle").textContent = id ? "تعديل المنتج" : "إضافة منتج جديد";
+  renderCategorySuggestions();
   
   // Reset form
   if (!id) {
@@ -2245,6 +2341,7 @@ function editProduct(id) {
   document.getElementById("pCostPrice").value = p.costPrice || "";
   document.getElementById("pDesc").value = p.description || "";
   document.getElementById("pCategory").value = p.category || "";
+  syncCategorySuggestionActive();
   document.getElementById("pFeatured").checked = p.featured || false;
   document.getElementById("pIsNew").checked = p.isNew || false;
   document.getElementById("pActive").checked = p.active !== false;
@@ -2475,6 +2572,7 @@ function renderChips(type) {
   if (type === "sizes") {
     container.innerHTML = tempSizes.map((v,i) => `
       <span class="chip">${v}<button onclick="removeChip('sizes',${i})">×</button></span>`).join("");
+    renderSizeSuggestions();
   } else {
     container.innerHTML = tempColors.map((c,i) => `
       <span class="chip color-chip">
@@ -2483,7 +2581,87 @@ function renderChips(type) {
         <button type="button" class="chip-img-btn" title="${c.image ? 'تغيير صورة اللون' : 'إضافة صورة لهذا اللون (اختياري)'}" onclick="pickColorImage(${i})"><i class='bx ${c.image ? 'bxs-image' : 'bx-image-add'}'></i></button>
         <button onclick="removeChip('colors',${i})">×</button>
       </span>`).join("");
+    renderColorSuggestions();
   }
+}
+
+// Renders clickable chips for every distinct size already used across other products,
+// so the admin can reuse a saved size (correct spelling/casing) with one tap instead of
+// retyping it. Clicking a suggestion toggles it in/out of the current product's sizes.
+function renderSizeSuggestions() {
+  const container = document.getElementById("sizeSuggestions");
+  if (!container) return;
+
+  const set = new Set();
+  allProducts.forEach(p => (p.sizes || []).forEach(s => {
+    const v = String(s).trim().toUpperCase();
+    if (v) set.add(v);
+  }));
+
+  const sizes = [...set].sort((a, b) => {
+    const ia = LETTER_SIZE_SEQUENCE.indexOf(a);
+    const ib = LETTER_SIZE_SEQUENCE.indexOf(b);
+    if (ia !== -1 && ib !== -1) return ia - ib;
+    if (ia !== -1) return -1;
+    if (ib !== -1) return 1;
+    const na = parseFloat(a), nb = parseFloat(b);
+    if (!isNaN(na) && !isNaN(nb)) return na - nb;
+    return a.localeCompare(b, "ar");
+  });
+
+  if (!sizes.length) {
+    container.innerHTML = "";
+    return;
+  }
+
+  const current = tempSizes.map(v => String(v).toUpperCase());
+  container.innerHTML = sizes.map(s => `
+    <button type="button" class="cat-suggest-chip ${current.includes(s) ? "active" : ""}" onclick="addSuggestedSize('${s.replace(/'/g, "\\'")}')">${s}</button>
+  `).join("");
+}
+
+function addSuggestedSize(size) {
+  const upper = String(size).trim().toUpperCase();
+  if (!upper) return;
+  const idx = tempSizes.findIndex(v => String(v).toUpperCase() === upper);
+  if (idx !== -1) tempSizes.splice(idx, 1); // tap again to remove
+  else tempSizes.push(upper);
+  renderChips("sizes");
+}
+
+// Same idea for colors: suggest every distinct color name already used across other
+// products, so the admin doesn't accidentally create near-duplicate colors by retyping
+// with different spelling/spacing.
+function renderColorSuggestions() {
+  const container = document.getElementById("colorSuggestions");
+  if (!container) return;
+
+  const set = new Set();
+  allProducts.forEach(p => (p.colors || []).forEach(c => {
+    const name = (typeof c === "string" ? c : (c && c.name) || "").trim();
+    if (name) set.add(name);
+  }));
+
+  const colors = [...set].sort((a, b) => a.localeCompare(b, "ar"));
+
+  if (!colors.length) {
+    container.innerHTML = "";
+    return;
+  }
+
+  const current = tempColors.map(c => c.name);
+  container.innerHTML = colors.map(c => `
+    <button type="button" class="cat-suggest-chip ${current.includes(c) ? "active" : ""}" onclick="addSuggestedColor('${c.replace(/'/g, "\\'")}')">${c}</button>
+  `).join("");
+}
+
+function addSuggestedColor(name) {
+  const val = String(name).trim();
+  if (!val) return;
+  const idx = tempColors.findIndex(c => c.name === val);
+  if (idx !== -1) tempColors.splice(idx, 1); // tap again to remove
+  else tempColors.push({ name: val, image: "" });
+  renderChips("colors");
 }
 
 // Triggers the hidden file picker for a specific color chip's optional image

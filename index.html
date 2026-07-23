@@ -654,7 +654,11 @@
       <a href="#deals-section" class="view-all">عرض الكل ←</a>
     </div>
 
-    <div class="deals-grid" id="dealsGrid"></div>
+    <div class="deals-carousel" id="dealsCarousel">
+      <button class="deals-arrow deals-arrow-right" id="dealsArrowRight" aria-label="السابق" onclick="dealsNext()"><i class='bx bx-chevron-right'></i></button>
+      <div class="deals-grid" id="dealsGrid"></div>
+      <button class="deals-arrow deals-arrow-left" id="dealsArrowLeft" aria-label="التالي" onclick="dealsPrev()"><i class='bx bx-chevron-left'></i></button>
+    </div>
   </div>
 </section>
 
@@ -1297,19 +1301,30 @@ function renderProducts() {
   observeReveals();
 }
 
+let dealsIndex = 0;
+let dealsAutoTimer = null;
+let dealsCardCount = 0;
+
 function renderDeals() {
   const grid = document.getElementById("dealsGrid");
   if (!grid) return;
 
-  // Prefer products with a real discount, fall back to the first products available
-  let deals = ALL_PRODUCTS.filter((p) => p.oldPrice && p.oldPrice > p.price).slice(0, 3);
-  if (deals.length < 3) {
-    const rest = ALL_PRODUCTS.filter((p) => !deals.includes(p)).slice(0, 3 - deals.length);
+  // Prefer products with a real discount, fall back to filling with other products
+  // so the carousel has enough items to actually slide through
+  const DEALS_LIMIT = 12;
+  let deals = ALL_PRODUCTS.filter((p) => p.oldPrice && p.oldPrice > p.price).slice(0, DEALS_LIMIT);
+  if (deals.length < DEALS_LIMIT) {
+    const rest = ALL_PRODUCTS.filter((p) => !deals.includes(p)).slice(0, DEALS_LIMIT - deals.length);
     deals = deals.concat(rest);
   }
 
+  stopDealsAutoplay();
+
   if (!deals.length) {
-    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><i class="bx bx-gift"></i><p>لا توجد عروض متاحة حالياً</p></div>';
+    grid.innerHTML = '<div class="empty-state" style="flex:1"><i class="bx bx-gift"></i><p>لا توجد عروض متاحة حالياً</p></div>';
+    dealsCardCount = 0;
+    const carousel = document.getElementById("dealsCarousel");
+    if (carousel) carousel.classList.remove("has-arrows");
     return;
   }
 
@@ -1322,7 +1337,7 @@ function renderDeals() {
         : null;
 
       return `
-      <div class="deal-card reveal" style="transition-delay:${idx * 0.08}s">
+      <div class="deal-card reveal" style="transition-delay:${(idx % 8) * 0.05}s">
         <button class="corner-heart wishlist-btn ${wished ? "active" : ""}" data-id="${p.id}" onclick="event.preventDefault();toggleWishlistBtn('${p.id}', this)" title="أضف للمفضلة">
           <i class='${wished ? "bx bxs-heart" : "bx bx-heart"}'></i>
         </button>
@@ -1341,7 +1356,102 @@ function renderDeals() {
     .join("");
 
   observeReveals();
+  dealsCardCount = deals.length;
+  initDealsCarousel();
 }
+
+// ====== Deals Carousel (auto-slide + prev/next arrows) ======
+function getDealsVisibleCount() {
+  const w = window.innerWidth;
+  if (w <= 768) return 1;
+  if (w <= 1024) return 2;
+  return 3;
+}
+
+function initDealsCarousel() {
+  const carousel = document.getElementById("dealsCarousel");
+  if (!carousel) return;
+
+  dealsIndex = 0;
+  const visible = getDealsVisibleCount();
+  const hasEnoughForArrows = dealsCardCount > visible;
+  carousel.classList.toggle("has-arrows", hasEnoughForArrows);
+
+  updateDealsPosition();
+  stopDealsAutoplay();
+  if (hasEnoughForArrows) startDealsAutoplay();
+}
+
+function updateDealsPosition() {
+  const grid = document.getElementById("dealsGrid");
+  if (!grid || !grid.children.length) return;
+
+  const visible = getDealsVisibleCount();
+  const maxIndex = Math.max(0, grid.children.length - visible);
+  if (dealsIndex > maxIndex) dealsIndex = 0;
+  if (dealsIndex < 0) dealsIndex = maxIndex;
+
+  const cardWidth = grid.children[0].getBoundingClientRect().width;
+  const gap = parseFloat(getComputedStyle(grid).gap) || 0;
+  const step = cardWidth + gap;
+
+  // Page is RTL: moving forward slides the products toward the right
+  grid.style.transform = `translateX(${dealsIndex * step}px)`;
+}
+
+function dealsNext() {
+  const grid = document.getElementById("dealsGrid");
+  if (!grid || !grid.children.length) return;
+  const visible = getDealsVisibleCount();
+  const maxIndex = Math.max(0, grid.children.length - visible);
+  dealsIndex = dealsIndex >= maxIndex ? 0 : dealsIndex + 1;
+  updateDealsPosition();
+  restartDealsAutoplay();
+}
+
+function dealsPrev() {
+  const grid = document.getElementById("dealsGrid");
+  if (!grid || !grid.children.length) return;
+  const visible = getDealsVisibleCount();
+  const maxIndex = Math.max(0, grid.children.length - visible);
+  dealsIndex = dealsIndex <= 0 ? maxIndex : dealsIndex - 1;
+  updateDealsPosition();
+  restartDealsAutoplay();
+}
+
+function startDealsAutoplay() {
+  stopDealsAutoplay();
+  dealsAutoTimer = setInterval(dealsNext, 4000);
+}
+
+function stopDealsAutoplay() {
+  if (dealsAutoTimer) {
+    clearInterval(dealsAutoTimer);
+    dealsAutoTimer = null;
+  }
+}
+
+function restartDealsAutoplay() {
+  const carousel = document.getElementById("dealsCarousel");
+  if (carousel && carousel.classList.contains("has-arrows")) startDealsAutoplay();
+}
+
+(function setupDealsCarouselEvents() {
+  document.addEventListener("DOMContentLoaded", () => {
+    const carousel = document.getElementById("dealsCarousel");
+    if (!carousel) return;
+    carousel.addEventListener("mouseenter", stopDealsAutoplay);
+    carousel.addEventListener("mouseleave", restartDealsAutoplay);
+
+    let resizeTimer = null;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        if (dealsCardCount) initDealsCarousel();
+      }, 200);
+    });
+  });
+})();
 
 // Colors can be plain strings (legacy products) or {name, image} objects (new products with optional per-color image)
 function colorName(c) { return typeof c === "string" ? c : (c && c.name) || ""; }

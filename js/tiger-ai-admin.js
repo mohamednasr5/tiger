@@ -295,6 +295,89 @@ function getWorkerUrl() {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// ✍️ توليد وصف منتج احترافي ومتوافق مع SEO بالذكاء الاصطناعي
+// ═══════════════════════════════════════════════════════════════
+
+async function generateProductDescriptionAI() {
+  const nameEl = document.getElementById('pName');
+  const descEl = document.getElementById('pDesc');
+  const catEl = document.getElementById('pCategory');
+  const btn = document.getElementById('aiDescBtn');
+
+  if (!nameEl || !descEl) return;
+
+  const name = nameEl.value.trim();
+  if (!name) {
+    if (typeof showToast === 'function') showToast('❌ اكتب اسم المنتج أولاً قبل توليد الوصف');
+    nameEl.focus();
+    return;
+  }
+
+  if (!AI_CONFIG.nvidiaApiKey) {
+    if (typeof showToast === 'function') showToast('⚠️ فعّل ذكاء Tiger AI وأدخل مفتاح NVIDIA من إعدادات الذكاء الاصطناعي أولاً');
+    return;
+  }
+
+  const category = (catEl && catEl.value.trim()) || '';
+  const originalBtnHTML = btn ? btn.innerHTML : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i> جاري التوليد...";
+  }
+
+  const prompt = `اكتب وصف منتج احترافي لمتجر ملابس إلكتروني "Tiger Jeans"، باللغة العربية، مُحسّن لمحركات البحث (SEO) بنسبة 100% لظهور المنتج في أوائل نتائج البحث.
+
+اسم المنتج: "${name}"${category ? `\nالفئة: "${category}"` : ''}
+
+الشروط:
+- من 3 إلى 5 جمل قصيرة وجذابة، بدون أي مقدمات أو عناوين أو رموز.
+- ادمج كلمات مفتاحية طبيعية مرتبطة بالمنتج والفئة (مثل نوع القصة، الخامة، المناسبة) دون حشو.
+- أبرز الجودة، الخامة، الراحة، والمناسبة للاستخدام اليومي حسب نوع المنتج.
+- أسلوب تسويقي مقنع يشجع على الشراء الفوري.
+- فقرة نصية عادية متصلة فقط، بدون Markdown وبدون علامات اقتباس.
+- لا تكرر اسم المنتج أكثر من مرتين.`;
+
+  try {
+    const response = await fetch(`${getWorkerUrl()}/v1/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${AI_CONFIG.nvidiaApiKey}`
+      },
+      body: JSON.stringify({
+        model: AI_CONFIG.textModel || AI_DEFAULTS.textModel,
+        messages: [
+          { role: 'system', content: 'أنت خبير كتابة محتوى تسويقي وتحسين محركات البحث (SEO) لمتاجر الملابس الإلكترونية باللغة العربية.' },
+          { role: 'user', content: prompt }
+        ],
+        max_tokens: 350,
+        temperature: 0.7
+      })
+    });
+
+    if (!response.ok) throw new Error(`فشل الاتصال بخدمة الذكاء الاصطناعي (${response.status})`);
+
+    const data = await response.json();
+    const text = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content
+      ? data.choices[0].message.content.trim()
+      : '';
+
+    if (!text) throw new Error('لم يتم توليد أي نص، حاول مرة أخرى');
+
+    descEl.value = text.replace(/^["'«»\s]+|["'«»\s]+$/g, '');
+    if (typeof showToast === 'function') showToast('✅ تم توليد الوصف بنجاح');
+  } catch (error) {
+    console.error('AI Description Generation Error:', error);
+    if (typeof showToast === 'function') showToast('❌ فشل توليد الوصف: ' + (error.message || 'خطأ غير متوقع'));
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalBtnHTML;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
 // 🎯 تصدير الوحدة العامة
 // ═══════════════════════════════════════════════════════════════
 
@@ -307,6 +390,7 @@ window.TigerAIAdmin = {
   
   resetCustomerPrompt,
   resetAdminPrompt,
+  generateDescription: generateProductDescriptionAI,
 
   isEnabled() {
     return AI_CONFIG.enabled;
