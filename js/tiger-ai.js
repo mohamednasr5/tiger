@@ -500,22 +500,21 @@
   function getDefaultAdminPrompt() {
     return `أنت "تايجر AI" — المساعد الإداري الذكي لمتجر Tiger Jeans. تعمل مع مالك المتجر أو الأدمن فقط.
 
-## مهمتك:
-1. تحليل أداء المتجر (المبيعات، الطلبات، العملاء، المنتجات).
-2. تقارير سريعة: أكثر المنتجات مبيعاً، الطلبات المتأخرة، المنتجات منخفضة المخزون.
-3. المساعدة في إدارة الطلبات (الحالات، التتبع، المبالغ).
-4. اقتراحات لتحسين الأرباح والتسعير.
-5. توليد أوصاف منتجات احترافية و SEO.
-6. الإجابة عن أي استفسار إداري بناءً على البيانات المتاحة.
+## مهمتك المزدوجة:
+### أ) الإجابة على الأسئلة (بشكل محادثة طبيعي):
+عندما يسألك الأدمن سؤالاً عن أي شيء (إيرادات، أرباح، مبيعات، مخزون، طلبات، عملاء)، أجب بطريقة واضحة ومنظمة مثل المحادثة الطبيعية. اشرح الأرقام وقدم التحليل بأسلوب سهل ومفهوم. مثال: "إجمالي المبيعات هذا الشهر X ج.م، بزيادة Y% عن الشهر السابق..."
 
-## القواعد:
+### ب) تنفيذ الطلبات والأوامر:
+عندما يطلب منك الأدمن تنفيذ شيء محدد (كتابة وصف SEO، تحليل مقارنة، اقتراح أسعار، توليد تقرير)، نفذ الطلب مباشرة بنتائج جاهزة للاستخدام.
+
+## القواعد الأساسية:
 - لديك صلاحية كاملة لرؤية كل البيانات: الأسعار، التكلفة (costPrice)، الأرباح، بيانات العملاء، الطلبات، الإعدادات.
 - قدم تحليلات مبنية على الأرقام الفعلية في السياق.
 - استخدم Markdown لتنظيم الردود (جداول، قوائم، تنسيق).
-- إذا سألك الأدمن عن شيء غير موجود في السياق، اعتذر بصدق.
-- لا تقترح أبداً تعديل أو حذف بيانات مباشرة — أنت للاستشارة والتحليل فقط.
 - اذكر دائماً الأرقام بالجنيه المصري (ج.م).
-- ردودك بالعربية الفصحى المبسطة أو المصرية حسب طلب الأدمن.
+- ردودك بالعربية المصرية الواضحة.
+- كن موجزاً ومباشراً — لا تضف حشو أو مقدمة طويلة.
+- لا تقل "بالطبع!" أو "بالتأكيد!" أو عبارات حشو مشابهة — ابدأ الرد مباشرة.
 
 ## بيانات السياق المتاحة:
 - products: كل المنتجات مع التكلفة والأرباح والمخزون.
@@ -530,6 +529,76 @@
       ? (aiConfig.adminSystemPrompt || getDefaultAdminPrompt())
       : (aiConfig.systemPrompt || getDefaultCustomerPrompt());
     return basePrompt;
+  }
+
+  // ========= TTS (Text-to-Speech) for Admin Mode =========
+  function speakResponse(text) {
+    if (!isAdminMode) return;
+    if (!('speechSynthesis' in window)) return;
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+    // Strip markdown for clean speech
+    const clean = text
+      .replace(/#{1,6}\s+/g, '')
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
+      .replace(/\*([^*]+)\*/g, '$1')
+      .replace(/`([^`]+)`/g, '$1')
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      .replace(/\*\*/g, '')
+      .replace(/[-*]\s+/gm, '')
+      .replace(/\d+\.\s+/gm, '')
+      .replace(/\n{2,}/g, '. ')
+      .replace(/\n/g, '. ')
+      .trim();
+    if (!clean || clean.length < 5) return;
+    const utterance = new SpeechSynthesisUtterance(clean);
+    utterance.lang = 'ar-EG';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.volume = 0.9;
+    // Try to find Arabic voice
+    const voices = window.speechSynthesis.getVoices();
+    const arVoice = voices.find(v => v.lang.startsWith('ar')) || voices.find(v => v.lang.startsWith('ar'));
+    if (arVoice) utterance.voice = arVoice;
+    window.speechSynthesis.speak(utterance);
+  }
+
+  // Preload voices
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.getVoices();
+    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+  }
+
+  // ========= Process AI Response (Customer Mode Only) =========
+  function processAiResponse(text) {
+    if (isAdminMode) return text; // Admin mode: no processing
+    let processed = text;
+    // Remove filler phrases
+    const fillerPatterns = [
+      /^بالطبع!\s*/i,
+      /^بالتأكيد!\s*/i,
+      /^طبعاً!\s*/i,
+      /^أكيد!\s*/i,
+      /^بالطبع\.\s*/i,
+      /^بالتأكيد\.\s*/i,
+      /^-\s*بالطبع!\s*/im,
+      /^-\s*بالتأكيد!\s*/im,
+    ];
+    for (const pat of fillerPatterns) {
+      processed = processed.replace(pat, '');
+    }
+    // Validate product links against cache
+    if (productsCache && productsCache.length > 0) {
+      const validIds = new Set(productsCache.map(p => p.id));
+      // Remove [text](product.html?id=XXX) where XXX is not a valid product ID
+      processed = processed.replace(/\[([^\]]+)\]\(product\.html\?id=([^)]+)\)/g, (match, linkText, productId) => {
+        if (validIds.has(productId)) {
+          return match; // Keep valid links
+        }
+        return linkText; // Remove invalid link, keep text only
+      });
+    }
+    return processed.trim() || text;
   }
 
   // ========= Message Building =========
@@ -595,7 +664,20 @@ ${JSON.stringify(context).slice(0, 50000)}
     root.innerHTML = `
       <button class="tj-ai-launcher" id="tjAiLauncher" aria-label="Tiger AI" title="اسأل Tiger AI">
         <span class="tj-ai-pulse"></span>
-        <i class='bx bx-bot'></i>
+        <span class="tj-ai-launcher-icon"><svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+      <defs>
+        <linearGradient id="tigerGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#FF5151"/>
+          <stop offset="100%" stop-color="#D43D3D"/>
+        </linearGradient>
+      </defs>
+      <circle cx="24" cy="24" r="23" fill="url(#tigerGrad)"/>
+      <ellipse cx="15.5" cy="16.5" rx="4.2" ry="5.2" fill="rgba(255,255,255,0.92)"/>
+      <ellipse cx="24" cy="13.5" rx="4.2" ry="5.2" fill="rgba(255,255,255,0.92)"/>
+      <ellipse cx="32.5" cy="16.5" rx="4.2" ry="5.2" fill="rgba(255,255,255,0.92)"/>
+      <ellipse cx="24" cy="29.5" rx="9.5" ry="8.5" fill="rgba(255,255,255,0.92)"/>
+      <text x="24" y="34" text-anchor="middle" fill="#FF5151" font-family="Arial Black, Impact, sans-serif" font-size="14" font-weight="bold">AI</text>
+    </svg></span>
       </button>
 
       <div class="tj-ai-drop-zone" id="tjAiDropZone">
@@ -606,7 +688,20 @@ ${JSON.stringify(context).slice(0, 50000)}
 
       <div class="tj-ai-panel" id="tjAiPanel" role="dialog" aria-label="Tiger AI Assistant">
         <div class="tj-ai-header">
-          <div class="tj-ai-avatar"><i class='bx bx-bot'></i></div>
+          <div class="tj-ai-avatar tj-ai-avatar-icon"><svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+      <defs>
+        <linearGradient id="tigerGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#FF5151"/>
+          <stop offset="100%" stop-color="#D43D3D"/>
+        </linearGradient>
+      </defs>
+      <circle cx="24" cy="24" r="23" fill="url(#tigerGrad)"/>
+      <ellipse cx="15.5" cy="16.5" rx="4.2" ry="5.2" fill="rgba(255,255,255,0.92)"/>
+      <ellipse cx="24" cy="13.5" rx="4.2" ry="5.2" fill="rgba(255,255,255,0.92)"/>
+      <ellipse cx="32.5" cy="16.5" rx="4.2" ry="5.2" fill="rgba(255,255,255,0.92)"/>
+      <ellipse cx="24" cy="29.5" rx="9.5" ry="8.5" fill="rgba(255,255,255,0.92)"/>
+      <text x="24" y="34" text-anchor="middle" fill="#FF5151" font-family="Arial Black, Impact, sans-serif" font-size="14" font-weight="bold">AI</text>
+    </svg></div>
           <div class="tj-ai-header-info">
             <h3>تايجر AI</h3>
             <span>متصل الآن</span>
@@ -982,10 +1077,15 @@ ${JSON.stringify(context).slice(0, 50000)}
   }
 
   function addAiMessage(html, saveToHistory = true, reasoning = '') {
+    // Process response for customer mode (validate links, remove filler)
+    let processedHtml = html;
+    if (typeof html === 'string') {
+      processedHtml = processAiResponse(html);
+    }
     const msg = document.createElement('div');
     msg.className = 'tj-ai-msg tj-ai-msg-ai';
     msg.innerHTML = `
-      <div class="tj-ai-msg-avatar"><i class='bx bx-bot'></i></div>
+      <div class="tj-ai-msg-avatar tj-ai-avatar-icon"></div>
       <div class="tj-ai-msg-bubble">
         ${reasoning ? `
           <div class="tj-ai-reasoning">
@@ -993,14 +1093,14 @@ ${JSON.stringify(context).slice(0, 50000)}
             ${escapeHtml(reasoning).slice(0, 600)}${reasoning.length > 600 ? '…' : ''}
           </div>
         ` : ''}
-        ${typeof html === 'string' ? markdownToHtml(html) : html}
+        ${typeof processedHtml === 'string' ? markdownToHtml(processedHtml) : processedHtml}
       </div>
     `;
     messagesEl.appendChild(msg);
     scrollToBottom();
 
-    if (saveToHistory && typeof html === 'string') {
-      chatHistory.push({ role: 'assistant', content: html });
+    if (saveToHistory && typeof processedHtml === 'string') {
+      chatHistory.push({ role: 'assistant', content: processedHtml });
       saveHistory();
     }
   }
@@ -1010,7 +1110,7 @@ ${JSON.stringify(context).slice(0, 50000)}
     msg.className = 'tj-ai-msg tj-ai-msg-ai';
     msg.id = 'tjAiTyping';
     msg.innerHTML = `
-      <div class="tj-ai-msg-avatar"><i class='bx bx-bot'></i></div>
+      <div class="tj-ai-msg-avatar tj-ai-avatar-icon"></div>
       <div class="tj-ai-msg-bubble">
         <div class="tj-ai-typing"><span></span><span></span><span></span></div>
       </div>
@@ -1032,10 +1132,10 @@ ${JSON.stringify(context).slice(0, 50000)}
     const msg = document.createElement('div');
     msg.className = 'tj-ai-msg tj-ai-msg-ai';
     msg.innerHTML = `
-      <div class="tj-ai-msg-avatar"><i class='bx bx-bot'></i></div>
+      <div class="tj-ai-msg-avatar tj-ai-avatar-icon"></div>
       <div class="tj-ai-msg-bubble">
         <div class="tj-ai-disabled">
-          <i class='bx bx-bot'></i>
+          <div class="tj-ai-disabled-icon"></div>
           <b>المساعد الذكي غير مُفعّل حالياً</b>
           ${escapeHtml(message || 'برجاء تفعيله من لوحة التحكم -> مساعد AI.')}
         </div>
@@ -1153,6 +1253,8 @@ ${JSON.stringify(context).slice(0, 50000)}
         content = 'معلش، ماقدرتش أجيب رد. حاول مرة تانية بصيغة مختلفة.';
       }
       addAiMessage(content, true, result.reasoning || '');
+      // Voice response for admin mode
+      speakResponse(content);
     } catch (err) {
       hideTyping();
       console.error('[TigerAI] error:', err);
@@ -1210,18 +1312,30 @@ ${JSON.stringify(context).slice(0, 50000)}
       return;
     }
 
-    // Don't show on admin login lock screen
-    if (isAdminMode && document.querySelector('.admin-lock:not([style*="display: none"])') && !document.querySelector('.admin-layout:not([style*="display: none"])')) {
-      // We're on admin page but not logged in yet — wait
-      const observer = new MutationObserver(() => {
-        if (document.querySelector('.admin-layout') && getComputedStyle(document.querySelector('.admin-layout')).display !== 'none') {
-          observer.disconnect();
-          continueInit();
+    // Don't show on admin login lock screen — wait until admin logs in
+    if (isAdminMode) {
+      const loginScreen = document.getElementById('loginScreen');
+      const adminLayout = document.getElementById('adminLayout');
+      // If login screen is visible and admin layout is hidden, wait for login
+      if (loginScreen && adminLayout) {
+        const loginVisible = loginScreen.style.display !== 'none' && getComputedStyle(loginScreen).display !== 'none';
+        const layoutHidden = adminLayout.style.display === 'none' || getComputedStyle(adminLayout).display === 'none';
+        if (loginVisible && layoutHidden) {
+          // Wait for successful login — login sets loginScreen.style.display='none' and adminLayout.style.display='block'
+          const observer = new MutationObserver(() => {
+            const stillHidden = adminLayout.style.display === 'none' || getComputedStyle(adminLayout).display === 'none';
+            if (!stillHidden) {
+              observer.disconnect();
+              continueInit();
+            }
+          });
+          observer.observe(loginScreen, { attributes: true, attributeFilter: ['style'] });
+          observer.observe(adminLayout, { attributes: true, attributeFilter: ['style'] });
+          // Safety timeout — if no login in 5 min, don't show widget (security)
+          setTimeout(() => { observer.disconnect(); }, 300000);
+          return;
         }
-      });
-      observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
-      setTimeout(() => { observer.disconnect(); continueInit(); }, 8000);
-      return;
+      }
     }
 
     continueInit();
