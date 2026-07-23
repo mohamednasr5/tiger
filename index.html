@@ -1,823 +1,1743 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!DOCTYPE html> 
+<html lang="ar-EG" dir="rtl">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
-<title>Tiger Jeans | تايگر چينز - لأرقى الملابس العالمية</title>
-<meta name="description" content="متجر Tiger Jeans - ملابس جينز عصرية بأفضل الأسعار في مصر" />
-<meta name="theme-color" content="#d4af37" />
+
+<!-- ====== Primary SEO Meta Tags ====== -->
+<title>Tiger Jeans | أفضل بناطيل جينز رجالي وحريمي وبناتي وشبابي في مصر</title>
+<meta name="description" content="تايجر جينز - متجرك الأول لبناطيل الجينز والملابس العصرية في مصر. تشكيلة جينز رجالي، حريمي، بناتي وشبابي بأفضل الأسعار وجودة عالية، شحن سريع لكل محافظات مصر ودفع آمن." />
+<meta name="keywords" content="تايجر جينز, بناطيل جينز, جينز رجالي, جينز حريمي, جينز بناتي, جينز شبابي, بنطلون جينز مصر, ملابس رجالي مصر, ملابس حريمي مصر, أفضل ماركة جينز مصر, Tiger Jeans, jeans Egypt" />
+<meta name="author" content="Tiger Jeans" />
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+<link rel="canonical" href="https://tiger-jeans.com/" />
+
+<!-- Language / Region targeting -->
+<link rel="alternate" hreflang="ar-eg" href="https://tiger-jeans.com/" />
+<link rel="alternate" hreflang="x-default" href="https://tiger-jeans.com/" />
+<meta name="geo.region" content="EG" />
+<meta name="geo.placename" content="Egypt" />
+<meta name="ICBM" content="26.8206,30.8025" />
+
+<!-- Open Graph (Facebook / WhatsApp / LinkedIn previews) -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Tiger Jeans" />
+<meta property="og:locale" content="ar_EG" />
+<meta property="og:url" content="https://tiger-jeans.com/" />
+<meta property="og:title" content="Tiger Jeans | أفضل بناطيل جينز رجالي وحريمي وبناتي وشبابي في مصر" />
+<meta property="og:description" content="تشكيلة جينز رجالي، حريمي، بناتي وشبابي بأفضل الأسعار وجودة عالية. شحن سريع لكل محافظات مصر ودفع آمن." />
+<meta property="og:image" content="https://tiger-jeans.com/images/icon-512.png" />
+<meta property="og:image:width" content="512" />
+<meta property="og:image:height" content="512" />
+
+<!-- Twitter / X Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Tiger Jeans | أفضل بناطيل جينز رجالي وحريمي وبناتي وشبابي في مصر" />
+<meta name="twitter:description" content="تشكيلة جينز رجالي، حريمي، بناتي وشبابي بأفضل الأسعار وجودة عالية. شحن سريع لكل محافظات مصر." />
+<meta name="twitter:image" content="https://tiger-jeans.com/images/icon-512.png" />
+
+<meta name="theme-color" content="#1a1a2e" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#d4af37" media="(prefers-color-scheme: light)" />
+<meta name="msapplication-TileColor" content="#1a1a2e" />
+<meta name="msapplication-tap-highlight" content="no" />
+
+<!-- iOS PWA Support -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Tiger Jeans" />
+
+<!-- Apple Touch Icons (iOS Home Screen & Splash) -->
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="images/icon-192.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="152x152" href="images/icon-152.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="images/icon-128.png" />
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="images/icon-96.png" />
+
+<!-- PWA Manifest -->
 <link rel="manifest" href="manifest.json" />
+<link rel="icon" type="image/png" sizes="512x512" href="images/icon-512.png" />
 <link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png" />
+
+<!-- Preconnect for performance -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://unpkg.com" />
+<link rel="preconnect" href="https://www.gstatic.com" />
+
 <link rel="shortcut icon" href="images/favicon-32x32.png" type="image/png" />
-<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="css/style.css" />
+
+<!-- Fonts & icons: loaded without blocking first render -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@300;400;500;700&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
+<link rel="preload" as="style" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" onload="this.onload=null;this.rel='stylesheet'" />
+<noscript>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@300;400;500;700&display=swap" />
+  <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" />
+</noscript>
+
+<!-- PWA Install Banner Styles -->
 <style>
-/* Hero Section */
-.hero-section {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  min-height: 85vh;
+/* Install Prompt Banner */
+.install-banner {
+  position: fixed;
+  bottom: -100%;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #1a1a1e, #0a0a0c);
+  border-top: 2px solid #d4af37;
+  padding: 1rem;
+  z-index: 9999;
+  transition: bottom 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+}
+.install-banner.show {
+  bottom: 0;
+}
+.install-content {
+  max-width: 1280px;
+  margin: 0 auto;
   display: flex;
   align-items: center;
-  justify-content: center;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  padding: 2rem;
-}
-
-.hero-content {
-  position: relative;
-  z-index: 2;
-  max-width: 900px;
-}
-
-.hero-logo {
-  width: 130px;
-  height: 130px;
-  margin: 0 auto 1.5rem;
-  animation: floatLogo 3s ease-in-out infinite;
-  filter: drop-shadow(0 10px 30px rgba(212,175,55,0.4));
-}
-
-@keyframes floatLogo {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-15px) rotate(3deg); }
-}
-
-.hero-title {
-  font-size: clamp(2.8rem, 7vw, 5rem);
-  font-weight: 900;
-  color: #fff;
-  margin-bottom: 0.5rem;
-  font-family: 'Cairo', sans-serif;
-  text-shadow: 0 4px 30px rgba(212,175,55,0.3);
-}
-
-.hero-title .gold {
-  color: #d4af37;
-  display: block;
-  font-size: 1.3em;
-}
-
-.hero-subtitle {
-  font-size: clamp(1rem, 2.5vw, 1.4rem);
-  color: rgba(255,255,255,0.85);
-  margin-bottom: 2.5rem;
-  font-weight: 300;
-  line-height: 1.6;
-}
-
-.hero-buttons {
-  display: flex;
+  justify-content: space-between;
   gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 2rem;
 }
-
-.btn-hero-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 1.1rem 2.8rem;
-  background: linear-gradient(135deg, #d4af37, #b8962e);
-  color: #000;
-  font-weight: 800;
-  font-size: 1.1rem;
-  border-radius: 50px;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  box-shadow: 0 10px 35px rgba(212,175,55,0.4);
-  font-family: 'Cairo', sans-serif;
-}
-
-.btn-hero-primary:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 18px 45px rgba(212,175,55,0.55);
-}
-
-.btn-hero-secondary {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 1.1rem 2.8rem;
-  background: transparent;
-  color: #d4af37;
-  border: 2px solid #d4af37;
-  font-weight: 700;
-  font-size: 1.05rem;
-  border-radius: 50px;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  font-family: 'Cairo', sans-serif;
-}
-
-.btn-hero-secondary:hover {
-  background: rgba(212,175,55,0.12);
-  transform: translateY(-4px);
-}
-
-/* Marquee */
-.marquee-bar {
-  background: linear-gradient(90deg, #d4af37, #b8962e, #d4af37);
-  padding: 0.65rem 0;
-  overflow: hidden;
-}
-
-.marquee-inner {
+.install-info {
   display: flex;
-  animation: marqueeScroll 40s linear infinite;
+  align-items: center;
+  gap: 1rem;
+}
+.install-icon {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  object-fit: contain;
+  font-family: 'Cairo', sans-serif;
+  flex-shrink: 0;
+}
+.install-text h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 0.15rem;
+  font-family: 'Cairo', sans-serif;
+}
+.install-text p {
+  font-size: 0.78rem;
+  color: #9a9aa5;
+}
+.install-buttons {
+  display: flex;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+.install-btn {
+  padding: 0.7rem 1.4rem;
+  background: linear-gradient(135deg, #d4af37, #e8cc6f);
+  color: #000;
+  border-radius: 10px;
+  font-weight: 800;
+  font-family: 'Cairo', sans-serif;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: 0.25s;
+  border: none;
   white-space: nowrap;
 }
-
-.marquee-inner span {
-  color: #000;
-  font-weight: 700;
-  padding: 0 2.5rem;
-  font-size: 0.95rem;
-  font-family: 'Cairo', sans-serif;
+.install-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(212,175,55,0.4);
 }
-
-@keyframes marqueeScroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
-/* Products Section */
-.products-section {
-  padding: 5rem 2rem;
-  background: var(--bg, #fafafa);
-}
-
-.section-header {
-  text-align: center;
-  margin-bottom: 3.5rem;
-}
-
-.section-header h2 {
-  font-size: 2.5rem;
-  color: var(--text, #222);
-  margin-bottom: 0.75rem;
-  font-family: 'Cairo', sans-serif;
-  font-weight: 900;
-}
-
-.section-header p {
-  color: var(--text-dim, #666);
-  font-size: 1.1rem;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.products-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-  gap: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.product-card {
-  background: #fff;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 5px 25px rgba(0,0,0,0.08);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+.dismiss-btn {
+  padding: 0.7rem 1rem;
+  background: transparent;
+  border: 1px solid #2a2a30;
+  color: #9a9aa5;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.85rem;
   cursor: pointer;
+  transition: 0.2s;
+}
+.dismiss-btn:hover {
+  border-color: #d4af37;
+  color: #d4af37;
+}
+
+/* iOS Install Hint */
+.ios-install-hint {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #1a1a1e, #0a0a0c);
+  border: 1px solid #d4af37;
+  border-radius: 12px;
+  padding: 0.8rem 1.2rem;
+  z-index: 9998;
+  display: none;
+  animation: bounceIn 0.5s ease;
+}
+.ios-install-hint.show { display: block; }
+@keyframes bounceIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Copy Button Animation */
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.7rem;
+  background: rgba(212,175,55,0.15);
+  border: 1px solid rgba(212,175,55,0.3);
+  border-radius: 6px;
+  color: #d4af37;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+  font-family: 'Cairo', sans-serif;
+}
+.copy-btn:hover {
+  background: rgba(212,175,55,0.25);
+  transform: scale(1.05);
+}
+.copy-btn.copied {
+  background: rgba(62,207,142,0.2);
+  border-color: #3ecf8e;
+  color: #3ecf8e;
+}
+
+/* Instapay Link Button */
+.instapay-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  background: linear-gradient(135deg, #00a8e8, #0077b6);
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-decoration: none;
+  transition: 0.25s;
+  font-family: 'Cairo', sans-serif;
+}
+.instapay-link:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(0,168,232,0.4);
+}
+.instapay-link i { font-size: 1.1rem; }
+
+/* Product Card Flip Animation */
+.product-card-wrapper {
+  perspective: 1000px;
+}
+.product-card-inner {
   position: relative;
-}
-
-.product-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.14);
-}
-
-.product-image-wrapper {
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(135deg, #f8f8f8, #eee);
-  height: 320px;
-}
-
-.product-card .product-image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
+  transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+  transform-style: preserve-3d;
 }
-
-.product-card:hover .product-image {
-  transform: scale(1.08);
+.product-card-wrapper:hover .product-card-inner {
+  transform: rotateY(180deg);
 }
-
-.product-badges {
+.product-front, .product-back {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.product-back {
+  transform: rotateY(180deg);
+  background: var(--surface);
+  border: 1px solid var(--gold-deep);
+  border-radius: var(--radius);
   display: flex;
   flex-direction: column;
-  gap: 6px;
-}
-
-.badge-new, .badge-sale {
-  padding: 0.35rem 0.85rem;
-  border-radius: 20px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  font-family: 'Cairo', sans-serif;
-}
-
-.badge-new {
-  background: #10b981;
-  color: #fff;
-}
-
-.badge-sale {
-  background: #ef4444;
-  color: #fff;
-}
-
-.product-info {
-  padding: 1.4rem;
-}
-
-.product-name {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: var(--text, #222);
-  margin-bottom: 0.75rem;
-  font-family: 'Cairo', sans-serif;
-  line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.product-price-row {
-  display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.9rem;
-}
-
-.price-current {
-  font-size: 1.4rem;
-  font-weight: 900;
-  color: #d4af37;
-  font-family: 'Cairo', sans-serif;
-}
-
-.price-old {
-  text-decoration: line-through;
-  color: #aaa;
-  font-size: 0.95rem;
-  font-family: 'Cairo', sans-serif;
-}
-
-.product-colors {
-  display: flex;
-  gap: 0.4rem;
-  flex-wrap: wrap;
-}
-
-.color-dot {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 2px solid #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.color-dot:hover {
-  transform: scale(1.2);
-}
-
-/* Features Section */
-.features-section {
-  padding: 5rem 2rem;
-  background: #fff;
-}
-
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.feature-item {
+  justify-content: center;
+  padding: 1.5rem;
   text-align: center;
-  padding: 2.5rem 1.5rem;
-  border-radius: 20px;
-  background: var(--bg-alt, #fafafa);
-  transition: all 0.3s ease;
-  border: 1px solid transparent;
 }
-
-.feature-item:hover {
-  background: rgba(212,175,55,0.08);
-  border-color: rgba(212,175,55,0.25);
-  transform: translateY(-6px);
-}
-
-.feature-icon {
-  font-size: 3.2rem;
-  margin-bottom: 1.2rem;
-  display: block;
-}
-
-.feature-item h3 {
-  font-size: 1.2rem;
-  margin-bottom: 0.6rem;
-  color: var(--text, #222);
-  font-family: 'Cairo', sans-serif;
-  font-weight: 800;
-}
-
-.feature-item p {
-  color: var(--text-dim, #666);
-  font-size: 0.95rem;
-  line-height: 1.6;
-}
-
-/* CTA Section */
-.cta-section {
-  background: linear-gradient(135deg, #d4af37 0%, #b8962e 100%);
-  padding: 5rem 2rem;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.cta-section::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-  animation: ctaPulse 15s ease-in-out infinite;
-}
-
-@keyframes ctaPulse {
-  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.5; }
-  50% { transform: scale(1.1) rotate(180deg); opacity: 0.8; }
-}
-
-.cta-content {
-  position: relative;
-  z-index: 1;
-}
-
-.cta-content h2 {
-  font-size: 2.5rem;
-  color: #000;
+.product-back .back-icon {
+  font-size: 3rem;
+  color: var(--gold);
   margin-bottom: 1rem;
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+.product-back .back-text {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
   font-family: 'Cairo', sans-serif;
+}
+.product-back .back-price {
+  font-size: 1.3rem;
+  color: var(--gold);
   font-weight: 900;
-}
-
-.cta-content p {
-  color: rgba(0,0,0,0.7);
-  font-size: 1.15rem;
-  margin-bottom: 2.5rem;
-}
-
-.btn-cta {
-  display: inline-block;
-  padding: 1.1rem 3.5rem;
-  background: #000;
-  color: #d4af37;
-  border-radius: 50px;
-  text-decoration: none;
-  font-weight: 800;
-  font-size: 1.1rem;
   font-family: 'Cairo', sans-serif;
-  transition: all 0.3s ease;
-}
-
-.btn-cta:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-}
-
-/* Loading Skeleton */
-.skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-  border-radius: 8px;
-  height: 20px;
-}
-
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .hero-section { min-height: 75vh; }
-  .products-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
-  .section-header h2 { font-size: 1.9rem; }
+  margin-bottom: 1rem;
 }
 </style>
+
+<!-- ====== Structured Data (JSON-LD) — helps Google, Bing, and AI answer engines
+     (Google AI Overviews, Bing Copilot, ChatGPT Search, Perplexity) understand
+     what this store sells and answer questions about it directly. ====== -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ClothingStore",
+  "@id": "https://tiger-jeans.com/#organization",
+  "name": "Tiger Jeans",
+  "alternateName": "تايجر جينز",
+  "url": "https://tiger-jeans.com/",
+  "logo": "https://tiger-jeans.com/images/icon-512.png",
+  "image": "https://tiger-jeans.com/images/icon-512.png",
+  "description": "تايجر جينز متجر إلكتروني مصري متخصص في بناطيل الجينز والملابس العصرية للرجال والحريمي والبنات والشباب، بأفضل الأسعار وجودة عالية وشحن لجميع محافظات مصر.",
+  "priceRange": "$$",
+  "areaServed": {
+    "@type": "Country",
+    "name": "Egypt"
+  },
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "EG"
+  },
+  "currenciesAccepted": "EGP",
+  "paymentAccepted": "Cash on Delivery, Vodafone Cash, InstaPay",
+  "brand": {
+    "@type": "Brand",
+    "name": "Tiger Jeans"
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": "https://tiger-jeans.com/#website",
+  "url": "https://tiger-jeans.com/",
+  "name": "Tiger Jeans",
+  "inLanguage": "ar-EG",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://tiger-jeans.com/?q={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "ما هو أفضل بنطلون جينز رجالي في مصر؟",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "تايجر جينز بيقدم تشكيلة واسعة من بناطيل الجينز الرجالي بخامات عالية الجودة ومقاسات متعددة، بتصاميم كلاسيك وسليم فيت وسكيني، بأسعار منافسة مقارنة بباقي ماركات الجينز في مصر."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "هل يوجد جينز حريمي وبناتي عند تايجر جينز؟",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "نعم، يوفر متجر تايجر جينز تشكيلة متجددة من بناطيل الجينز الحريمي والبناتي بقصات عصرية (سكيني، وايد ليج، مام فيت) تناسب جميع الأذواق والمقاسات."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "هل يتوفر جينز شبابي عصري في المتجر؟",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "بالتأكيد، تايجر جينز متخصص في أحدث صيحات الجينز الشبابي، مع تشكيلات موسمية جديدة تناسب صيحات الموضة الحالية."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "هل تايجر جينز يوصل لكل محافظات مصر؟",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "نعم، يوفر تايجر جينز خدمة شحن سريعة لجميع محافظات جمهورية مصر العربية، مع إمكانية الدفع عند الاستلام أو الدفع الإلكتروني الآمن."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "ما هي طرق الدفع المتاحة في متجر تايجر جينز؟",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "يمكنك الدفع عند الاستلام (كاش)، أو عن طريق فودافون كاش، أو انستاباي، وجميع طرق الدفع آمنة وموثوقة."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "كيف أعرف المقاس المناسب لي عند شراء بنطلون جينز؟",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "يوفر متجر تايجر جينز دليل مقاسات تفصيلي لكل منتج، بالإضافة إلى صفحة دليل المقاسات (Size Guide) لمساعدتك في اختيار المقاس الأنسب لجسمك قبل إتمام الطلب."
+      }
+    }
+  ]
+}
+</script>
 </head>
+
 <body>
 
-<!-- Marquee Bar -->
-<div class="marquee-bar">
-  <div class="marquee-inner">
-    <span>💙 لأن مظهرك يستحق الأفضل</span>
-    <span>💚 اختر أسلوبك... واترك الانطباع لنا</span>
-    <span>💛 الموضة ليست رفاهية... إنها هويتك</span>
-    <span>🧡 كن مختلفًا... في كل ظهور</span>
-    <span>🩷 أحدث الصيحات... بأسعار تستحقها</span>
-    <span>💙 لأن مظهرك يستحق الأفضل</span>
-    <span>💚 اختر أسلوبك... واترك الانطباع لنا</span>
-    <span>💛 الموضة ليست رفاهية... إنها هويتك</span>
-    <span>🧡 كن مختلفًا... في كل ظهور</span>
-    <span>🩷 أحدث الصيحات... بأسعار تستحقها</span>
+<!-- ====== PWA Install Banner ====== -->
+<div class="install-banner" id="installBanner">
+  <div class="install-content">
+    <div class="install-info">
+      <img src="images/logo-icon.png" class="install-icon" width="128" height="128" alt="Tiger Jeans" />
+      <div class="install-text">
+        <h3>ثبّت Tiger Jeans</h3>
+        <p>تسوق أسرع وأفضل بدون متصفح</p>
+      </div>
+    </div>
+    <div class="install-buttons">
+      <button class="install-btn" id="installBtn">
+        <i class='bx bx-download'></i> تثبيت الآن
+      </button>
+      <button class="dismiss-btn" id="dismissInstall">لاحقاً</button>
+    </div>
   </div>
 </div>
 
-<!-- Header -->
+<!-- iOS Install Hint (shown on iOS) -->
+<div class="ios-install-hint" id="iosHint">
+  <span style="color: #d4af37; font-weight: 700;">⭐ ثبّت التطبيق:</span>
+  <span style="font-size: 0.85rem;">اضغط على <strong style="color: #d4af37;">↗ مشاركة</strong> ثم <strong style="color: #d4af37;">"إضافة إلى الشاشة الرئيسية"</strong></span>
+</div>
+
+<!-- ====== Top Bar ====== -->
+<div class="top-bar">
+  <div class="container">
+    <div class="top-bar-inner">
+      <div class="top-left">
+        <span><i class='bx bxs-phone-call'></i> شحن لجميع المحافظات 🇪🇬</span>
+        <span class="divider">|</span>
+        <a href="https://wa.me/201289440111" target="_blank"><i class='bx bxl-whatsapp'></i> الواتساب: 01289440111</a>
+      </div>
+      <div class="top-right">
+        <a href="#" id="topAccountLink" onclick="openAuthModal()"><i class='bx bx-user'></i> حسابي</a>
+        <a href="#" id="topLoginLink" onclick="openAuthModal()">سجل دخولك</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== Header ====== -->
 <header class="site-header">
   <div class="container">
     <div class="header-main">
+      <!-- Logo -->
       <a href="/" class="logo">
-        <img src="images/logo-icon.png" class="logo-icon" alt="Tiger Jeans" />
-        <div class="logo-text"><strong>TIGER JEANS</strong><small>لأرقى الملابس العالمية</small></div>
+        <img src="images/logo-icon.png" class="logo-icon" width="128" height="128" alt="Tiger Jeans" />
+        <div class="logo-text">
+          <strong>TIGER JEANS</strong>
+          <small>تايجر چينز</small>
+        </div>
       </a>
-      <nav class="main-nav">
-        <a href="/">الرئيسية</a>
+
+      <!-- Navigation -->
+      <nav class="main-nav" id="mainNav">
+        <a href="/" class="active">الرئيسية</a>
         <a href="#products">المنتجات</a>
-        <a href="track.html">تتبع الطلب</a>
+        <a href="#deals-section">عروض مميزة 🔥</a>
+        <a href="#deals-section">الخصومات</a>
+        <a href="size-guide.html">دليل المقاسات</a>
         <a href="gift-cards.html">بطاقات الهدايا</a>
       </nav>
+
+      <!-- Actions -->
       <div class="header-actions">
-        <button class="action-btn search-toggle" onclick="toggleSearch()" title="بحث">
-          <i class='bx bx-search'></i>
-        </button>
-        <a href="orders.html" class="action-btn" title="طلباتي"><i class='bx bx-receipt'></i></a>
-        <a href="wishlist.html" class="action-btn wishlist-btn-header"><i class='bx bx-heart'></i><span class="wishlist-badge" style="display:none">0</span></a>
-        <a href="cart.html" class="action-btn cart-btn"><i class='bx bx-cart-alt'></i><span class="cart-badge" style="display:none">0</span></a>
+        <button class="theme-toggle" onclick="toggleTheme()" title="تبديل الوضع الليلي/النهاري" aria-label="تبديل الوضع الليلي/النهاري"><i class='bx bx-moon'></i></button>
+        <button class="action-btn" onclick="toggleSearch()" aria-label="بحث"><i class='bx bx-search'></i></button>
+        <button class="action-btn" id="headerAccountBtn" onclick="openAuthModal()" aria-label="حسابي"><i class='bx bx-user'></i></button>
+        <a href="orders.html" class="action-btn" title="طلباتي" aria-label="طلباتي"><i class='bx bx-receipt'></i></a>
+        <a href="wishlist.html" class="action-btn wishlist-btn-header" aria-label="المفضلة">
+          <i class='bx bx-heart'></i>
+          <span class="wishlist-badge" style="display:none">0</span>
+        </a>
+        <a href="cart.html" class="action-btn cart-btn" aria-label="سلة المشتريات">
+          <i class='bx bx-cart-alt'></i>
+          <span class="cart-badge" style="display:none">0</span>
+        </a>
+        <button class="burger" onclick="toggleMobileNav()" aria-label="فتح القائمة"><i class='bx bx-menu'></i></button>
       </div>
     </div>
   </div>
 
-  <!-- Search Overlay -->
-  <div class="search-overlay" id="searchOverlay" style="display:none">
-    <div class="search-container">
-      <input type="text" id="searchInput" placeholder="ابحث عن منتج..." onkeyup="handleSearch(event)" />
-      <button onclick="toggleSearch()"><i class='bx bx-x'></i></button>
+  <!-- Search Box -->
+  <div class="search-dropdown" id="searchDropdown">
+    <div class="container">
+      <div class="search-input-wrap">
+        <input type="text" id="searchInput" placeholder="ابحث عن منتج..." oninput="liveSearch()" onkeydown="if(event.key==='Escape')closeLiveSearch()" autocomplete="off" />
+        <div class="search-results-panel" id="searchResultsPanel"></div>
+      </div>
     </div>
-    <div class="search-results" id="searchResults"></div>
   </div>
 </header>
 
-<!-- Hero Section -->
-<section class="hero-section" id="hero">
-  <div class="hero-content">
-    <img src="images/logo-icon.png" alt="Tiger Jeans Logo" class="hero-logo" />
-    <h1 class="hero-title">
-      تايگر
-      <span class="gold">چينز</span>
-    </h1>
-    <p class="hero-subtitle">الأناقة تبدأ من هنا... أحدث صيحات الموضة بأفضل الأسعار وجودة لا مثيل لها</p>
-    
+<main>
+<!-- ====== Marquee Banner ====== -->
+<div class="marquee-bar">
+  <div class="marquee-content" id="marqueeContent">
+    <span class="marquee-item">⭐ نقدم 5 توصيل من أجلنا من أكثر 10,000 عملي</span>
+    <span class="marquee-sep">✦</span>
+    <span class="marquee-item">🎁 خصم خاص لمحدود وقت</span>
+    <span class="marquee-sep">✦</span>
+    <span class="marquee-item">📢 مجددة خصوصية دجين وصلت حديثاً - تشكيل الربيع</span>
+    <span class="marquee-sep">✦</span>
+    <span class="marquee-item">🔥 التوصيل مجاني للطلبات فوق 500 جنيه</span>
+    <span class="marquee-sep">✦</span>
+    <span class="marquee-item">⭐ نقدم 5 توصيل من أجلنا من أكثر 10,000 عملي</span>
+    <span class="marquee-sep">✦</span>
+    <span class="marquee-item">🎁 خصم خاص لمحدود وقت</span>
+    <span class="marquee-sep">✦</span>
+    <span class="marquee-item">📢 مجددة خصوصية دجين وصلت حديثاً - تشكيل الربيع</span>
+    <span class="marquee-sep">✦</span>
+    <span class="marquee-item">🔥 التوصيل مجاني للطلبات فوق 500 جنيه</span>
+  </div>
+</div>
+
+<!-- ====== Hero Section ====== -->
+<section class="hero-section">
+  <div class="hero-blob b1"></div>
+  <div class="hero-blob b2"></div>
+  <div class="container">
+    <div class="hero-badge">✨ اكتشف أحدث تشكيلات Tiger</div>
+    <h1 class="hero-title">اكتشِف أناقة<br><span class="gold-text">تليق بك</span></h1>
+    <p class="hero-desc">مشتري وصول البنر الذي تأثير أونر والملابس العصرية<br>بأسعار منافسة وجودة لا تضاهى</p>
     <div class="hero-buttons">
-      <a href="#products" class="btn-hero-primary">
-        <i class='bx bx-shopping-bag'></i> تسوق الآن
-      </a>
-      <a href="#features" class="btn-hero-secondary">
-        <i class='bx bx-star'></i> لماذا نحن
-      </a>
+      <a href="#products" class="btn-primary">تسوق الآن <i class='bx bx-left-arrow-alt'></i></a>
+      <a href="#featured" class="btn-secondary">عروض مميزة</a>
     </div>
   </div>
 </section>
 
-<!-- Products Section -->
-<section class="products-section" id="products">
-  <div class="section-header">
-    <h2>🛒 منتجاتنا المميزة</h2>
-    <p>تشكيلة حصرية من الجينز العصري بجودة عالية وأسعار منافسة</p>
-  </div>
-  
-  <div class="products-grid" id="productsGrid">
-    <!-- Loading Skeletons -->
-    <div class="product-card">
-      <div class="product-image-wrapper"><div style="width:100%;height:100%;background:#f0f0f0"></div></div>
-      <div class="product-info"><div class="skeleton"></div><div class="skeleton" style="width:60%;margin-top:8px"></div></div>
-    </div>
-    <div class="product-card">
-      <div class="product-image-wrapper"><div style="width:100%;height:100%;background:#f0f0f0"></div></div>
-      <div class="product-info"><div class="skeleton"></div><div class="skeleton" style="width:60%;margin-top:8px"></div></div>
-    </div>
-    <div class="product-card">
-      <div class="product-image-wrapper"><div style="width:100%;height:100%;background:#f0f0f0"></div></div>
-      <div class="product-info"><div class="skeleton"></div><div class="skeleton" style="width:60%;margin-top:8px"></div></div>
-    </div>
-    <div class="product-card">
-      <div class="product-image-wrapper"><div style="width:100%;height:100%;background:#f0f0f0"></div></div>
-      <div class="product-info"><div class="skeleton"></div><div class="skeleton" style="width:60%;margin-top:8px"></div></div>
-    </div>
-    <div class="product-card">
-      <div class="product-image-wrapper"><div style="width:100%;height:100%;background:#f0f0f0"></div></div>
-      <div class="product-info"><div class="skeleton"></div><div class="skeleton" style="width:60%;margin-top:8px"></div></div>
-    </div>
-    <div class="product-card">
-      <div class="product-image-wrapper"><div style="width:100%;height:100%;background:#f0f0f0"></div></div>
-      <div class="product-info"><div class="skeleton"></div><div class="skeleton" style="width:60%;margin-top:8px"></div></div>
-    </div>
-  </div>
-  
-  <div style="text-align:center;margin-top:3.5rem">
-    <a href="#" class="btn-hero-primary" onclick="loadMoreProducts()" id="loadMoreBtn">
-      <i class='bx bx-reload'></i> عرض جميع المنتجات
-    </a>
-  </div>
-</section>
-
-<!-- Features Section -->
-<section class="features-section" id="features">
-  <div class="section-header">
-    <h2>✨ لماذا Tiger Jeans؟</h2>
-    <p>نقدم لك أفضل تجربة تسوق أونلاين</p>
-  </div>
-  
-  <div class="features-grid">
-    <div class="feature-item">
-      <span class="feature-icon">🚚</span>
-      <h3>شحن سريع</h3>
-      <p>توصيل لجميع المحافظات عبر بوستا خلال 3-5 أيام عمل فقط</p>
-    </div>
-    <div class="feature-item">
-      <span class="feature-icon">💎</span>
-      <h3>جودة عالية</h3>
-      <p>خامات مستوردة عالية الجودة مع ضمان الجودة على كل منتج</p>
-    </div>
-    <div class="feature-item">
-      <span class="feature-icon">💰</span>
-      <h3>أسعار منافسة</h3>
-      <p>أفضل الأسعار في السوق مع خصومات تصل إلى 40%</p>
-    </div>
-    <div class="feature-item">
-      <span class="feature-icon">🤖</span>
-      <h3>مساعد ذكي AI</h3>
-      <p>مساعد ذكي يجاوب على جميع استفساراتك فوراً وبشكل دقيق</p>
+<!-- ====== Stats Section ====== -->
+<section class="stats-section">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-number">4.9</div>
+        <div class="stat-label"><i class='bx bxs-star gold-text'></i> تقيم</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">500+</div>
+        <div class="stat-label">منتج</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">10K+</div>
+        <div class="stat-label">عملاء سعداء</div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- CTA Section -->
-<section class="cta-section">
-  <div class="cta-content">
-    <h2>🐯 انضم لعائلة Tiger Jeans</h2>
-    <p>سجل الآن واحصل على خصم 10% على أول طلب + شحن مجاني</p>
-    <a href="#products" class="btn-cta">ابدأ التسوق الآن</a>
+<!-- ====== Features Section ====== -->
+<section class="features-section">
+  <div class="container">
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon icon-shipping">
+          <svg viewBox="0 0 64 64" width="30" height="30" fill="none">
+            <path class="truck-body" d="M4 40V20a2 2 0 0 1 2-2h26a2 2 0 0 1 2 2v20" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+            <path class="truck-cab" d="M34 26h11l9 9v5h-20V26Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+            <circle class="truck-wheel" cx="16" cy="42" r="4.5" stroke="currentColor" stroke-width="3"/>
+            <circle class="truck-wheel" cx="42" cy="42" r="4.5" stroke="currentColor" stroke-width="3"/>
+            <path class="truck-line" d="M4 40h6M46 40h6" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            <path class="truck-smoke" d="M2 16c1-2 3-2 4 0M0 12c1-2 3-2 4 0" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="feature-info">
+          <h3>شحن سريع</h3>
+          <p>توصيل لجميع المحافظات</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon discount-icon icon-discount">
+          <svg viewBox="0 0 64 64" width="30" height="30" fill="none">
+            <path class="tag-shape" d="M8 8h22l26 26-22 22-26-26V8Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round" fill="rgba(255,255,255,.08)"/>
+            <circle class="tag-hole" cx="18" cy="18" r="4" fill="currentColor"/>
+            <clipPath id="tagClip"><path d="M8 8h22l26 26-22 22-26-26V8Z"/></clipPath>
+            <g clip-path="url(#tagClip)">
+              <path class="tag-shine" d="M-10 20 L54 -10" stroke="rgba(255,255,255,.55)" stroke-width="10"/>
+            </g>
+          </svg>
+        </div>
+        <div class="feature-info">
+          <h3>خصومات ممتازة</h3>
+          <p>أفضل الأسعار والموسمية</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon icon-package">
+          <svg viewBox="0 0 64 64" width="30" height="30" fill="none">
+            <path d="M10 26h44v28a2 2 0 0 1-2 2H12a2 2 0 0 1-2-2V26Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+            <path class="box-lid-left" d="M10 26 6 14h22l4 12" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+            <path class="box-lid-right" d="M54 26 58 14H36l-4 12" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+            <path d="M32 26V56" stroke="currentColor" stroke-width="2.5" stroke-dasharray="3 4"/>
+          </svg>
+        </div>
+        <div class="feature-info">
+          <h3>إيصال سريع</h3>
+          <p>خلال ٤ أيام</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon icon-secure">
+          <svg viewBox="0 0 64 64" width="30" height="30" fill="none">
+            <path class="shield-shape" d="M32 6 12 14v16c0 14 8.5 22.4 20 28 11.5-5.6 20-14 20-28V14L32 6Z" stroke="currentColor" stroke-width="3" stroke-linejoin="round" fill="rgba(255,255,255,.06)"/>
+            <path class="shield-check" d="M22 32l7 7 13-15" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+          </svg>
+        </div>
+        <div class="feature-info">
+          <h3>دفع آمن</h3>
+          <p>طرق دفع موثوقة</p>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- Footer -->
-<footer class="site-footer">
-  <div class="container footer-bottom">
-    <div class="footer-legal-links">
-      <a href="/">الرئيسية</a>
-      <a href="about.html">من نحن</a>
-      <a href="contact.html">اتصل بنا</a>
-      <a href="gift-cards.html">بطاقات هدايا</a>
-      <a href="track.html">تتبع الطلب</a>
+<!-- ====== Products Section ====== -->
+<section class="section" id="products">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <span class="eyebrow">التشكيلة الكاملة</span>
+        <h2>أحدث المنتجات</h2>
+      </div>
+      <a href="#" class="view-all">عرض الكل ←</a>
     </div>
-    <p>جميع الحقوق محفوظة © Tiger Jeans 2026 | تطوير
-        <a href="https://www.facebook.com/en.mohamed.nasr" target="_blank" rel="noopener" class="credit-link">محمد نصر</a>
+
+    <!-- Category Filters -->
+    <div class="category-filters" id="catFilters">
+      <button class="cat-chip active" data-cat="all">الكل</button>
+    </div>
+
+    <!-- Products Grid with Flip Animation -->
+    <div class="products-grid" id="productsGrid">
+      <div class="loading-state">جاري تحميل المنتجات...</div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== Featured/Deals Section ====== -->
+<section class="section featured-section deals-section" id="deals-section" style="background:var(--bg-alt)">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <span class="eyebrow">عروض حصرية</span>
+        <h2>عروض مميزة لك ✨</h2>
+      </div>
+      <a href="#deals-section" class="view-all">عرض الكل ←</a>
+    </div>
+
+    <div class="deals-grid" id="dealsGrid"></div>
+  </div>
+</section>
+
+<!-- ====== About / Keyword-rich Intro Section (static, always visible — read by search
+     engines and AI crawlers that don't execute JavaScript) ====== -->
+<section class="section seo-intro-section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <span class="eyebrow">تايجر جينز</span>
+        <h2>وجهتك الأولى لبناطيل الجينز في مصر</h2>
+      </div>
+    </div>
+    <p class="seo-intro-text">
+      <strong>تايجر جينز</strong> متجر مصري متخصص في بناطيل الجينز والملابس العصرية، بتشكيلة متكاملة تناسب الجميع:
+      <strong>جينز رجالي</strong> بقصات كلاسيك وسليم فيت، <strong>جينز حريمي</strong> بموديلات سكيني ووايد ليج،
+      <strong>جينز بناتي</strong> بألوان وقصات عصرية، و<strong>جينز شبابي</strong> يواكب أحدث صيحات الموضة.
+      بنوفرلك جودة خامة عالية، مقاسات دقيقة، أسعار منافسة، شحن سريع لجميع محافظات جمهورية مصر العربية،
+      ودفع آمن سواء عند الاستلام أو أونلاين.
     </p>
+  </div>
+</section>
+
+<!-- ====== FAQ Section (matches FAQPage structured data in <head>) ====== -->
+<section class="section faq-section" id="faq">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <span class="eyebrow">أسئلة شائعة</span>
+        <h2>كل اللي محتاج تعرفه عن تايجر جينز</h2>
+      </div>
+    </div>
+    <div class="faq-list">
+      <details class="faq-item" open>
+        <summary>ما هو أفضل بنطلون جينز رجالي في مصر؟</summary>
+        <p>تايجر جينز بيقدم تشكيلة واسعة من بناطيل الجينز الرجالي بخامات عالية الجودة ومقاسات متعددة، بتصاميم كلاسيك وسليم فيت وسكيني، بأسعار منافسة مقارنة بباقي ماركات الجينز في مصر.</p>
+      </details>
+      <details class="faq-item">
+        <summary>هل يوجد جينز حريمي وبناتي عند تايجر جينز؟</summary>
+        <p>نعم، يوفر متجر تايجر جينز تشكيلة متجددة من بناطيل الجينز الحريمي والبناتي بقصات عصرية (سكيني، وايد ليج، مام فيت) تناسب جميع الأذواق والمقاسات.</p>
+      </details>
+      <details class="faq-item">
+        <summary>هل يتوفر جينز شبابي عصري في المتجر؟</summary>
+        <p>بالتأكيد، تايجر جينز متخصص في أحدث صيحات الجينز الشبابي، مع تشكيلات موسمية جديدة تناسب صيحات الموضة الحالية.</p>
+      </details>
+      <details class="faq-item">
+        <summary>هل تايجر جينز يوصل لكل محافظات مصر؟</summary>
+        <p>نعم، يوفر تايجر جينز خدمة شحن سريعة لجميع محافظات جمهورية مصر العربية، مع إمكانية الدفع عند الاستلام أو الدفع الإلكتروني الآمن.</p>
+      </details>
+      <details class="faq-item">
+        <summary>ما هي طرق الدفع المتاحة في متجر تايجر جينز؟</summary>
+        <p>يمكنك الدفع عند الاستلام (كاش)، أو عن طريق فودافون كاش، أو انستاباي، وجميع طرق الدفع آمنة وموثوقة.</p>
+      </details>
+      <details class="faq-item">
+        <summary>كيف أعرف المقاس المناسب لي عند شراء بنطلون جينز؟</summary>
+        <p>يوفر متجر تايجر جينز دليل مقاسات تفصيلي لكل منتج، بالإضافة إلى صفحة دليل المقاسات (Size Guide) لمساعدتك في اختيار المقاس الأنسب لجسمك قبل إتمام الطلب.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ====== Footer ====== -->
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="footer-brand">
+          <img src="images/logo-icon.png" class="logo-icon" width="128" height="128" alt="Tiger Jeans" />
+          <strong>TIGER JEANS</strong>
+        </div>
+        <p>وجهتك الأولى للأزياء العصرية بأفضل جودة وأسعار تنافسية.</p>
+        <div class="social-links">
+          <a href="#" id="socialFacebook" target="_blank" rel="noopener" aria-label="فيسبوك"><i class='bx bxl-facebook'></i></a>
+          <a href="#" id="socialInstagram" target="_blank" rel="noopener" aria-label="انستجرام"><i class='bx bxl-instagram'></i></a>
+          <a href="#" id="socialWhatsapp" target="_blank" rel="noopener" aria-label="واتساب"><i class='bx bxl-whatsapp'></i></a>
+          <a href="#" id="socialTiktok" target="_blank" rel="noopener" aria-label="تيك توك"><i class='bx bxl-tiktok'></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h3>روابط سريعة</h3>
+        <a href="/">الرئيسية</a>
+        <a href="#products">المنتجات</a>
+        <a href="#featured">العروض</a>
+        <a href="gift-cards.html">بطاقات الهدايا</a>
+        <a href="track.html">تتبع الطلب</a>
+      </div>
+      <div class="footer-col">
+        <h3>حسابي</h3>
+        <a href="track.html">تتبع طلبي</a>
+        <a href="cart.html">السلة</a>
+        <a href="checkout.html">إتمام الشراء</a>
+      </div>
+      <div class="footer-col">
+        <h3>تواصل معنا</h3>
+        <p><i class='bx bxs-map'></i> جمهورية مصر العربية</p>
+        <p><i class='bx bxs-envelope'></i> info@tiger-jeans.com</p>
+        <p><i class='bx bxs-phone'></i> 01289440111</p>
+      </div>
+      <div class="footer-col">
+        <h3>معلومات</h3>
+        <a href="about.html">من نحن</a>
+        <a href="contact.html">اتصل بنا</a>
+        <a href="privacy-policy.html">سياسة الخصوصية</a>
+        <a href="terms.html">الشروط والأحكام</a>
+        <a href="return-policy.html">سياسة الاسترجاع والاستبدال</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-payment-icons" style="display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap;margin-bottom:1rem;opacity:.9">
+        <img src="images/payments/gift-card.png" alt="بطاقة هدايا" height="26" style="border-radius:5px" />
+        <img src="images/payments/vodafone-cash.png" alt="فودافون كاش" height="26" style="border-radius:5px" />
+        <img src="images/payments/instapay.png" alt="إنستاباي" height="26" style="border-radius:5px" />
+        <img src="images/payments/cash-on-delivery.png" alt="الدفع عند الاستلام" height="26" style="border-radius:5px" />
+      </div>
+      <div class="footer-dev-credit">
+        <span class="credit-text">برمجة وتطوير</span>
+        <span class="heartbeat">❤️</span>
+        <a href="https://www.facebook.com/en.mohamed.nasr" target="_blank" rel="noopener" class="dev-name">
+          المهندس محمد حماد
+        </a>
+        <div class="dev-social">
+          <a href="https://www.facebook.com/en.mohamed.nasr" target="_blank" rel="noopener" title="فيسبوك" class="dev-social-btn facebook-btn">
+            <i class='bx bxl-facebook'></i>
+          </a>
+          <a href="https://wa.me/201279934735" target="_blank" rel="noopener" title="واتساب" class="dev-social-btn whatsapp-btn">
+            <i class='bx bxl-whatsapp'></i>
+          </a>
+        </div>
+      </div>
+      <p class="copyright-text">جميع الحقوق محفوظة © Tiger Jeans 2026</p>
+    </div>
   </div>
 </footer>
 
-<!-- Bottom Navigation (Mobile) -->
-<nav class="bottom-nav" aria-label="التنقل السفلي">
-  <div class="bottom-nav-inner">
-    <a href="/" data-nav="home" class="active"><i class='bx bx-home-alt'></i><span>الرئيسية</span></a>
-    <a href="#products" data-nav="search" onclick="if(window.location.pathname==='/'){event.preventDefault();toggleSearch();}"><i class='bx bx-search'></i><span>بحث</span></a>
-    <a href="#products" data-nav="categories"><i class='bx bx-category'></i><span>الأقسام</span></a>
-    <a href="cart.html" data-nav="cart"><i class='bx bx-cart-alt'></i><span>السلة</span><span class="bn-badge cart-badge" style="display:none">0</span></a>
-    <a href="gift-cards.html" data-nav="giftcards"><i class='bx bx-gift'></i><span>هدايا</span></a>
-    <a href="#" data-nav="account" id="bottomAccountLink"><i class='bx bx-user'></i><span>حسابي</span></a>
+<!-- ====== Quick View Modal ====== -->
+<div class="modal-overlay" id="quickViewModal">
+  <div class="qv-modal">
+    <button class="close-modal" onclick="closeQuickView()">&times;</button>
+    <div id="qvBody" style="display:contents"></div>
   </div>
-</nav>
+</div>
 
-<!-- Scripts -->
+<!-- ====== Scroll to Top ====== -->
+<button class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()" title="للأعلى"><i class='bx bx-up-arrow-alt'></i></button>
+
+<!-- ====== Auth Modal ====== -->
+<div class="modal-overlay" id="authModal">
+  <div class="auth-modal">
+    <button class="close-modal" onclick="closeAuthModal()">&times;</button>
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-tab="login">تسجيل الدخول</button>
+      <button class="auth-tab" data-tab="signup">إنشاء حساب</button>
+    </div>
+    
+    <!-- Login Form -->
+    <div class="auth-form" id="loginForm">
+      <div class="field">
+        <label>البريد الإلكتروني أو رقم الموبايل</label>
+        <input type="text" id="loginEmail" placeholder="أدخل بريدك الإلكتروني أو الموبايل" />
+      </div>
+      <div class="field">
+        <label>كلمة المرور</label>
+        <input type="password" id="loginPass" placeholder="••••••••" />
+      </div>
+      <button class="btn-primary full-width" onclick="doEmailLogin()">دخول</button>
+      <div class="auth-divider">أو</div>
+      <button class="btn-google" onclick="googleLogin()">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        الدخول بحساب Google
+      </button>
+    </div>
+
+    <!-- Signup Form -->
+    <div class="auth-form hidden" id="signupForm">
+      <div class="field">
+        <label>الاسم الكامل</label>
+        <input type="text" placeholder="أدخل اسمك الكامل" />
+      </div>
+      <div class="field">
+        <label>البريد الإلكتروني</label>
+        <input type="email" placeholder="example@email.com" />
+      </div>
+      <div class="field">
+        <label>رقم الموبايل</label>
+        <input type="tel" placeholder="01xxxxxxxxx" />
+      </div>
+      <div class="field">
+        <label>كلمة المرور</label>
+        <input type="password" placeholder="••••••••" />
+      </div>
+      <button class="btn-primary full-width">إنشاء حساب</button>
+      <div class="auth-divider">أو</div>
+      <button class="btn-google" onclick="googleLogin()">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        التسجيل بحساب Google
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="js/config.js"></script>
-<script src="js/upload.js"></script>
-<script src="js/telegram-bot.js"></script>
-<script src="js/tiger-ai.js"></script>
-<script>
-// ====== Global State ======
-let allProducts = [];
-let displayedCount = 6;
+<script src="js/admin-enhancements.js"></script>
 
-// ====== Initialize Page ======
-document.addEventListener('DOMContentLoaded', () => {
-  loadFeaturedProducts();
-  loadCartBadge();
-  loadWishlistBadge();
+<script>
+// ====== PWA Install Logic ======
+let deferredPrompt = null;
+
+// Show install banner if PWA can be installed
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  
+  // Check if user dismissed before
+  if (!localStorage.getItem('pwa-dismissed')) {
+    setTimeout(() => {
+      document.getElementById('installBanner').classList.add('show');
+    }, 3000);
+  }
 });
 
-// ====== Load Products from Firebase ======
-async function loadFeaturedProducts() {
+// Install button click
+document.getElementById('installBtn').addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  
+  if (outcome === 'accepted') {
+    showToast('تم تثبيت التطبيق بنجاح! 🎉');
+  }
+  
+  deferredPrompt = null;
+  document.getElementById('installBanner').classList.remove('show');
+});
+
+// Dismiss install banner
+document.getElementById('dismissInstall').addEventListener('click', () => {
+  document.getElementById('installBanner').classList.remove('show');
+  localStorage.setItem('pwa-dismissed', 'true');
+});
+
+// App installed event
+window.addEventListener('appinstalled', () => {
+  showToast('تم تثبيت Tiger Jeans بنجاح! ✓');
+  document.getElementById('installBanner').classList.remove('show');
+});
+
+// Detect iOS and show hint
+function isIOS() {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+
+if (isIOS() && !window.navigator.standalone) {
+  setTimeout(() => {
+    if (!localStorage.getItem('ios-hint-dismissed')) {
+      document.getElementById('iosHint').classList.add('show');
+      setTimeout(() => {
+        document.getElementById('iosHint').classList.remove('show');
+      }, 10000);
+    }
+  }, 5000);
+}
+
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('[PWA] Service Worker registered'))
+      .catch(err => console.log('[PWA] SW registration failed:', err));
+  });
+}
+
+// ====== Products Data ======
+let ALL_PRODUCTS = [];
+let ACTIVE_CAT = "all";
+let productsLoadAttempted = false;
+let productsLoadTimeout = null;
+
+// Load products from Firebase with mobile-friendly error handling
+function loadProductsFromFirebase() {
+  if (productsLoadAttempted) return; // Prevent multiple loads
+  productsLoadAttempted = true;
+  
+  // Show loading state
+  const grid = document.getElementById("productsGrid");
+  if (grid && !grid.hasChildNodes()) {
+    grid.innerHTML = '<div class="loading-state"><i class="bx bx-loader-alt bx-spin" style="font-size:2rem"></i><p>جاري تحميل المنتجات...</p></div>';
+  }
+  
+  // Set a timeout to retry if Firebase is slow (common on mobile)
+  productsLoadTimeout = setTimeout(() => {
+    // If still loading after 8 seconds, show message
+    const grid = document.getElementById("productsGrid");
+    if (grid) {
+      const loadingEl = grid.querySelector('.loading-state');
+      if (loadingEl) {
+        loadingEl.innerHTML = '<i class="bx bx-wifi-off" style="font-size:2rem"></i><p>بطء في الاتصال... جاري المحاولة</p><button onclick="retryLoadProducts()" class="btn-secondary" style="margin-top:1rem"><i class="bx bx-refresh"></i> إعادة المحاولة</button>';
+      }
+    }
+  }, 8000);
+  
   try {
-    const snap = await db.ref('products')
-      .orderByChild('active')
-      .equalTo(true)
-      .once('value');
-    
-    const data = snap.val();
-    if (!data) {
-      document.getElementById('productsGrid').innerHTML = `
-        <div style="grid-column:1/-1;text-align:center;padding:3rem;color:#999">
-          <i class='bx bx-package' style="font-size:3rem;display:block;margin-bottom:1rem"></i>
-          <p>لا توجد منتجات حالياً</p>
-        </div>
-      `;
-      return;
-    }
-    
-    // Convert to array
-    allProducts = Object.entries(data).map(([id, product]) => ({
-      id,
-      ...product
-    }));
-    
-    // Sort: featured first, then by date
-    allProducts.sort((a, b) => {
-      if (a.featured && !b.featured) return -1;
-      if (!a.featured && b.featured) return 1;
-      return (b.createdAt || 0) - (a.createdAt || 0);
+    db.ref("products").on("value", (snap) => {
+      // Clear the timeout since we got data
+      if (productsLoadTimeout) {
+        clearTimeout(productsLoadTimeout);
+        productsLoadTimeout = null;
+      }
+      
+      const val = snap.val() || {};
+      ALL_PRODUCTS = Object.entries(val)
+        .map(([id, p]) => ({ id, ...p }))
+        .filter((p) => p.active !== false);
+      
+      buildCategoryFilters();
+      renderProducts();
+      renderDeals();
+      applySearchFromUrl();
+      
+      console.log(`✓ Loaded ${ALL_PRODUCTS.length} products successfully`);
+    }, (error) => {
+      console.error('Firebase products load error:', error);
+      handleProductsError(error);
     });
-    
-    // Render first batch
-    renderProducts(allProducts.slice(0, displayedCount));
-    
-  } catch (error) {
-    console.error('Error loading products:', error);
+  } catch (err) {
+    console.error('Firebase init error:', err);
+    handleProductsError(err);
   }
 }
 
-// ====== Render Products ======
-function renderProducts(products) {
-  const grid = document.getElementById('productsGrid');
-  if (!grid || !products.length) return;
+function handleProductsError(error) {
+  const grid = document.getElementById("productsGrid");
+  if (!grid) return;
   
-  grid.innerHTML = products.map(product => {
-    const image = (product.images && product.images[0]) || 'images/poster-1.png';
-    const oldPriceHtml = product.oldPrice && product.oldPrice > product.price 
-      ? `<span class="price-old">${fmtPrice(product.oldPrice)}</span>` 
-      : '';
-    const discountPercent = product.oldPrice && product.oldPrice > product.price
-      ? Math.round((1 - product.price / product.oldPrice) * 100)
-      : 0;
-    
-    const badgesHtml = [];
-    if (product.isNew) badgesHtml.push('<span class="badge-new">جديد</span>');
-    if (discountPercent > 0) badgesHtml.push(`<span class="badge-sale">-${discountPercent}%</span>`);
-    
-    const colorsHtml = (product.colors || []).slice(0, 5).map(c => {
-      const colorMap = {
-        'أسود': '#222', 'أسود فحمي': '#333', 'أسود مغسول': '#444',
-        'أبيض': '#fff', 'ثلجي': '#f0f0f0',
-        'أزرق': '#0066cc', 'أزرق داكن': '#004499', 'أزرق ثلجي': '#6699cc', 'أزرق فاتح': '#3399ff', 'أزرق كلاسيكي': '#0055aa', 'أزرق متوسط': '#0077dd',
-        'رمادي': '#888', 'رمادي فاتح': '#bbb', 'جريg': '#999',
-        'أخضر زيتوني': '#556b2f', 'ساجي ثلجي': '#708090'
-      };
-      const bgColor = colorMap[c.name] || '#d4af37';
-      const borderCol = (c.name === 'أبيض' || c.name === 'ثلجي') ? '#ddd' : 'transparent';
-      return `<span class="color-dot" style="background:${bgColor};border-color:${borderCol}" title="${c.name}"></span>`;
-    }).join('');
-    
-    return `
-      <div class="product-card" onclick="window.location.href='#product-${product.id}'">
-        <div class="product-image-wrapper">
-          <img src="${image}" alt="${product.name}" class="product-image" loading="lazy" />
-          ${badgesHtml.length ? `<div class="product-badges">${badgesHtml.join('')}</div>` : ''}
-        </div>
-        <div class="product-info">
-          <h3 class="product-name">${product.name}</h3>
-          <div class="product-price-row">
-            <span class="price-current">${fmtPrice(product.price)}</span>
-            ${oldPriceHtml}
-          </div>
-          <div class="product-colors">
-            ${colorsHtml}
-            ${(product.colors || []).length > 5 ? `<span style="font-size:0.78rem;color:#999;margin-right:5px">+${product.colors.length - 5}</span>` : ''}
-          </div>
-        </div>
-      </div>
-    `;
-  }).join('');
+  grid.innerHTML = `
+    <div class="loading-state" style="padding:3rem;text-align:center">
+      <i class="bx bx-error-circle" style="font-size:2.5rem;color:#ff4757;margin-bottom:1rem;display:block"></i>
+      <h3 style="margin-bottom:.5rem">حدث خطأ في التحميل</h3>
+      <p style="color:var(--text-dim);margin-bottom:1.5rem">تأكد من اتصالك بالإنترنت ثم أعد المحاولة</p>
+      <button onclick="retryLoadProducts()" class="btn-primary">
+        <i class="bx bx-refresh"></i> إعادة تحميل المنتجات
+      </button>
+    </div>
+  `;
+}
+
+function retryLoadProducts() {
+  productsLoadAttempted = false;
   
-  // Update load more button
-  const loadMoreBtn = document.getElementById('loadMoreBtn');
-  if (loadMoreBtn) {
-    if (displayedCount >= allProducts.length) {
-      loadMoreBtn.style.display = 'none';
+  // Remove old listener
+  try {
+    db.ref("products").off();
+  } catch(e) {}
+  
+  // Reload
+  loadProductsFromFirebase();
+}
+
+// Initialize products when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(loadProductsFromFirebase, 100); // Small delay for mobile
+  });
+} else {
+  setTimeout(loadProductsFromFirebase, 100);
+}
+
+// Supports shared/search-engine links like tiger-jeans.com/?q=جينز رجالي
+// (matches the SearchAction in the WebSite structured data)
+let searchFromUrlApplied = false;
+function applySearchFromUrl() {
+  if (searchFromUrlApplied) return;
+  const params = new URLSearchParams(window.location.search);
+  const q = params.get("q");
+  if (!q) return;
+  searchFromUrlApplied = true;
+  const input = document.getElementById("searchInput");
+  if (input) {
+    input.value = q;
+    document.getElementById("searchDropdown")?.classList.add("show");
+    liveSearch();
+  }
+}
+
+// Default marquee messages (used until/unless the admin sets custom ones)
+const DEFAULT_MARQUEE = [
+  "⭐ نقدم 5 توصيل من أجلنا من أكثر 10,000 عملي",
+  "🎁 خصم خاص لمحدود وقت",
+  "📢 مجددة خصوصية دجين وصلت حديثاً - تشكيل الربيع",
+  "🔥 التوصيل مجاني للطلبات فوق 500 جنيه"
+];
+
+function renderMarquee(messages) {
+  const list = (messages && messages.length) ? messages : DEFAULT_MARQUEE;
+  const el = document.getElementById("marqueeContent");
+  if (!el) return;
+  // Duplicated twice so the CSS animation (0 -> -50%) loops seamlessly
+  const build = () => list.map(m => `<span class="marquee-item">${m}</span><span class="marquee-sep">✦</span>`).join("");
+  el.innerHTML = build() + build();
+}
+
+// Load marquee (moving announcement strip) from admin settings
+db.ref("banners/marquee").on("value", (snap) => {
+  const val = snap.val();
+  renderMarquee(Array.isArray(val) ? val : (val ? Object.values(val) : null));
+});
+
+// Load banners
+db.ref("banners/hero").on("value", (snap) => {
+  const b = snap.val();
+  if (!b) return;
+  if (b.title) startHeroTypewriter(b.title);
+  if (b.subtitle) document.querySelector(".hero-desc").textContent = b.subtitle;
+});
+
+// Load social media links (footer) from admin settings.
+// A link with no URL saved stays hidden instead of pointing to "#".
+db.ref("settings/social").on("value", (snap) => {
+  const s = snap.val() || {};
+  const map = {
+    socialFacebook: s.facebook,
+    socialInstagram: s.instagram,
+    socialWhatsapp: s.whatsapp,
+    socialTiktok: s.tiktok
+  };
+  Object.entries(map).forEach(([id, url]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (url) {
+      el.href = url;
+      el.style.display = "";
     } else {
-      loadMoreBtn.style.display = 'inline-flex';
+      el.style.display = "none";
+    }
+  });
+});
+
+// ====== Hero Title Typewriter Effect (types then erases in a loop) ======
+let heroTypeTimer = null;
+let heroLoopTimer = null;
+
+// Splits an HTML string into tokens: whole tags stay intact, everything else is one character.
+// This lets us "type" HTML (like <br> and <span class="gold-text">) without breaking markup.
+function tokenizeHeroHtml(html) {
+  const tokens = [];
+  let i = 0;
+  while (i < html.length) {
+    if (html[i] === "<") {
+      const end = html.indexOf(">", i);
+      if (end === -1) { tokens.push(html[i]); i++; }
+      else { tokens.push(html.slice(i, end + 1)); i = end + 1; }
+    } else {
+      tokens.push(html[i]);
+      i++;
     }
   }
+  return tokens;
 }
 
-// ====== Load More Products ======
-function loadMoreProducts() {
-  displayedCount += 6;
-  renderProducts(allProducts.slice(0, displayedCount));
-  document.getElementById('products').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
+function startHeroTypewriter(html, opts) {
+  const el = document.querySelector(".hero-title");
+  if (!el) return;
+  clearTimeout(heroTypeTimer);
+  clearTimeout(heroLoopTimer);
 
-// ====== Search Functionality ======
-function toggleSearch() {
-  const overlay = document.getElementById('searchOverlay');
-  const isHidden = overlay.style.display === 'none' || !overlay.style.display;
-  overlay.style.display = isHidden ? 'flex' : 'none';
-  if (isHidden) {
-    setTimeout(() => document.getElementById('searchInput').focus(), 100);
+  const tokens = tokenizeHeroHtml(html);
+  let idx = 0;
+  el.classList.add("typing-cursor");
+
+  function typeNext() {
+    if (idx < tokens.length) {
+      idx++;
+      el.innerHTML = tokens.slice(0, idx).join("");
+      heroTypeTimer = setTimeout(typeNext, 55);
+    } else {
+      heroLoopTimer = setTimeout(eraseNext, 2400);
+    }
+  }
+  function eraseNext() {
+    if (idx > 0) {
+      idx--;
+      el.innerHTML = tokens.slice(0, idx).join("");
+      heroTypeTimer = setTimeout(eraseNext, 25);
+    } else {
+      heroLoopTimer = setTimeout(typeNext, 500);
+    }
+  }
+
+  if (opts && opts.instant) {
+    // Paint the full title immediately so it counts toward LCP without
+    // delay, then start the decorative type/erase loop afterward.
+    idx = tokens.length;
+    el.innerHTML = tokens.join("");
+    heroLoopTimer = setTimeout(eraseNext, 2400);
+  } else {
+    el.innerHTML = "";
+    typeNext();
   }
 }
 
-function handleSearch(event) {
-  const query = event.target.value.trim().toLowerCase();
-  const resultsContainer = document.getElementById('searchResults');
-  
-  if (query.length < 2) {
-    resultsContainer.innerHTML = '';
-    resultsContainer.style.display = 'none';
+// Show the title in the markup instantly (good LCP), then keep the
+// decorative typing loop running afterward.
+document.addEventListener("DOMContentLoaded", () => {
+  const el = document.querySelector(".hero-title");
+  if (el) startHeroTypewriter(el.innerHTML.trim(), { instant: true });
+});
+
+// ====== Stats Count-Up Animation ======
+// Parses "10K+" / "500+" / "4.9" into {prefix, target, decimals, suffix} and animates from 0.
+function parseStatValue(raw) {
+  const match = raw.trim().match(/^([^\d.]*)([\d.]+)\s*([Kk]?\+?%?)$/);
+  if (!match) return null;
+  const [, prefix, numStr, suffix] = match;
+  const decimals = numStr.includes(".") ? numStr.split(".")[1].length : 0;
+  const target = parseFloat(numStr);
+  return { prefix, target, decimals, suffix };
+}
+
+function animateStatNumber(el) {
+  const parsed = parseStatValue(el.textContent);
+  if (!parsed) return;
+  const { prefix, target, decimals, suffix } = parsed;
+  const duration = 1600;
+  const start = performance.now();
+
+  function tick(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+    const current = target * eased;
+    el.textContent = prefix + current.toFixed(decimals) + suffix;
+    if (progress < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      el.textContent = prefix + target.toFixed(decimals) + suffix;
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+function initStatsCountUp() {
+  const nums = document.querySelectorAll(".stat-number");
+  if (!nums.length) return;
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          animateStatNumber(entry.target);
+          io.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.4 }
+  );
+  nums.forEach((el) => io.observe(el));
+}
+document.addEventListener("DOMContentLoaded", initStatsCountUp);
+
+function buildCategoryFilters() {
+  const cats = ["all", ...new Set(ALL_PRODUCTS.map((p) => p.category).filter(Boolean))];
+  const wrap = document.getElementById("catFilters");
+  wrap.innerHTML = cats
+    .map(
+      (c) =>
+        `<button class="cat-chip ${c === ACTIVE_CAT ? "active" : ""}" data-cat="${c}" onclick="setCat('${c}')">${c === "all" ? "الكل" : c}</button>`
+    )
+    .join("");
+}
+
+function setCat(c) {
+  ACTIVE_CAT = c;
+  buildCategoryFilters();
+  renderProducts();
+}
+
+function filterProducts() {
+  renderProducts();
+}
+
+function renderProducts() {
+  const q = (document.getElementById("searchInput")?.value || "").trim().toLowerCase();
+  let list = ALL_PRODUCTS;
+  if (ACTIVE_CAT !== "all") list = list.filter((p) => p.category === ACTIVE_CAT);
+  if (q) list = list.filter((p) => (p.name || "").toLowerCase().includes(q));
+
+  const grid = document.getElementById("productsGrid");
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty-state"><i class="bx bx-shopping-bag"></i><p>لا توجد منتجات متاحة حالياً</p></div>';
     return;
   }
   
-  const filtered = allProducts.filter(p => 
-    (p.name || '').toLowerCase().includes(query) ||
-    (p.category || '').toLowerCase().includes(query) ||
-    (p.description || '').toLowerCase().includes(query) ||
-    (p.colors || []).some(c => c.name.toLowerCase().includes(query))
-  ).slice(0, 6);
-  
-  if (filtered.length > 0) {
-    resultsContainer.innerHTML = filtered.map(p => `
-      <div class="search-result-item" onclick="window.location.href='#product-${p.id}';toggleSearch();">
-        <img src="${p.images?.[0] || 'images/poster-1.png'}" alt="${p.name}" />
-        <div>
-          <strong>${p.name}</strong>
-          <span>${fmtPrice(p.price)}</span>
+  grid.innerHTML = list
+    .map((p, idx) => {
+      const img = (p.images && p.images[0]) || "images/product-1.png";
+      const img2 = (p.images && p.images[1]) || img;
+      const sizes = (p.sizes && p.sizes.join(" ")) || "";
+      const wished = isWishlisted(p.id);
+
+      return `
+      <div class="product-card-wrapper reveal" style="transition-delay:${(idx % 8) * 0.05}s">
+        <div class="product-card v2">
+          <div class="product-image v2">
+            ${p.oldPrice && p.oldPrice > p.price ? `<span class="product-badge-tag sale">خصم</span>` : (p.isNew ? `<span class="product-badge-tag">جديد</span>` : "")}
+            <button class="corner-heart wishlist-btn ${wished ? "active" : ""}" data-id="${p.id}" onclick="event.preventDefault();toggleWishlistBtn('${p.id}', this)" title="أضف للمفضلة">
+              <i class='${wished ? "bx bxs-heart" : "bx bx-heart"}'></i>
+            </button>
+            <a href="product.html?id=${p.id}">
+              <img class="img-primary" src="${img}" alt="${p.name || ""}" loading="lazy" />
+              <img class="img-secondary" src="${img2}" alt="${p.name || ""}" loading="lazy" />
+            </a>
+            <div class="product-overlay v2">
+              <button class="overlay-btn eye-btn" style="--d:0" title="معاينة سريعة" onclick="event.preventDefault();openQuickView('${p.id}')"><i class='bx bx-show'></i></button>
+              <button class="overlay-btn add-cart-btn" style="--d:1" onclick="event.preventDefault();quickAdd('${p.id}', this, event)"><i class='bx bx-cart-add'></i> أضف للسلة</button>
+            </div>
+          </div>
+          <div class="product-body">
+            <h3 class="product-name"><a href="product.html?id=${p.id}">${p.name || ""}</a></h3>
+            <div class="product-meta">
+              <span class="meta-label">المقاس:</span>
+              <span class="meta-value">${sizes}</span>
+            </div>
+            <div class="product-pricing">
+              <span class="current-price">${fmtPrice(p.price)}</span>
+              ${p.oldPrice ? `<span class="old-price">${fmtPrice(p.oldPrice)}</span>` : ""}
+            </div>
+          </div>
         </div>
+      </div>`;
+    })
+    .join("");
+
+  observeReveals();
+}
+
+function renderDeals() {
+  const grid = document.getElementById("dealsGrid");
+  if (!grid) return;
+
+  // Prefer products with a real discount, fall back to the first products available
+  let deals = ALL_PRODUCTS.filter((p) => p.oldPrice && p.oldPrice > p.price).slice(0, 3);
+  if (deals.length < 3) {
+    const rest = ALL_PRODUCTS.filter((p) => !deals.includes(p)).slice(0, 3 - deals.length);
+    deals = deals.concat(rest);
+  }
+
+  if (!deals.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><i class="bx bx-gift"></i><p>لا توجد عروض متاحة حالياً</p></div>';
+    return;
+  }
+
+  grid.innerHTML = deals
+    .map((p, idx) => {
+      const img = (p.images && p.images[0]) || "images/product-1.png";
+      const wished = isWishlisted(p.id);
+      const discount = p.oldPrice && p.oldPrice > p.price
+        ? Math.round(100 - (p.price / p.oldPrice) * 100)
+        : null;
+
+      return `
+      <div class="deal-card reveal" style="transition-delay:${idx * 0.08}s">
+        <button class="corner-heart wishlist-btn ${wished ? "active" : ""}" data-id="${p.id}" onclick="event.preventDefault();toggleWishlistBtn('${p.id}', this)" title="أضف للمفضلة">
+          <i class='${wished ? "bx bxs-heart" : "bx bx-heart"}'></i>
+        </button>
+        ${discount ? `<div class="deal-badge">${discount}%-</div>` : ""}
+        <a href="product.html?id=${p.id}">
+          <img src="${img}" alt="${p.name || ""}" loading="lazy" />
+        </a>
+        <div class="deal-info">
+          <span class="deal-price">${fmtPrice(p.price)}</span>
+          <button class="deal-tag add-cart-btn" aria-label="أضف للسلة" onclick="event.preventDefault();quickAdd('${p.id}', this, event)">
+            <i class='bx bx-cart-add'></i> <span>أضف للسلة</span>
+          </button>
+        </div>
+      </div>`;
+    })
+    .join("");
+
+  observeReveals();
+}
+
+// Colors can be plain strings (legacy products) or {name, image} objects (new products with optional per-color image)
+function colorName(c) { return typeof c === "string" ? c : (c && c.name) || ""; }
+
+// Guesses which size-guide tab fits a product based on its name/category text
+function guessSizeGuideCategory(p) {
+  const text = ((p.category || "") + " " + (p.name || "")).toLowerCase();
+  if (text.includes("تيشرت") || text.includes("تي شيرت") || text.includes("t-shirt") || text.includes("tshirt")) return "tshirt1";
+  if (text.includes("سليم") || text.includes("slim")) return "slimfit";
+  if (text.includes("جينز") && (text.includes("طويل") || text.includes("أطوال") || text.includes("طول خاص"))) return "jeansTall";
+  if (text.includes("جينز") || text.includes("jeans")) return "jeans";
+  if (text.includes("قميص") || text.includes("قمصان") || text.includes("shirt")) return "shirts";
+  return "shirts";
+}
+
+function quickAdd(id, btnEl, evt) {
+  const p = ALL_PRODUCTS.find((x) => x.id === id);
+  if (!p) return;
+  addToCart({
+    id: p.id,
+    name: p.name,
+    price: p.price,
+    image: (p.images && p.images[0]) || "",
+    size: (p.sizes && p.sizes[0]) || "",
+    color: (p.colors && p.colors.length) ? colorName(p.colors[0]) : "",
+    qty: 1
+  });
+  if (btnEl) {
+    btnEl.classList.add("added");
+    const originalHTML = btnEl.innerHTML;
+    btnEl.innerHTML = "<i class='bx bx-check'></i> أُضيف";
+    setTimeout(() => {
+      btnEl.classList.remove("added");
+      btnEl.innerHTML = originalHTML;
+    }, 1400);
+  }
+  flyToCart(evt);
+}
+
+// ====== Fly-to-cart animation ======
+function flyToCart(evt) {
+  const cartBtn = document.querySelector(".cart-btn");
+  if (!cartBtn) return;
+  const startEl = evt && evt.target ? evt.target.closest(".product-image, .deal-card") : null;
+  const startRect = startEl ? startEl.getBoundingClientRect() : { left: window.innerWidth / 2, top: window.innerHeight / 2, width: 40, height: 40 };
+  const endRect = cartBtn.getBoundingClientRect();
+
+  const fly = document.createElement("div");
+  fly.className = "fly-icon";
+  fly.innerHTML = "<i class='bx bx-shopping-bag'></i>";
+  fly.style.left = (startRect.left + startRect.width / 2 - 13) + "px";
+  fly.style.top = (startRect.top + startRect.height / 2 - 13) + "px";
+  document.body.appendChild(fly);
+
+  requestAnimationFrame(() => {
+    fly.style.left = (endRect.left + endRect.width / 2 - 13) + "px";
+    fly.style.top = (endRect.top + endRect.height / 2 - 13) + "px";
+    fly.style.transform = "scale(.3)";
+    fly.style.opacity = "0.3";
+  });
+
+  setTimeout(() => fly.remove(), 750);
+}
+
+// ====== Wishlist toggle ======
+function toggleWishlistBtn(id, btn) {
+  const p = ALL_PRODUCTS.find((x) => x.id === id);
+  if (!p) return;
+  const added = toggleWishlistItem({
+    id: p.id,
+    name: p.name,
+    price: p.price,
+    image: (p.images && p.images[0]) || ""
+  });
+  document.querySelectorAll(`.wishlist-btn[data-id="${id}"]`).forEach((b) => {
+    b.classList.toggle("active", added);
+    const icon = b.querySelector("i");
+    if (icon) icon.className = added ? "bx bxs-heart" : "bx bx-heart";
+  });
+  showToast(added ? "تمت الإضافة إلى المفضلة ♥" : "تمت الإزالة من المفضلة");
+}
+
+// ====== Quick View Modal ======
+let qvSelSize = "", qvSelColor = "";
+function openQuickView(id) {
+  const p = ALL_PRODUCTS.find((x) => x.id === id);
+  if (!p) return;
+  qvSelSize = (p.sizes && p.sizes[0]) || "";
+  qvSelColor = (p.colors && p.colors.length) ? colorName(p.colors[0]) : "";
+  const img = (p.images && p.images[0]) || "images/product-1.png";
+  const modal = document.getElementById("quickViewModal");
+  document.getElementById("qvBody").innerHTML = `
+    <div class="qv-image"><img src="${img}" alt="${p.name || ""}" /></div>
+    <div class="qv-info">
+      <h2>${p.name || ""}</h2>
+      <div class="qv-price">
+        <span>${fmtPrice(p.price)}</span>
+        ${p.oldPrice ? `<span class="old-price">${fmtPrice(p.oldPrice)}</span>` : ""}
       </div>
-    `).join('');
-    resultsContainer.style.display = 'block';
+      <p class="qv-desc">${p.description || "منتج مميز من تشكيلة Tiger Jeans، خامة عالية الجودة وتصميم عصري يناسب جميع الأذواق."}</p>
+      ${p.sizes && p.sizes.length ? `<div class="qv-desc"><strong>المقاسات المتاحة:</strong> ${p.sizes.join(" · ")} &nbsp;•&nbsp; <a href="size-guide.html?cat=${guessSizeGuideCategory(p)}" target="_blank" style="color:var(--gold);font-weight:600"><i class='bx bx-ruler'></i> مش عارف مقاسك؟</a></div>` : ""}
+      <div class="qv-actions">
+        <button class="btn-primary" style="flex:1;justify-content:center" onclick="quickAdd('${p.id}', this, event); closeQuickView()"><i class='bx bx-cart-add'></i> أضف إلى السلة</button>
+        <a href="product.html?id=${p.id}" class="btn-secondary">التفاصيل الكاملة</a>
+      </div>
+    </div>`;
+  modal.classList.add("show");
+  document.body.style.overflow = "hidden";
+}
+function closeQuickView() {
+  document.getElementById("quickViewModal").classList.remove("show");
+  document.body.style.overflow = "";
+}
+document.getElementById("quickViewModal").addEventListener("click", (e) => {
+  if (e.target.id === "quickViewModal") closeQuickView();
+});
+
+// ====== Scroll reveal (IntersectionObserver) ======
+let revealObserver;
+function observeReveals() {
+  if (!revealObserver) {
+    revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("in");
+            revealObserver.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+  }
+  document.querySelectorAll(".reveal:not(.in), .reveal-scale:not(.in)").forEach((el) => revealObserver.observe(el));
+}
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".stat-item, .feature-card, .deal-card, section > .container > h2, .section-header").forEach((el) => el.classList.add("reveal"));
+  observeReveals();
+});
+
+// ====== Scroll to top button ======
+window.addEventListener("scroll", () => {
+  const btn = document.getElementById("scrollTopBtn");
+  if (!btn) return;
+  btn.classList.toggle("show", window.scrollY > 500);
+});
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// ====== UI Functions ======
+function toggleSearch() {
+  const dropdown = document.getElementById("searchDropdown");
+  const opening = !dropdown.classList.contains("show");
+  dropdown.classList.toggle("show");
+  if (opening) {
+    setTimeout(() => document.getElementById("searchInput")?.focus(), 150);
   } else {
-    resultsContainer.innerHTML = '<div class="no-results"><i class=\'bx bx-search\'></i> لم يتم العثور على نتائج</div>';
-    resultsContainer.style.display = 'block';
+    closeLiveSearch();
+    document.getElementById("searchInput").value = "";
   }
 }
 
-// Close search on Escape
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    const overlay = document.getElementById('searchOverlay');
-    if (overlay && overlay.style.display !== 'none') toggleSearch();
+// ====== Live Search (results appear as soon as you type) ======
+function liveSearch() {
+  const q = (document.getElementById("searchInput")?.value || "").trim().toLowerCase();
+  const panel = document.getElementById("searchResultsPanel");
+  if (!panel) return;
+
+  // Keep the main products grid in sync too.
+  filterProducts();
+
+  if (!q) { closeLiveSearch(); return; }
+
+  const matches = (typeof ALL_PRODUCTS !== "undefined" ? ALL_PRODUCTS : [])
+    .filter((p) => (p.name || "").toLowerCase().includes(q) || (p.category || "").toLowerCase().includes(q))
+    .slice(0, 6);
+
+  if (!matches.length) {
+    panel.innerHTML = `<div class="search-result-empty">لا توجد نتائج لـ "${q}"</div>`;
+  } else {
+    panel.innerHTML = matches
+      .map((p) => {
+        const img = (p.images && p.images[0]) || "images/product-1.png";
+        return `
+        <a class="search-result-item" href="product.html?id=${p.id}">
+          <img src="${img}" alt="${p.name || ""}" loading="lazy" />
+          <div class="search-result-info">
+            <div class="search-result-name">${p.name || ""}</div>
+            <div class="search-result-price">${fmtPrice(p.price)}</div>
+          </div>
+        </a>`;
+      })
+      .join("");
+  }
+  panel.classList.add("show");
+}
+
+function closeLiveSearch() {
+  const panel = document.getElementById("searchResultsPanel");
+  if (panel) { panel.classList.remove("show"); panel.innerHTML = ""; }
+}
+
+// Close the live search panel when clicking elsewhere on the page
+document.addEventListener("click", (e) => {
+  const wrap = document.querySelector(".search-input-wrap");
+  if (wrap && !wrap.contains(e.target)) closeLiveSearch();
+});
+
+function toggleMobileNav() {
+  document.getElementById("mainNav").classList.toggle("show");
+}
+
+// إغلاق قائمة الموبايل تلقائياً عند الضغط على أي رابط بداخلها
+document.querySelectorAll(".main-nav a").forEach((link) => {
+  link.addEventListener("click", () => {
+    document.getElementById("mainNav").classList.remove("show");
+  });
+});
+
+function openAuthModal() {
+  document.getElementById("authModal").classList.add("show");
+  document.body.style.overflow = "hidden";
+}
+
+function closeAuthModal() {
+  document.getElementById("authModal").classList.remove("show");
+  document.body.style.overflow = "";
+}
+
+// Other pages (e.g. gift-cards.html "تسجيل الدخول" link) redirect here with
+// ?auth=login when they need the login modal but don't have it themselves.
+document.addEventListener("DOMContentLoaded", () => {
+  if (new URLSearchParams(location.search).get("auth") === "login") {
+    openAuthModal();
+    // Clean the URL so a refresh doesn't keep forcing the modal open.
+    history.replaceState(null, "", location.pathname);
   }
 });
 
-// ====== Cart & Wishlist Badges ======
-function loadCartBadge() {
-  try {
-    const cart = JSON.parse(localStorage.getItem('tj_cart') || '[]');
-    const count = cart.reduce((sum, item) => sum + (item.qty || 1), 0);
-    updateBadgeElements('cart-badge', count);
-  } catch (e) {}
-}
-
-function loadWishlistBadge() {
-  try {
-    const wishlist = JSON.parse(localStorage.getItem('tj_wishlist') || '[]');
-    updateBadgeElements('wishlist-badge', wishlist.length);
-  } catch (e) {}
-}
-
-function updateBadgeElements(className, count) {
-  document.querySelectorAll(`.${className}`).forEach(el => {
-    el.textContent = count;
-    el.style.display = count > 0 ? 'inline-flex' : 'none';
+// Auth tabs
+document.querySelectorAll(".auth-tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".auth-tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+    const formId = tab.dataset.tab === "login" ? "loginForm" : "signupForm";
+    document.querySelectorAll(".auth-form").forEach(f => f.classList.add("hidden"));
+    document.getElementById(formId).classList.remove("hidden");
   });
+});
+
+// Email Login
+async function doEmailLogin() {
+  const email = document.getElementById("loginEmail").value.trim();
+  const pass = document.getElementById("loginPass").value.trim();
+  
+  if (!email || !pass) {
+    showToast("أدخل البريد وكلمة المرور");
+    return;
+  }
+  
+  try {
+    await auth.signInWithEmailAndPassword(email, pass);
+    closeAuthModal();
+    showToast("تم تسجيل الدخول بنجاح!");
+  } catch (err) {
+    showToast("خطأ: " + err.message);
+  }
+}
+
+// Google Login with error handling
+async function googleLogin() {
+  // Check if running in supported environment
+  if (window.location.protocol === 'file:') {
+    showToast("⚠️ Google Login يعمل فقط على خادم HTTP (مثل GitHub Pages أو Netlify)");
+    
+    // Try popup anyway for development
+    if (typeof auth !== 'undefined') {
+      try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({
+          prompt: 'select_account'
+        });
+        const result = await auth.signInWithPopup(provider);
+        closeAuthModal();
+        showToast("مرحباً " + (result.user.displayName || "") + "! 👋");
+      } catch (err) {
+        console.log("Google Auth Error:", err);
+        if (err.code === 'auth/operation-not-supported-in-this-environment') {
+          showToast("يرجى رفع الموقع على استضافة لدعم تسجيل الدخول");
+        } else {
+          showToast("حدث خطأ في تسجيل الدخول");
+        }
+      }
+    }
+    return;
+  }
+  
+  // Normal flow for HTTP servers
+  try {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({
+      prompt: 'select_account'
+    });
+    const result = await auth.signInWithPopup(provider);
+    closeAuthModal();
+    showToast("مرحباً " + (result.user.displayName || "") + "! 👋");
+  } catch (err) {
+    console.log("Google Auth Error:", err);
+    if (err.code !== 'auth/popup-closed-by-user') {
+      showToast("حدث خطأ: " + err.message);
+    }
+  }
+}
+
+// ====== Copy to Clipboard Function ======
+function copyToClipboard(text, btnElement) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      showCopySuccess(btnElement);
+    }).catch(() => {
+      fallbackCopy(text, btnElement);
+    });
+  } else {
+    fallbackCopy(text, btnElement);
+  }
+}
+
+function fallbackCopy(text, btnElement) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand('copy');
+    showCopySuccess(btnElement);
+  } catch (err) {
+    showToast("فشل النسخ");
+  }
+  document.body.removeChild(textarea);
+}
+
+function showCopySuccess(btn) {
+  const originalText = btn.innerHTML;
+  btn.classList.add('copied');
+  btn.innerHTML = '<i class=\'bx bx-check\'></i> تم النسخ!';
+  setTimeout(() => {
+    btn.classList.remove('copied');
+    btn.innerHTML = originalText;
+  }, 2000);
 }
 </script>
 
+<!-- ====== Bottom Navigation (Mobile, <992px) ====== -->
+<nav class="bottom-nav" aria-label="التنقل السفلي">
+  <div class="bottom-nav-inner">
+    <a href="/" data-nav="home" class="active"><i class='bx bx-home-alt'></i><span>الرئيسية</span></a>
+    <a href="/#products" data-nav="search" class="" onclick="if(window.location.pathname==='/'||window.location.pathname.endsWith('/index.html')){event.preventDefault();toggleSearch();}"><i class='bx bx-search'></i><span>بحث</span></a>
+    <a href="#" data-nav="categories" class="" onclick="event.preventDefault();toggleCatSheet();"><i class='bx bx-category'></i><span>الأقسام</span></a>
+    <a href="cart.html" data-nav="cart" class=""><i class='bx bx-cart-alt'></i><span>السلة</span><span class="bn-badge cart-badge" style="display:none">0</span></a>
+    <a href="gift-cards.html" data-nav="giftcards"><i class='bx bx-gift'></i><span>هدايا</span></a>
+    <a href="orders.html" id="bottomAccountLink" data-nav="account" class=""><i class='bx bx-user'></i><span>طلباتي</span></a>
+  </div>
+</nav>
+
+<!-- Quick Categories Sheet (opens above bottom nav on tap) -->
+<div class="cat-sheet" id="catSheet">
+  <div class="cat-sheet-inner" id="catSheetInner"></div>
+</div>
+
+<script>
+function toggleCatSheet() {
+  const sheet = document.getElementById("catSheet");
+  const navBtn = document.querySelector('.bottom-nav a[data-nav="categories"]');
+  const opening = !sheet.classList.contains("show");
+  if (opening) {
+    const inner = document.getElementById("catSheetInner");
+    const cats = ["all", ...new Set((typeof ALL_PRODUCTS !== "undefined" ? ALL_PRODUCTS : []).map((p) => p.category).filter(Boolean))];
+    inner.innerHTML = cats.map((c) =>
+      `<button class="cat-chip ${c === ACTIVE_CAT ? "active" : ""}" onclick="setCat('${c}');toggleCatSheet();document.getElementById('products').scrollIntoView({behavior:'smooth'});">${c === "all" ? "الكل" : c}</button>`
+    ).join("");
+  }
+  sheet.classList.toggle("show", opening);
+  navBtn.classList.toggle("active", opening);
+}
+
+// ====== Start Sales Popups ======
+// Initialize sales popups after page loads
+document.addEventListener('DOMContentLoaded', () => {
+  // Wait a bit for products to load, then start popups
+  setTimeout(() => {
+    if (typeof startSalesPopups === 'function') {
+      startSalesPopups();
+    }
+  }, 5000);
+});
+</script>
+<script src="js/tiger-ai.js"></script>
 </body>
 </html>
