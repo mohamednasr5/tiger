@@ -7,6 +7,45 @@
  */
 
 // ═══════════════════════════════════════════════════════════════
+// 🔗 دوال التوافق - معرفة فوراً (قبل أي شيء)
+// ═══════════════════════════════════════════════════════════════
+
+// تعريف الدوال كـ global functions فوراً
+window.loadTelegramSettings = async function() {
+  return await window._loadTelegramConfig();
+};
+
+window.saveTelegramSettings = async function() {
+  return await window._saveTelegramConfig();
+};
+
+window.saveTelegramSettingsFromUI = async function() {
+  return await window._saveTelegramConfig();
+};
+
+window.toggleTelegramBot = async function(enabled) {
+  return await window._toggleTelegramBot(enabled);
+};
+
+window.fetchChatId = async function() {
+  return await window._fetchChatId();
+};
+
+window.sendTestMessage = async function() {
+  return await window._sendTestMessage();
+};
+
+window.testBotConnection = async function() {
+  return await window._testBotConnection();
+};
+
+window.addTelegramLog = function(message) {
+  if (typeof window._addTelegramLog === 'function') {
+    window._addTelegramLog(message);
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════
 // ⚙️ إعدادات البوت
 // ═══════════════════════════════════════════════════════════════
 
@@ -24,7 +63,7 @@ let TELEGRAM_CONFIG = { ...TELEGRAM_DEFAULTS };
 // 🔄 تحميل الإعدادات من Firebase
 // ═══════════════════════════════════════════════════════════════
 
-async function loadTelegramConfig() {
+window._loadTelegramConfig = async function() {
   try {
     if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
       const db = firebase.database();
@@ -61,25 +100,25 @@ async function loadTelegramConfig() {
     addTelegramLog('❌ خطأ في تحميل الإعدادات: ' + error.message);
   }
   return false;
-}
+};
 
 // ═══════════════════════════════════════════════════════════════
 // 💾 حفظ الإعدادات
 // ═══════════════════════════════════════════════════════════════
 
-async function saveTelegramConfig() {
+window._saveTelegramConfig = async function() {
   const botToken = document.getElementById('telegramBotToken')?.value?.trim() || '';
   const chatId = document.getElementById('telegramChatId')?.value?.trim() || '';
   const enabled = document.getElementById('telegramEnabled')?.checked || false;
 
   // التحقق من التوكن
   if (!botToken) {
-    showToast('❌ أدخل توكن البوت');
+    if (typeof showToast === 'function') showToast('❌ أدخل توكن البوت');
     return false;
   }
 
   if (!botToken.includes(':') || !botToken.match(/^\d+:[A-Za-z0-9_-]+$/)) {
-    showToast('❌ صيغة التوكن غير صحيحة');
+    if (typeof showToast === 'function') showToast('❌ صيغة التوكن غير صحيحة');
     return false;
   }
 
@@ -98,7 +137,7 @@ async function saveTelegramConfig() {
       await db.ref('telegramConfig').set(TELEGRAM_CONFIG);
       
       addTelegramLog(`💾 تم حفظ الإعدادات - ${new Date().toLocaleTimeString('ar-EG')}`);
-      showToast('✅ تم حفظ إعدادات البوت بنجاح');
+      if (typeof showToast === 'function') showToast('✅ تم حفظ إعدادات البوت بنجاح');
       
       // تحديث حالة المديرين
       updateAdminBadge();
@@ -108,21 +147,21 @@ async function saveTelegramConfig() {
   } catch (error) {
     console.error('❌ خطأ في الحفظ:', error);
     addTelegramLog('❌ خطأ في الحفظ: ' + error.message);
-    showToast('❌ فشل حفظ الإعدادات');
+    if (typeof showToast === 'function') showToast('❌ فشل حفظ الإعدادات');
   }
   
   return false;
-}
+};
 
 // ═══════════════════════════════════════════════════════════════
 // 🔗 اختبار اتصال البوت
 // ═══════════════════════════════════════════════════════════════
 
-async function testBotConnection() {
+window._testBotConnection = async function() {
   const token = document.getElementById('telegramBotToken')?.value?.trim() || TELEGRAM_CONFIG.botToken;
   
   if (!token) {
-    showToast('❌ أدخل توكن البوت أولاً');
+    if (typeof showToast === 'function') showToast('❌ أدخل توكن البوت أولاً');
     return false;
   }
 
@@ -140,14 +179,19 @@ async function testBotConnection() {
     if (result.ok && result.result) {
       const botInfo = result.result;
       
-      document.getElementById('telegramBotName').textContent = botInfo.first_name;
-      document.getElementById('telegramBotUsername').textContent = '@' + botInfo.username;
+      // تحديث معلومات البوت مع التحقق من وجود العناصر
+      const nameEl = document.getElementById('telegramBotName');
+      if (nameEl) nameEl.textContent = botInfo.first_name;
+      
+      const usernameEl = document.getElementById('telegramBotUsername');
+      if (usernameEl) usernameEl.textContent = '@' + botInfo.username;
       
       updateConnectionStatus('success', 'متصل ✓');
       addTelegramLog(`✅ اتصل بـ @${botInfo.username}`);
       
       // تفعيل شارة القائمة
-      document.getElementById('navTelegramStatus').style.display = 'inline';
+      const badge = document.getElementById('navTelegramStatus');
+      if (badge) badge.style.display = 'inline';
       
       return true;
     } else {
@@ -164,16 +208,17 @@ async function testBotConnection() {
     
     return false;
   }
-}
+};
 
 // ═══════════════════════════════════════════════════════════════
 // 🔄 تفعيل/إيقاف البوت
 // ═══════════════════════════════════════════════════════════════
 
-async function toggleTelegramBot(enabled) {
+window._toggleTelegramBot = async function(enabled) {
   if (!TELEGRAM_CONFIG.botToken) {
-    showToast('❌ أدخل توكن البوت أولاً');
-    document.getElementById('telegramEnabled').checked = false;
+    if (typeof showToast === 'function') showToast('❌ أدخل توكن البوت أولاً');
+    const checkbox = document.getElementById('telegramEnabled');
+    if (checkbox) checkbox.checked = false;
     return;
   }
 
@@ -189,14 +234,13 @@ async function toggleTelegramBot(enabled) {
 
   // حفظ الحالة
   await saveTelegramConfig();
-}
+};
 
 // ═══════════════════════════════════════════════════════════════
 // 🔧 إعداد Webhook
 // ═══════════════════════════════════════════════════════════════
 
 async function setupWebhook() {
-  const token = TELEGRAM_CONFIG.botToken;
   const webhookUrl = `${TELEGRAM_CONFIG.workerUrl}/api/telegram/webhook`;
 
   addTelegramLog('⚙️ جاري تفعيل Webhook...');
@@ -210,13 +254,13 @@ async function setupWebhook() {
     
     if (result.ok) {
       addTelegramLog('✅ Webhook مفعّل: ' + webhookUrl);
-      showToast('✅ تم تفعيل البوت بنجاح');
+      if (typeof showToast === 'function') showToast('✅ تم تفعيل البوت بنجاح');
     } else {
       throw new Error(result.description);
     }
   } catch (error) {
     addTelegramLog('❌ فشل تفعيل Webhook: ' + error.message);
-    showToast('❌ فشل تفعيل البوت');
+    if (typeof showToast === 'function') showToast('❌ فشل تفعيل البوت');
   }
 }
 
@@ -235,11 +279,11 @@ async function deleteWebhook() {
 // 📱 جلب Chat ID
 // ═══════════════════════════════════════════════════════════════
 
-async function fetchChatId() {
+window._fetchChatId = async function() {
   const token = document.getElementById('telegramBotToken')?.value?.trim() || TELEGRAM_CONFIG.botToken;
   
   if (!token) {
-    showToast('❌ أدخل توكن البوت أولاً');
+    if (typeof showToast === 'function') showToast('❌ أدخل توكن البوت أولاً');
     return;
   }
 
@@ -257,9 +301,11 @@ async function fetchChatId() {
       const chatIds = [...new Set(result.result.map(u => u.message?.chat.id).filter(Boolean))];
       
       if (chatIds.length > 0) {
-        document.getElementById('telegramChatId').value = chatIds[0];
+        const input = document.getElementById('telegramChatId');
+        if (input) input.value = chatIds[0];
+        
         addTelegramLog(`✅ تم العثور على Chat ID: ${chatIds[0]}`);
-        showToast('✅ تم جلب Chat ID');
+        if (typeof showToast === 'function') showToast('✅ تم جلب Chat ID');
         
         // عرض جميع IDs المكتشفة
         if (chatIds.length > 1) {
@@ -267,28 +313,28 @@ async function fetchChatId() {
         }
       } else {
         addTelegramLog('⚠️ لا توجد رسائل. أرسل رسالة للبوت أولاً');
-        showToast('⚠️ أرسل رسالة للبوت ثم حاول مجدداً');
+        if (typeof showToast === 'function') showToast('⚠️ أرسل رسالة للبوت ثم حاول مجدداً');
       }
     } else {
       addTelegramLog('⚠️ لا توجد رسائل. أرسل رسالة للبوت أولاً');
-      showToast('⚠️ أرسل رسالة للبوت ثم حاول مجدداً');
+      if (typeof showToast === 'function') showToast('⚠️ أرسل رسالة للبوت ثم حاول مجدداً');
     }
   } catch (error) {
     addTelegramLog('❌ خطأ: ' + error.message);
-    showToast('❌ فشل جلب Chat ID');
+    if (typeof showToast === 'function') showToast('❌ فشل جلب Chat ID');
   }
-}
+};
 
 // ═══════════════════════════════════════════════════════════════
 // 📤 إرسال رسالة اختبار
 // ═══════════════════════════════════════════════════════════════
 
-async function sendTestMessage() {
+window._sendTestMessage = async function() {
   const chatId = document.getElementById('telegramChatId')?.value?.trim() || TELEGRAM_CONFIG.chatId;
   const token = document.getElementById('telegramBotToken')?.value?.trim() || TELEGRAM_CONFIG.botToken;
 
   if (!token || !chatId) {
-    showToast('❌ تأكد من التوكن و Chat ID');
+    if (typeof showToast === 'function') showToast('❌ تأكد من التوكن و Chat ID');
     return;
   }
 
@@ -312,15 +358,15 @@ async function sendTestMessage() {
 
     if (result.ok) {
       addTelegramLog('✅ تم إرسال الرسالة بنجاح');
-      showToast('✅ تم إرسال رسالة الاختبار');
+      if (typeof showToast === 'function') showToast('✅ تم إرسال رسالة الاختبار');
     } else {
       throw new Error(result.description);
     }
   } catch (error) {
     addTelegramLog('❌ فشل الإرسال: ' + error.message);
-    showToast('❌ فشل إرسال الرسالة');
+    if (typeof showToast === 'function') showToast('❌ فشل إرسال الرسالة');
   }
-}
+};
 
 // ═══════════════════════════════════════════════════════════════
 // 📊 تحديث حالة الاتصال
@@ -354,7 +400,7 @@ function updateConnectionStatus(status, message) {
 // 📝 إضافة سجل
 // ═══════════════════════════════════════════════════════════════
 
-function addTelegramLog(message) {
+window._addTelegramLog = function(message) {
   const logEl = document.getElementById('telegramLog');
   if (!logEl) return;
 
@@ -369,7 +415,10 @@ function addTelegramLog(message) {
   while (logEl.children.length > 100) {
     logEl.removeChild(logEl.lastChild);
   }
-}
+};
+
+// تصدير الدالة أيضاً بدون underscore
+window.addTelegramLog = window._addTelegramLog;
 
 // ═══════════════════════════════════════════════════════════════
 // 🏆 تحديث شارة المديرين
@@ -443,13 +492,13 @@ window.TelegramBot = {
   },
 
   // تحميل الإعدادات
-  loadConfig: loadTelegramConfig,
+  loadConfig: window._loadTelegramConfig,
   
   // حفظ الإعدادات
-  saveConfig: saveTelegramConfig,
+  saveConfig: window._saveTelegramConfig,
 
   // اختبار الاتصال
-  test: testBotConnection
+  test: window._testBotConnection
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -460,27 +509,42 @@ if (typeof window !== 'undefined') {
   // انتظار تحميل Firebase
   document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
-      loadTelegramConfig();
+      if (typeof window._loadTelegramConfig === 'function') {
+        window._loadTelegramConfig();
+      }
     }, 1500);
   });
 }
 
 // ═══════════════════════════════════════════════════════════════
-// 🔗 دوال التوافق مع admin.html (Aliases)
+// 🌐 دوال عامة متاحة عالمياً (للاستخدام من أي صفحة)
 // ═══════════════════════════════════════════════════════════════
 
-// هذه الدوال مستدعاة من admin.html - نعملها كـ wrappers
-window.loadTelegramSettings = loadTelegramConfig;
-window.saveTelegramSettings = saveTelegramConfig;
-window.toggleTelegramBot = toggleTelegramBot;
-window.fetchChatId = fetchChatId;
-window.sendTestMessage = sendTestMessage;
-window.testBotConnection = testBotConnection;
-window.addTelegramLog = addTelegramLog;
+// إرسال إشعار طلب جديد - يمكن استدعاؤها من checkout.html أو أي مكان
+window.notifyNewOrder = async function(orderData) {
+  if (typeof window.TelegramBot !== 'undefined' && typeof window.TelegramBot.notifyNewOrder === 'function') {
+    return await window.TelegramBot.notifyNewOrder(orderData);
+  }
+  console.warn('TelegramBot not loaded yet');
+  return false;
+};
 
-// دالة الحفظ من UI (موجودة في admin.html)
-window.saveTelegramSettingsFromUI = async function() {
-  return await saveTelegramConfig();
+// إرسال تنبيه مخزون منخفض
+window.notifyLowStock = async function(productData) {
+  if (typeof window.TelegramBot !== 'undefined' && typeof window.TelegramBot.notifyLowStock === 'function') {
+    return await window.TelegramBot.notifyLowStock(productData);
+  }
+  console.warn('TelegramBot not loaded yet');
+  return false;
+};
+
+// إرسال إشعار عام
+window.sendTelegramNotification = async function(message) {
+  if (typeof window.TelegramBot !== 'undefined' && typeof window.TelegramBot.notify === 'function') {
+    return await window.TelegramBot.notify(message);
+  }
+  console.warn('TelegramBot not loaded yet');
+  return false;
 };
 
 console.log('📱 Telegram Bot Module Loaded');
