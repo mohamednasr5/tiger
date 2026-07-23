@@ -83,6 +83,13 @@
   let isWaiting = false;
   let attachedImage = null;       // { dataUrl, mimeType } or null
   let isAdminMode = false;
+  // Admin-only send mode, set by the "سؤال"/"عملية" buttons above the input:
+  //  - 'question'  (default) → the model can only ever reply with text, exactly
+  //    like before (tools are only offered if the admin also types "نفذ").
+  //  - 'operation' → the next message is treated as an explicit execute
+  //    request even without typing "نفذ": ADMIN_TOOLS are offered and a real
+  //    tool call is required, so the admin gets full, frictionless control.
+  let chatMode = 'question';
   let productsCache = null;       // cached products list (with stock)
   let productsCacheTime = 0;
   let allProductsSnapshot = null;
@@ -750,13 +757,13 @@
 - كتابة أوصاف منتجات و SEO، واقتراح أسعار وعروض وتحسينات لزيادة الأرباح.
 
 ## قواعد استدعاء الوظائف (إلزامية):
-- القاعدة الأهم: أي سؤال أو طلب من الأدمن يُجاب افتراضياً بنص فقط (معلومات، تحليل، شرح، وصف للخطوات) من غير تنفيذ أي عملية فعلية على قاعدة البيانات — حتى لو صيغة الطلب أمرية زي "غيّر السعر" أو "احذف المنتج". في الحالة دي وضّح للأدمن إيه اللي هتعمله واطلب منه يكتب كلمة "نفذ" صراحة لو عايز التنفيذ الفعلي يحصل.
-- استدعاء الأدوات (function calling) بيبقى متاح ليك فقط في الرسائل اللي فيها الأدمن كتب كلمة "نفذ" (أو "نفّذ") صراحة ضمن نفس الرسالة. لو الكلمة مش موجودة، الأدوات مش متاحة ليك أصلاً في هذا الرد، فمينفعش تنفذ أي حاجة أياً كان الطلب.
-- لما الأدمن يكتب "نفذ" مع تحديد العملية بوضوح، استدعِ الأداة (tool) المناسبة فعلياً في نفس الرد — مش بمجرد كتابة إنك نفذتها.
+- القاعدة الأهم: أي سؤال أو طلب من الأدمن يُجاب افتراضياً بنص فقط (معلومات، تحليل، شرح، وصف للخطوات) من غير تنفيذ أي عملية فعلية على قاعدة البيانات — حتى لو صيغة الطلب أمرية زي "غيّر السعر" أو "احذف المنتج". في الحالة دي وضّح للأدمن إيه اللي هتعمله واطلب منه يكتب كلمة "نفذ" صراحة، أو يضغط زرار "عملية" اللي فوق مربع الكتابة، لو عايز التنفيذ الفعلي يحصل.
+- استدعاء الأدوات (function calling) بيبقى متاح ليك بس لما الأدمن يكتب كلمة "نفذ" (أو "نفّذ") صراحة، أو لما يكون ضاغط زرار "عملية" فوق مربع الكتابة قبل الإرسال. لو ولا واحدة من الحالتين حصلت، الأدوات مش متاحة ليك أصلاً في هذا الرد، فمينفعش تنفذ أي حاجة أياً كان الطلب.
+- لما تتاح لك الأدوات (نفذ أو زرار عملية)، استدعِ الأداة (tool) المناسبة فعلياً في نفس الرد — مش بمجرد كتابة إنك نفذتها.
+- عندك صلاحية كاملة على قاعدة البيانات: فيه أدوات مخصصة لأشهر العمليات (منتجات، مخزون، طلبات، دفع، أكواد خصم، شحن، إشعارات، بطاقات هدايا، تفعيل/تعطيل المساعد وبوت تيليجرام)، وفيه كمان 3 أدوات عامة تغطي أي حاجة تانية مش موجودة كأداة مخصصة: dbSetValue (كتابة قيمة كاملة في أي مسار)، dbUpdateFields (تعديل حقول معينة بس من غير ما تمسح الباقي)، dbDeleteValue (حذف مسار بالكامل). استخدم الأداة المخصصة لو موجودة، واستخدم الأدوات العامة لأي تعديل تاني مطلوب منك — منقصش عن أي طلب تنفيذي بحجة "الأداة مش موجودة" إلا لو فعلاً مستحيل تقني.
+- لو المعلومة الناقصة لتنفيذ العملية غير موجودة (مثل id منتج أو مسار غير معروف)، اسأل الأدمن يحددها أو ابحث عنها في products/orders الموجودة بالسياق أولاً، ولا تستدعِ الأداة بمعطيات ناقصة أو مخترعة.
+- بعض العمليات (الحذف والإجراءات النهائية) تتطلب تأكيد صريح إضافي من الأدمن قبل التنفيذ حتى بعد "نفذ"/"عملية" — هذا مُدار تلقائياً بواسطة النظام بعد استدعائك للأداة، فلا داعي تطلب التأكيد بنفسك نصياً.
 - ممنوع منعاً باتاً كتابة عبارات مثل "تم التنفيذ" أو "تم الحذف" أو "تم التعديل" أو أي جملة توحي بحدوث تغيير في قاعدة البيانات إلا إذا استدعيت الأداة الحقيقية المطابقة في نفس الرد. الرد النصي فقط بدون استدعاء أداة = العملية لم تحدث إطلاقاً ولازم تقولها صراحة كده.
-- لو المعلومة الناقصة لتنفيذ العملية غير موجودة (مثل id منتج غير معروف)، اسأل الأدمن يحددها أو ابحث عنها في products/orders الموجودة بالسياق أولاً، ولا تستدعِ الأداة بمعطيات ناقصة أو مخترعة.
-- بعض العمليات (الحذف والإجراءات النهائية) تتطلب تأكيد صريح إضافي من الأدمن قبل التنفيذ حتى بعد كلمة "نفذ" — هذا مُدار تلقائياً بواسطة النظام بعد استدعائك للأداة، فلا داعي تطلب التأكيد بنفسك نصياً.
-- لو العملية المطلوبة مش من ضمن الأدوات المتاحة لك، أخبر الأدمن بصراحة إنها غير مدعومة حالياً بدل ما تتظاهر بالتنفيذ.
 - ردودك دايماً نص عادي/Markdown بسيط (فقرات، قوائم، تنسيق **) — ممنوع عرض أكواد برمجية أو JSON خام أو كتل code block في ردك للأدمن إلا لو طلب صراحة كود.
 
 ## قواعد عامة:
@@ -779,7 +786,8 @@
   // Tools in DANGEROUS_TOOLS are never auto-executed — the UI shows a confirm
   // card and only runs after the admin explicitly clicks "تأكيد".
   const DANGEROUS_TOOLS = new Set([
-    'deleteProduct', 'deletePromoCode', 'deleteShippingRate', 'deleteGiftCard', 'deleteOrder'
+    'deleteProduct', 'deletePromoCode', 'deleteShippingRate', 'deleteGiftCard', 'deleteOrder',
+    'dbDeleteValue'
   ]);
 
   const ADMIN_TOOLS = [
@@ -1014,6 +1022,55 @@
           required: ['enabled']
         }
       }
+    },
+    // ── Generic full-database tools ──────────────────────────────────────
+    // Fallback for ANY change that isn't covered by one of the specific
+    // tools above (custom fields, new nodes, bulk edits, settings that don't
+    // have a dedicated tool yet, ...). This gives the admin AI full control
+    // over the database instead of being limited to a fixed action list.
+    // aiConfig/secret (API key + admin prompt) stays protected regardless —
+    // it's unreadable/unwritable by the client SDK per the security rules.
+    {
+      type: 'function',
+      function: {
+        name: 'dbSetValue',
+        description: 'كتابة قيمة جديدة بالكامل في أي مسار (path) داخل قاعدة البيانات، وتستبدل القيمة الحالية بالكامل. استخدمها لأي تعديل مش متغطي بأداة مخصصة، أو لإنشاء عنصر/مسار جديد بالكامل.',
+        parameters: {
+          type: 'object',
+          properties: {
+            path: { type: 'string', description: 'مسار البيانات، مثال: products/abc123/description أو settings/heroBanner' },
+            value: { type: 'string', description: 'القيمة الجديدة. اكتبها كـ JSON صحيح لو object/array/رقم/boolean (مثال: {"a":1} أو 42 أو true)، أو نص عادي لو القيمة نص بسيط.' }
+          },
+          required: ['path', 'value']
+        }
+      }
+    },
+    {
+      type: 'function',
+      function: {
+        name: 'dbUpdateFields',
+        description: 'تعديل حقول معينة فقط داخل مسار في قاعدة البيانات من غير ما تمسح باقي الحقول الموجودة (بمثابة دمج/merge).',
+        parameters: {
+          type: 'object',
+          properties: {
+            path: { type: 'string', description: 'مسار العنصر المطلوب تعديله، مثال: products/abc123 أو orders/xyz789' },
+            fields: { type: 'string', description: 'الحقول المطلوب تحديثها فقط، ككائن JSON صحيح. مثال: {"price": 499, "featured": true}' }
+          },
+          required: ['path', 'fields']
+        }
+      }
+    },
+    {
+      type: 'function',
+      function: {
+        name: 'dbDeleteValue',
+        description: 'حذف مسار بالكامل نهائياً من قاعدة البيانات (أي عنصر أو حقل، مش بس المنتجات/الطلبات اللي ليها أداة حذف مخصصة) — عملية لا يمكن التراجع عنها.',
+        parameters: {
+          type: 'object',
+          properties: { path: { type: 'string', description: 'مسار العنصر المطلوب حذفه بالكامل' } },
+          required: ['path']
+        }
+      }
     }
   ];
 
@@ -1024,7 +1081,8 @@
       deletePromoCode: () => `حذف كود الخصم "${args.code}" نهائياً`,
       deleteShippingRate: () => `حذف سعر الشحن الخاص بمحافظة "${args.governorate}"`,
       deleteGiftCard: () => `حذف بطاقة الهدية (ID: ${args.cardId}) نهائياً`,
-      deleteOrder: () => `حذف الطلب (ID: ${args.orderId}) نهائياً`
+      deleteOrder: () => `حذف الطلب (ID: ${args.orderId}) نهائياً`,
+      dbDeleteValue: () => `حذف المسار "${args.path}" بالكامل من قاعدة البيانات نهائياً`
     };
     return (d[name] && d[name]()) || `تنفيذ العملية: ${name}`;
   }
@@ -1126,9 +1184,49 @@
         await db.ref('settings/telegram/enabled').set(!!args.enabled);
         return args.enabled ? 'تم تفعيل بوت تيليجرام' : 'تم تعطيل بوت تيليجرام';
       }
+      case 'dbSetValue': {
+        const path = normalizeDbPath(args.path);
+        await db.ref(path).set(parseToolValue(args.value));
+        return `تم تحديث "${path}" في قاعدة البيانات`;
+      }
+      case 'dbUpdateFields': {
+        const path = normalizeDbPath(args.path);
+        const fields = parseToolValue(args.fields);
+        if (!fields || typeof fields !== 'object' || Array.isArray(fields)) {
+          throw new Error('الحقول المطلوب تحديثها لازم تكون كائن JSON صحيح، مثال: {"price": 499}');
+        }
+        await db.ref(path).update(fields);
+        return `تم تحديث الحقول المطلوبة في "${path}"`;
+      }
+      case 'dbDeleteValue': {
+        const path = normalizeDbPath(args.path);
+        await db.ref(path).remove();
+        return `تم حذف "${path}" بالكامل من قاعدة البيانات`;
+      }
       default:
         throw new Error('أداة غير معروفة: ' + name);
     }
+  }
+
+  // Basic safety net for the generic full-DB tools: blocks empty/root paths
+  // and the secret AI config (which security rules already deny writing to
+  // from the client anyway — this just gives a clear message instead of a
+  // raw permission-denied error).
+  function normalizeDbPath(path) {
+    const p = String(path || '').trim().replace(/^\/+|\/+$/g, '');
+    if (!p) throw new Error('لازم تحدد مسار (path) داخل قاعدة البيانات — مينفعش مسار فاضي أو الجذر بالكامل.');
+    if (/^aiConfig\/secret(\/|$)/i.test(p)) {
+      throw new Error('مسار aiConfig/secret محمي (مفتاح API والبرومبت السري) ومينفعش تتعدل من هنا.');
+    }
+    return p;
+  }
+
+  // Tool arguments arrive as strings (JSON schema keeps them simple/portable
+  // for the model). Try to parse as JSON first (covers objects, arrays,
+  // numbers, booleans, null); fall back to the raw string for plain text.
+  function parseToolValue(raw) {
+    if (typeof raw !== 'string') return raw;
+    try { return JSON.parse(raw); } catch (_) { return raw; }
   }
 
   function buildSystemPrompt() {
@@ -1226,7 +1324,6 @@ ${JSON.stringify(context).slice(0, 50000)}
 
         <div class="tj-ai-quick" id="tjAiQuick">
           <button class="tj-ai-quick-chip" data-prompt="عاوز بنطلون جينز أزرق مقاس 34 يناسب الصيف"><i class='bx bx-search'></i> بحث ذكي</button>
-          <button class="tj-ai-quick-chip" data-prompt="اقترحلي إطلالة كاملة لمناسبة رسمية"><i class='bx bx-t-shirt'></i> إطلالة كاملة</button>
           <button class="tj-ai-quick-chip" data-prompt="إيه طرق الدفع المتاحة في المتجر؟"><i class='bx bx-credit-card'></i> طرق الدفع</button>
           <button class="tj-ai-quick-chip" data-prompt="إيه سياسة الاسترجاع والاستبدال؟"><i class='bx bx-undo'></i> الاسترجاع</button>
           <button class="tj-ai-quick-chip" data-prompt="ازاي أعرف مقاسي الصح؟"><i class='bx bx-ruler'></i> دليل المقاسات</button>
@@ -1236,6 +1333,7 @@ ${JSON.stringify(context).slice(0, 50000)}
         <div class="tj-ai-messages" id="tjAiMessages"></div>
 
         <div class="tj-ai-input-wrap">
+          <div class="tj-ai-mode-row" id="tjAiModeRow"></div>
           <div class="tj-ai-input-attach-row" id="tjAiAttachRow"></div>
           <div class="tj-ai-input-row">
             <textarea id="tjAiTextarea" placeholder="اكتب سؤالك أو ارفع صورة..." rows="1"></textarea>
@@ -1272,6 +1370,35 @@ ${JSON.stringify(context).slice(0, 50000)}
       `;
     }
 
+    // ----- Mode row above the input box -----
+    // Admin: "سؤال" / "عملية" toggle — decides whether the next message is
+    // answered as plain information, or is allowed to actually execute a
+    // real action (tool call) on the database.
+    // Customer: "تتبع طلبك" — one click pulls the current customer's
+    // undelivered orders directly (no need to type anything).
+    const modeRowEl = root.querySelector('#tjAiModeRow');
+    if (isAdminMode) {
+      modeRowEl.innerHTML = `
+        <div class="tj-ai-mode-toggle">
+          <button type="button" class="tj-ai-mode-btn active" id="tjAiModeQuestion" data-mode="question">
+            <i class='bx bx-message-rounded-dots'></i> سؤال
+          </button>
+          <button type="button" class="tj-ai-mode-btn" id="tjAiModeOperation" data-mode="operation">
+            <i class='bx bx-bolt-circle'></i> عملية
+          </button>
+        </div>
+        <div class="tj-ai-mode-hint" id="tjAiModeHint">
+          <i class='bx bx-error-circle'></i> وضع "عملية" مفعّل: أي طلب هيتنفذ فعلياً على قاعدة البيانات — اكتب طلبك بدقة.
+        </div>
+      `;
+    } else {
+      modeRowEl.innerHTML = `
+        <button type="button" class="tj-ai-track-btn" id="tjAiTrackBtn">
+          <i class='bx bx-package'></i> تتبع طلبك
+        </button>
+      `;
+    }
+
     bindEvents();
   }
 
@@ -1305,6 +1432,20 @@ ${JSON.stringify(context).slice(0, 50000)}
     root.querySelector('#tjAiAttach').addEventListener('click', () => attachInput.click());
     attachInput.addEventListener('change', onFileSelected);
 
+    // Admin: سؤال / عملية mode toggle
+    const modeQuestionBtn = root.querySelector('#tjAiModeQuestion');
+    const modeOperationBtn = root.querySelector('#tjAiModeOperation');
+    if (modeQuestionBtn && modeOperationBtn) {
+      modeQuestionBtn.addEventListener('click', () => setChatMode('question'));
+      modeOperationBtn.addEventListener('click', () => setChatMode('operation'));
+    }
+
+    // Customer: تتبع طلبك button
+    const trackBtn = root.querySelector('#tjAiTrackBtn');
+    if (trackBtn) {
+      trackBtn.addEventListener('click', handleTrackOrderClick);
+    }
+
     // Persist open state
     if (sessionStorage.getItem(TIGER_AI_OPEN_KEY) === '1') {
       openPanel();
@@ -1312,6 +1453,18 @@ ${JSON.stringify(context).slice(0, 50000)}
 
     // Init draggable + long-press dismiss
     initDragDismiss();
+  }
+
+  // Switches the admin "سؤال"/"عملية" mode and updates the button/hint UI.
+  function setChatMode(mode) {
+    chatMode = mode === 'operation' ? 'operation' : 'question';
+    if (!root) return;
+    const qBtn = root.querySelector('#tjAiModeQuestion');
+    const oBtn = root.querySelector('#tjAiModeOperation');
+    const hint = root.querySelector('#tjAiModeHint');
+    if (qBtn) qBtn.classList.toggle('active', chatMode === 'question');
+    if (oBtn) oBtn.classList.toggle('active', chatMode === 'operation');
+    if (hint) hint.classList.toggle('show', chatMode === 'operation');
   }
 
   // ========= Draggable + Long-Press Dismiss =========
@@ -1734,6 +1887,77 @@ ${JSON.stringify(context).slice(0, 50000)}
 - الدفع ببطاقة الهدايا`;
   }
 
+  // ========= Customer: "تتبع طلبك" button =========
+  // Answers directly from Firebase data (no LLM call needed, so it can never
+  // hallucinate an order number or a wrong tracking link) with only the
+  // orders that have NOT been delivered yet, showing: order number, product,
+  // shipping status, a link to track on our own store, and — once the order
+  // is actually shipping — a live carrier tracking link (e.g. Bosta).
+  async function handleTrackOrderClick() {
+    if (isWaiting) return;
+    isWaiting = true;
+    sendBtn.disabled = true;
+
+    const displayText = 'تتبع طلبك';
+    addUserMessage(displayText);
+    chatHistory.push({ role: 'user', content: displayText });
+    saveHistory();
+    showTyping();
+
+    try {
+      const authUser = await waitForAuthUser();
+      const savedPhone = getSavedCustomerPhone();
+      const trackPageUrl = `${location.origin}/track.html`;
+      const ordersPageUrl = `${location.origin}/orders.html`;
+
+      hideTyping();
+
+      if (!authUser && !savedPhone) {
+        addAiMessage(
+          `مش عارف هوية حضرتك حالياً عشان أجيب طلباتك. سجّل دخول لحسابك، أو ادخل على [تتبع الطلب](${trackPageUrl}) واكتب رقم موبايلك أو رقم الطلب.`
+        );
+        return;
+      }
+
+      const orders = await loadMyOrders(authUser ? authUser.uid : null, savedPhone);
+      const pending = orders.filter(o => o.status !== 'delivered' && o.status !== 'cancelled');
+
+      if (!pending.length) {
+        const msg = orders.length
+          ? `كل طلباتك اتسلمت بالفعل ✅ — تقدر تشوف كل طلباتك السابقة في [صفحة طلباتي](${ordersPageUrl}).`
+          : `مفيش طلبات مسجلة باسمك لحد دلوقتي. لو عندك طلب، تقدر تتابعه من [تتبع الطلب](${trackPageUrl}).`;
+        addAiMessage(msg);
+        return;
+      }
+
+      const blocks = pending.map(o => {
+        const lines = [
+          `**🔸 الطلب رقم ${o.code}**`,
+          `**المنتج:** ${o.itemsSummary || '—'}`,
+          `**حالة الشحن:** ${o.statusLabel}`,
+          `**تتبع طلبك على متجرنا:** [${trackPageUrl}](${trackPageUrl})`
+        ];
+        if (o.status === 'shipping' && o.trackingUrl) {
+          lines.push(`**تتبع لحظة بلحظة مع ${o.shippingCompanyName || 'شركة الشحن'}:** [${o.trackingUrl}](${o.trackingUrl})`);
+        }
+        return lines.join('\n');
+      });
+
+      const header = pending.length > 1
+        ? `عندك ${pending.length} طلبات لسه ما اتسلمتش:`
+        : 'طلبك لسه ما اتسلمش، وده تفاصيله:';
+
+      addAiMessage(`${header}\n\n${blocks.join('\n\n')}`);
+    } catch (err) {
+      hideTyping();
+      console.error('[TigerAI] track order error:', err);
+      addAiMessage('⚠️ حصل خطأ أثناء جلب بيانات طلباتك، حاول مرة أخرى.');
+    } finally {
+      isWaiting = false;
+      sendBtn.disabled = false;
+    }
+  }
+
   // ========= Admin Action-Intent Guard =========
   // Detects if the admin's message is asking for an actual write/delete/toggle
   // action (as opposed to a question or report request), so we can force the
@@ -2020,11 +2244,13 @@ ${JSON.stringify(context).slice(0, 50000)}
     try {
       const { messages } = await buildMessages(text, currentImage);
       // Tools are only ever sent to the model when the admin explicitly
-      // typed "نفذ" in this message. If it's missing, ADMIN_TOOLS is not
-      // passed at all — the model has no tool to call and can only reply
-      // with text, no matter how the request is phrased.
-      const executeRequested = isAdminMode && hasExplicitExecuteCommand(text);
-      const isActionRequest = isAdminMode && looksLikeAdminActionRequest(text);
+      // typed "نفذ" in this message, OR clicked the "عملية" button above the
+      // input before sending. Otherwise ADMIN_TOOLS is not passed at all —
+      // the model has no tool to call and can only reply with text, no
+      // matter how the request is phrased.
+      const operationMode = isAdminMode && chatMode === 'operation';
+      const executeRequested = isAdminMode && (operationMode || hasExplicitExecuteCommand(text));
+      const isActionRequest = isAdminMode && (operationMode || looksLikeAdminActionRequest(text));
       const toolsForThisTurn = executeRequested ? ADMIN_TOOLS : null;
 
       let result;
@@ -2083,6 +2309,10 @@ ${JSON.stringify(context).slice(0, 50000)}
     } finally {
       isWaiting = false;
       sendBtn.disabled = false;
+      // Always fall back to "سؤال" (question-only) mode after every send —
+      // the admin must consciously click "عملية" again for the next
+      // message, so a real DB write can never happen by accident.
+      if (isAdminMode) setChatMode('question');
     }
   }
 

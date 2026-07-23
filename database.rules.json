@@ -1,1 +1,87 @@
-{"rules": {"products": {".read": true, ".write": "auth != null"}, "orders": {".read": true, ".write": true}, "preorders": {".read": true, ".write": true}, "shippingRates": {".read": true, ".write": "auth != null"}, "promoCodes": {".read": true, ".write": "auth != null"}, "banners": {".read": true, ".write": "auth != null"}, "settings": {".read": true, ".write": "auth != null"}, "notifications": {".read": true, ".write": "auth != null"}, "giftCardRequests": {".read": true, ".write": true, ".indexOn": ["uid", "senderPhone", "status"]}, "giftCards": {".read": true, ".write": true, ".indexOn": ["ownerUid", "ownerPhone", "status", "cardNumber"]}, "returns": {".read": true, ".write": true}, "visitors": {".read": true, ".write": true}, "blockedIPs": {".read": true, ".write": true}}}
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "products": {
+      ".read": true,
+      ".write": true,
+      "stock": {
+        ".read": true,
+        ".write": true,
+        "$size": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        }
+      }
+    },
+
+    "orders": {
+      ".read": true,
+      ".write": true,
+      "$orderId": {
+        ".read": true,
+        ".write": true,
+        "status": {
+          ".validate": "newData.isString()"
+        }
+      },
+      ".indexOn": ["customerId", "status", "createdAt"]
+    },
+
+    "customers": {
+      ".read": true,
+      ".write": true,
+      "$customerId": {
+        ".read": true,
+        ".write": true
+      }
+    },
+
+    "preorders": { ".read": true, ".write": true },
+
+    "shippingRates": { ".read": true, ".write": true },
+
+    "promoCodes": { ".read": true, ".write": true },
+
+    "banners": { ".read": true, ".write": true },
+
+    "settings": { ".read": true, ".write": true },
+
+    "notifications": { ".read": true, ".write": true },
+
+    "telegramConfig": { ".read": true, ".write": true },
+
+    "giftCardRequests": {
+      ".read": true,
+      ".write": true,
+      ".indexOn": ["uid", "senderPhone", "status"]
+    },
+
+    "giftCards": {
+      ".read": true,
+      ".write": true,
+      ".indexOn": ["ownerUid", "ownerPhone", "status", "cardNumber"]
+    },
+
+    "returns": { ".read": true, ".write": true },
+
+    "aiConfig": {
+      ".read": true,
+      ".write": true,
+      "public": {
+        ".read": true,
+        ".write": true
+      },
+      "secret": {
+        ".read": false,
+        ".write": false
+      }
+    },
+
+    "analytics": { ".read": true, ".write": true },
+
+    "visitors": { ".read": true, ".write": true },
+
+    "blockedIPs": { ".read": true, ".write": true }
+  }
+}
