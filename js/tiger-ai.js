@@ -750,14 +750,14 @@
 - كتابة أوصاف منتجات و SEO، واقتراح أسعار وعروض وتحسينات لزيادة الأرباح.
 
 ## قواعد استدعاء الوظائف (إلزامية):
-- استخدم الأدوات (function calling) فقط لتنفيذ عملية كتابة/تعديل/حذف/تفعيل فعلية صريحة طلبها الأدمن (مثال: "غيّر سعر..."، "احذف..."، "فعّل..."، "ابعت إشعار...").
-- ممنوع نهائياً استدعاء أي أداة لمجرد سؤال استرجاعي أو تحليلي أو تقرير (مثال: "اعرض ملخص الأداء"، "إيه أكتر المنتجات مبيعاً"، "قد إيه المخزون المتبقي"، "قارن بين..."). الأسئلة دي تُجاب فورًا بنص مباشر ومنظم (Markdown) من بيانات context الموجودة بالفعل (products/orders/stats/settings) — بدون أي استدعاء أداة إطلاقاً، حتى لو السؤال يبدأ بفعل أمر زي "اعرض" أو "وضّح".
-- أي طلب لتنفيذ عملية فعلية (تعديل، حذف، تفعيل/تعطيل، إرسال، إنشاء) يجب أن يتم فقط عن طريق استدعاء الأداة (tool) المناسبة فعلياً في نفس الرد — وليس بمجرد كتابة أنك نفذتها.
+- القاعدة الأهم: أي سؤال أو طلب من الأدمن يُجاب افتراضياً بنص فقط (معلومات، تحليل، شرح، وصف للخطوات) من غير تنفيذ أي عملية فعلية على قاعدة البيانات — حتى لو صيغة الطلب أمرية زي "غيّر السعر" أو "احذف المنتج". في الحالة دي وضّح للأدمن إيه اللي هتعمله واطلب منه يكتب كلمة "نفذ" صراحة لو عايز التنفيذ الفعلي يحصل.
+- استدعاء الأدوات (function calling) بيبقى متاح ليك فقط في الرسائل اللي فيها الأدمن كتب كلمة "نفذ" (أو "نفّذ") صراحة ضمن نفس الرسالة. لو الكلمة مش موجودة، الأدوات مش متاحة ليك أصلاً في هذا الرد، فمينفعش تنفذ أي حاجة أياً كان الطلب.
+- لما الأدمن يكتب "نفذ" مع تحديد العملية بوضوح، استدعِ الأداة (tool) المناسبة فعلياً في نفس الرد — مش بمجرد كتابة إنك نفذتها.
 - ممنوع منعاً باتاً كتابة عبارات مثل "تم التنفيذ" أو "تم الحذف" أو "تم التعديل" أو أي جملة توحي بحدوث تغيير في قاعدة البيانات إلا إذا استدعيت الأداة الحقيقية المطابقة في نفس الرد. الرد النصي فقط بدون استدعاء أداة = العملية لم تحدث إطلاقاً ولازم تقولها صراحة كده.
-- لو الأدمن طلب عملية تنفيذية، استدعِ الأداة المناسبة فوراً في هذا الرد بدل ما ترد بجملة تصف إنك هتنفذ أو نفذت.
 - لو المعلومة الناقصة لتنفيذ العملية غير موجودة (مثل id منتج غير معروف)، اسأل الأدمن يحددها أو ابحث عنها في products/orders الموجودة بالسياق أولاً، ولا تستدعِ الأداة بمعطيات ناقصة أو مخترعة.
-- بعض العمليات (الحذف والإجراءات النهائية) تتطلب تأكيد صريح من الأدمن قبل التنفيذ — هذا مُدار تلقائياً بواسطة النظام بعد استدعائك للأداة، فلا داعي تطلب التأكيد بنفسك نصياً.
+- بعض العمليات (الحذف والإجراءات النهائية) تتطلب تأكيد صريح إضافي من الأدمن قبل التنفيذ حتى بعد كلمة "نفذ" — هذا مُدار تلقائياً بواسطة النظام بعد استدعائك للأداة، فلا داعي تطلب التأكيد بنفسك نصياً.
 - لو العملية المطلوبة مش من ضمن الأدوات المتاحة لك، أخبر الأدمن بصراحة إنها غير مدعومة حالياً بدل ما تتظاهر بالتنفيذ.
+- ردودك دايماً نص عادي/Markdown بسيط (فقرات، قوائم، تنسيق **) — ممنوع عرض أكواد برمجية أو JSON خام أو كتل code block في ردك للأدمن إلا لو طلب صراحة كود.
 
 ## قواعد عامة:
 - لديك صلاحية كاملة لرؤية كل البيانات: الأسعار، التكلفة (costPrice)، الأرباح، بيانات العملاء، الطلبات، الإعدادات.
@@ -1769,14 +1769,41 @@ ${JSON.stringify(context).slice(0, 50000)}
     return ADMIN_ACTION_RE.test(text);
   }
 
+  // ========= Explicit Execute Gate =========
+  // The admin must type the word "نفذ" (execute) somewhere in the message
+  // for the assistant to be allowed to touch the database at all. Without
+  // it, ADMIN_TOOLS is never even sent to the model, so a real tool call is
+  // physically impossible — the reply can only ever be text. This is a
+  // stronger guarantee than the keyword-based intent guard above, which is
+  // now only used to catch the model lying about having made a change.
+  const EXECUTE_WORDS = ['نفذ', 'نفّذ', 'ونفذ', 'ونفّذ'];
+  const EXECUTE_RE = new RegExp(
+    '(?:^|[^' + ARABIC_LETTER + '])(?:' +
+      EXECUTE_WORDS.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') +
+    ')(?:[^' + ARABIC_LETTER + ']|$)',
+    'i'
+  );
+
+  function hasExplicitExecuteCommand(text) {
+    if (!text) return false;
+    return EXECUTE_RE.test(text);
+  }
+
   // If the model claims an action happened ("تم التنفيذ"/"تم الحذف"/...) without
   // actually calling a tool, that claim is false — the DB was never touched.
   const FALSE_COMPLETION_RE = /تم\s*(التنفيذ|الحذف|التعديل|التحديث|التفعيل|التعطيل|الإرسال|الارسال|الإنشاء|الانشاء|التغيير|الإخفاء|الاخفاء|الإظهار|الاظهار|التجميد)/;
 
   function guardFalseCompletion(text, wasActionRequest, hadToolCalls) {
-    if (!wasActionRequest || hadToolCalls) return text;
+    // Runs whenever no tool was actually called. Previously this only fired
+    // for messages that matched the ADMIN_ACTION_WORDS heuristic; now that
+    // tools are only ever offered to the model when the admin explicitly
+    // typed "نفذ", any "تم الحذف/التعديل/..." claim without a real tool
+    // call is always false, so we catch it unconditionally.
+    if (hadToolCalls) return text;
     if (FALSE_COMPLETION_RE.test(text)) {
-      return 'لسه محصلش أي تغيير فعلي في قاعدة البيانات. حاول تحدد العملية بشكل أوضح (مثلاً: اسم/id المنتج، القيمة الجديدة بالظبط) وهنفذها فعلياً عن طريق الأداة المناسبة.';
+      return wasActionRequest
+        ? 'لسه محصلش أي تغيير فعلي في قاعدة البيانات. اكتب "نفذ" صراحة مع تحديد العملية بدقة (مثلاً: اسم/id المنتج، القيمة الجديدة بالظبط) وهنفذها فعلياً عن طريق الأداة المناسبة.'
+        : 'ده وصف نصي بس، لسه محصلش أي تغيير فعلي في قاعدة البيانات. لو عايز تنفيذ فعلي، اكتب كلمة "نفذ" صراحة مع تفاصيل العملية.';
     }
     return text;
   }
@@ -1992,7 +2019,13 @@ ${JSON.stringify(context).slice(0, 50000)}
 
     try {
       const { messages } = await buildMessages(text, currentImage);
+      // Tools are only ever sent to the model when the admin explicitly
+      // typed "نفذ" in this message. If it's missing, ADMIN_TOOLS is not
+      // passed at all — the model has no tool to call and can only reply
+      // with text, no matter how the request is phrased.
+      const executeRequested = isAdminMode && hasExplicitExecuteCommand(text);
       const isActionRequest = isAdminMode && looksLikeAdminActionRequest(text);
+      const toolsForThisTurn = executeRequested ? ADMIN_TOOLS : null;
 
       let result;
       try {
@@ -2004,14 +2037,14 @@ ${JSON.stringify(context).slice(0, 50000)}
           maxTokens: 1500,
           topP: 0.95,
           stream: false,
-          tools: isAdminMode ? ADMIN_TOOLS : null,
-          // Force an actual tool call for clear action requests instead of
-          // letting the model just describe doing it in text.
-          toolChoice: isActionRequest ? 'required' : null
+          tools: toolsForThisTurn,
+          // Force an actual tool call when the admin explicitly asked to
+          // execute, instead of letting the model just describe doing it.
+          toolChoice: executeRequested ? 'required' : null
         });
       } catch (forceErr) {
         // Some hosted models reject tool_choice:"required" — retry with "auto".
-        if (isActionRequest) {
+        if (executeRequested) {
           result = await callNvidiaAPI({
             apiKey: aiConfig.apiKey,
             model,
