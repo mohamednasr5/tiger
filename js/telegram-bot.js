@@ -465,4 +465,22 @@ if (typeof window !== 'undefined') {
   });
 }
 
+// ═══════════════════════════════════════════════════════════════
+// 🔗 دوال التوافق مع admin.html (Aliases)
+// ═══════════════════════════════════════════════════════════════
+
+// هذه الدوال مستدعاة من admin.html - نعملها كـ wrappers
+window.loadTelegramSettings = loadTelegramConfig;
+window.saveTelegramSettings = saveTelegramConfig;
+window.toggleTelegramBot = toggleTelegramBot;
+window.fetchChatId = fetchChatId;
+window.sendTestMessage = sendTestMessage;
+window.testBotConnection = testBotConnection;
+window.addTelegramLog = addTelegramLog;
+
+// دالة الحفظ من UI (موجودة في admin.html)
+window.saveTelegramSettingsFromUI = async function() {
+  return await saveTelegramConfig();
+};
+
 console.log('📱 Telegram Bot Module Loaded');
