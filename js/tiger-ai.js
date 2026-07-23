@@ -1240,6 +1240,10 @@ ${JSON.stringify(context).slice(0, 50000)}
         <div class="tj-ai-messages" id="tjAiMessages"></div>
 
         <div class="tj-ai-input-wrap">
+          <!-- زر تتبع الطلبات -->
+          <button type="button" class="tj-ai-track-btn" id="tjAiTrackBtn" title="تتبع طلباتك">
+            <i class='bx bx-package'></i> <span>تتبع الطلبات</span>
+          </button>
           <div class="tj-ai-mode-row" id="tjAiModeRow"></div>
           <div class="tj-ai-input-attach-row" id="tjAiAttachRow"></div>
           <div class="tj-ai-input-row">
@@ -1263,7 +1267,15 @@ ${JSON.stringify(context).slice(0, 50000)}
     attachInput = root.querySelector('#tjAiFile');
     attachRow = root.querySelector('#tjAiAttachRow');
     modeRow = root.querySelector('#tjAiModeRow');
+    trackOrdersBtn = root.querySelector('#tjAiTrackBtn');
     dropZone = root.querySelector('#tjAiDropZone');
+
+    // Wire up Track Orders button (customer mode only)
+    if (!isAdminMode && trackOrdersBtn) {
+      trackOrdersBtn.addEventListener('click', handleTrackOrders);
+    } else if (trackOrdersBtn) {
+      trackOrdersBtn.style.display = 'none';
+    }
 
     // Customize quick prompts for admin mode
     if (isAdminMode) {
@@ -1721,6 +1733,202 @@ ${JSON.stringify(context).slice(0, 50000)}
     `;
     messagesEl.appendChild(msg);
     scrollToBottom();
+  }
+
+  // ========= Track Orders Feature =========
+  const MOTIVATIONAL_MESSAGES = [
+    '🐯 سعدنا بشراءكم من متجر تايجر! شكراً لثقتكم بنا.',
+    '⭐ شكراً لتسوقكم مع تايجر جينز! ثروتك هي أولويتنا.',
+    '🎉 يا إيه سرورنا بيك! متجر تايجر دايماً في خدمتك.',
+    '💫 تسوق ذكي مع تايجر! شكراً لاختياركم الأفضل.',
+    '🚀 رائع إنك جزء من عائلة تايجر! هنعمل كل ما نقدر لنوصلك أسرع.',
+    '✨ ثقتنا هي أغلى حاجة عندنا! شكراً من قلب تايجر.'
+  ];
+
+  const ORDER_STATUS_ICONS = {
+    'pending': '⏳', 'confirmed': '✅', 'processing': '🔄', 
+    'shipping': '🚚', 'shipped': '📦', 'delivered': '🎉', 'cancelled': '❌'
+  };
+
+  const ORDER_STATUS_LABELS_AR = {
+    'pending': 'قيد المراجعة', 'confirmed': 'تم التأكيد', 'processing': 'قيد التجهيز',
+    'shipping': 'جاري الشحن', 'shipped': 'تم الشحن', 'delivered': 'تم التسليم', 'cancelled': 'ملغي'
+  };
+
+  function getRandomMotivation() {
+    return MOTIVATIONAL_MESSAGES[Math.floor(Math.random() * MOTIVATIONAL_MESSAGES.length)];
+  }
+
+  async function handleTrackOrders() {
+    if (isWaiting) return;
+
+    // Check if user is logged in
+    const authUser = await waitForAuthUser(1500);
+    
+    if (!authUser) {
+      // Not logged in - show login prompt
+      addAiMessage(`🔐 **مطلوب تسجيل الدخول**\n\nعزيزي العميل، لتتبع طلبك يرجى تسجيل الدخول أولاً حتى نتمكن من الوصول لبياناتك.`, false);
+      
+      // Show login button in chat
+      const loginMsg = document.createElement('div');
+      loginMsg.className = 'tj-ai-msg tj-ai-msg-ai';
+      loginMsg.innerHTML = `
+        <div class="tj-ai-msg-avatar">${TIGER_AI_ICON_SVG}</div>
+        <div class="tj-ai-msg-bubble">
+          <button class="tj-ai-login-prompt-btn" id="tjAiLoginPromptBtn">
+            <i class='bx bx-log-in'></i> تسجيل الدخول الآن
+          </button>
+        </div>
+      `;
+      messagesEl.appendChild(loginMsg);
+      scrollToBottom();
+      
+      document.getElementById('tjAiLoginPromptBtn').addEventListener('click', () => {
+        if (typeof openAuthModal === 'function') {
+          openAuthModal();
+        } else {
+          window.location.href = `${location.origin}/index.html?auth=login`;
+        }
+      });
+      return;
+    }
+
+    // User is logged in - show loading
+    isWaiting = true;
+    showTyping();
+
+    try {
+      // Get user's phone from Firebase Auth or saved data
+      let userPhone = '';
+      
+      // Try to get phone from users table in Firebase
+      const db = getDb();
+      if (db && authUser.uid) {
+        try {
+          const userSnap = await db.ref('users/' + authUser.uid).once('value');
+          const userData = userSnap.val();
+          if (userData && userData.phone) {
+            userPhone = userData.phone;
+          }
+        } catch (e) {
+          console.log('[TigerAI] Error fetching user phone:', e);
+        }
+      }
+      
+      // Fallback to saved phone in localStorage
+      if (!userPhone) {
+        userPhone = getSavedCustomerPhone();
+      }
+
+      if (!userPhone || !db) {
+        hideTyping();
+        addAiMessage(`❌ **لم يتم العثور على بيانات**\n\nلم نتمكن من العثور على رقم هاتف مسجل لحسابك. يرجى التواصل مع خدمة العملاء أو محاولة **[تتبع الطلب برقم الهاتف](${location.origin}/track.html)**.`, false);
+        return;
+      }
+
+      // Fetch orders from Firebase
+      const ordersSnap = await db.ref('orders').once('value');
+      const allOrders = ordersSnap.val() || {};
+      
+      // Clean phone number for matching
+      const cleanUserPhone = userPhone.replace(/[^0-9]/g, '');
+      
+      // Filter customer's non-delivered orders
+      const customerOrders = Object.entries(allOrders)
+        .filter(([id, order]) => {
+          if (!order.customer || !order.customer.phone) return false;
+          const orderPhone = String(order.customer.phone).replace(/[^0-9]/g, '');
+          // Match phones (partial match for flexibility)
+          return (orderPhone.includes(cleanUserPhone) || cleanUserPhone.includes(orderPhone)) &&
+                 order.status !== 'delivered' && order.status !== 'cancelled';
+        })
+        .map(([id, order]) => ({
+          id,
+          code: order.orderCode || order.code || id,
+          status: order.status || 'pending',
+          statusLabel: ORDER_STATUS_LABELS_AR[order.status] || order.status || 'قيد المراجعة',
+          statusIcon: ORDER_STATUS_ICONS[order.status] || '📋',
+          total: order.totalPrice || order.total || 0,
+          items: order.items || [],
+          createdAt: order.createdAt,
+          shippingCompany: order.shippingCompany || '',
+          trackingNumber: order.trackingNumber || '',
+          lastNote: extractLastStatusNote(order)
+        }))
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+      hideTyping();
+
+      if (customerOrders.length === 0) {
+        addAiMessage(`📭 **لا توجد طلبات نشطة**\n\n${getRandomMotivation()}\n\nلم نجد أي طلبات قيد التجهيز أو الشحن لحسابك حالياً.\n\n• جميع طلباتك تم **التسليم** أو **الإلغاء**\n• أو لم يتم تسجيل أي طلب بهذا الرقم\n\nيمكنك [مراجعة جميع طلباتك من هنا](${location.origin}/orders.html)`, false);
+        return;
+      }
+
+      // Build beautiful tracking response
+      let trackingHtml = `📦 **تتبع طلباتك**\n\n${getRandomMotivation()}\n\n`;
+      trackingHtml += `---\n**لديك ${customerOrders.length} طلب/طلبات نشطة:**\n\n`;
+
+      customerOrders.forEach((order, idx) => {
+        const dateStr = order.createdAt ? new Date(order.createdAt).toLocaleDateString('ar-EG', { 
+          year: 'numeric', month: 'short', day: 'numeric' 
+        }) : 'غير محدد';
+        
+        const itemsSummary = order.items.map(it => 
+          `${it.name || it.productName}${it.qty ? ' ×' + it.qty : ''}`
+        ).join('، ') || 'منتجات مختلفة';
+
+        trackingHtml += `### ${order.statusIcon} الطلب رقم: **${order.code}**\n\n`;
+        trackingHtml += `| الحقل | التفاصile |\n`;
+        trackingHtml += `|--------|----------|\n`;
+        trackingHtml += `| **حالة الطلب** | ${order.statusLabel} |\n`;
+        trackingHtml += `| **المنتجات** | ${itemsSummary} |\n`;
+        trackingHtml += `| **الإجمالي** | **${fmtPrice(order.total)}** |\n`;
+        trackingHtml += `| **تاريخ الطلب** | ${dateStr} |\n`;
+        
+        if (order.lastNote) {
+          trackingHtml += `| **ملاحظة** | ${escapeHtml(order.lastNote)} |\n`;
+        }
+        
+        // Shipping info for shipped orders
+        if (order.status === 'shipping' || order.status === 'shipped') {
+          const companyName = getShippingCompanyName(order.shippingCompany);
+          trackingHtml += `| **حالة الشحن** | 🚚 ${companyName} |\n`;
+          
+          if (order.trackingNumber) {
+            const trackUrl = getShipmentTrackingUrl(order.shippingCompany, order.trackingNumber);
+            if (trackUrl) {
+              trackingHtml += `| **رقم التتبع** | \`${order.trackingNumber}\` |\n`;
+              trackingHtml += `| **رابط التتبع** | [تابع شحنتك هنا](${trackUrl}) 📍 |\n`;
+            } else {
+              trackingHtml += `| **رقم التتبع** | \`${order.trackingNumber}\` |\n`;
+            }
+          }
+        }
+        
+        if (idx < customerOrders.length - 1) {
+          trackingHtml += `\n---\n`;
+        }
+      });
+
+      trackingHtml += `\n---\n\n💡 **نصيحة:** يمكنك دائماً مراجعة جميع طلباتك من [صفحة طلباتي](${location.origin}/orders.html)`;
+
+      addAiMessage(trackingHtml, false);
+
+    } catch (err) {
+      hideTyping();
+      console.error('[TigerAI] Track orders error:', err);
+      addAiMessage(`❌ حدث خطأ أثناء جلب بيانات طلباتك. يرجى المحاولة مرة أخرى لاحقاً.\n\nأو يمكنك [تتبع طلبك يدوياً من هنا](${location.origin}/track.html)`, false);
+    } finally {
+      isWaiting = false;
+    }
+  }
+
+  function extractLastStatusNote(order) {
+    if (!order.statusHistory || !Array.isArray(order.statusHistory) || order.statusHistory.length === 0) {
+      return '';
+    }
+    const lastEntry = order.statusHistory[order.statusHistory.length - 1];
+    return lastEntry.note || '';
   }
 
   // ========= File Attach =========

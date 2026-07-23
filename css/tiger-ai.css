@@ -443,6 +443,107 @@
   border-top:1px solid var(--line,#2a2a30);
   flex-shrink:0;
 }
+
+/* Track Orders Button - above input box */
+.tj-ai-track-btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.5rem;
+  width:100%;
+  padding:.6rem .9rem;
+  margin-bottom:.6rem;
+  border-radius:12px;
+  border:1.5px solid var(--gold,#d4af37);
+  background:linear-gradient(135deg,rgba(212,175,55,.12) 0%,rgba(212,175,55,.06) 100%);
+  color:var(--gold,#d4af37);
+  font-family:'Cairo',sans-serif;
+  font-size:.85rem;
+  font-weight:700;
+  cursor:pointer;
+  transition:.25s ease;
+  animation:tjAiTrackPulse 3s ease-in-out infinite;
+}
+.tj-ai-track-btn:hover{
+  background:linear-gradient(135deg,rgba(212,175,55,.22) 0%,rgba(212,175,55,.12) 100%);
+  transform:translateY(-2px);
+  box-shadow:0 6px 20px rgba(212,175,55,.25);
+}
+.tj-ai-track-btn:active{
+  transform:scale(.98);
+}
+.tj-ai-track-btn i{font-size:1.15rem}
+.tj-ai-track-btn:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+  animation:none;
+  transform:none;
+}
+@keyframes tjAiTrackPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(212,175,55,.3)}
+  50%{box-shadow:0 0 0 8px rgba(212,175,55,0)}
+}
+
+/* Login Prompt Button inside chat */
+.tj-ai-login-prompt-btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.45rem;
+  width:100%;
+  padding:.65rem 1rem;
+  border-radius:10px;
+  border:none;
+  background:linear-gradient(135deg,var(--gold,#d4af37) 0%,#b8942e 100%);
+  color:#0a0a0c;
+  font-family:'Cairo',sans-serif;
+  font-size:.88rem;
+  font-weight:700;
+  cursor:pointer;
+  transition:.2s ease;
+  margin-top:.5rem;
+}
+.tj-ai-login-prompt-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 18px rgba(212,175,55,.4);
+}
+.tj-ai-login-prompt-btn i{font-size:1.15rem}
+
+/* Track Orders Table Styling (inside AI message bubble) */
+.tj-ai-msg-bubble table{
+  width:100%;
+  border-collapse:collapse;
+  margin:.5rem 0;
+  font-size:.82rem;
+}
+.tj-ai-msg-bubble th,
+.tj-ai-msg-bubble td{
+  padding:.5rem .6rem;
+  text-align:right;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  line-height:1.5;
+}
+.tj-ai-msg-bubble th{
+  background:rgba(212,175,55,.1);
+  color:var(--gold,#d4af37);
+  font-weight:700;
+  white-space:nowrap;
+}
+.tj-ai-msg-bubble td{
+  color:var(--text,#fff);
+}
+.tj-ai-msg-bubble tr:last-child td{
+  border-bottom:none;
+}
+.tj-ai-msg-bubble code{
+  background:rgba(212,175,55,.15);
+  color:var(--gold,#d4af37);
+  padding:.15rem .4rem;
+  border-radius:4px;
+  font-size:.78rem;
+  direction:ltr;
+  display:inline-block;
+}
 .tj-ai-input-attach-row{
   display:none;
   gap:.5rem;
