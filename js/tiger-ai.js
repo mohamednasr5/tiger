@@ -970,6 +970,11 @@ ${JSON.stringify(SIZE_GUIDE_DATA, null, 2)}
     // Basic markdown-like formatting
     let html = escapeHtml(text);
     
+    // Links: [نص](https://...) -> real clickable <a> (only http/https allowed,
+    // so the model can never smuggle a javascript: or data: URL through here)
+    html = html.replace(/\[([^\[\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (m, label, url) => {
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer">${label}</a>`;
+    });
     // Bold
     html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     // Italic
