@@ -290,8 +290,9 @@ function resetAdminPrompt() {
 // ═══════════════════════════════════════════════════════════════
 
 function getWorkerUrl() {
-  // يمكن تغيير هذا حسب إعداداتك
-  return 'https://telegram.studegy10.workers.dev';
+  // ⚠️ هذا لازم يكون رابط الـ AI Proxy Worker (اللي بيكلم NVIDIA)، مش رابط بوت Telegram.
+  // نفس الرابط المستخدم بنجاح في js/tiger-ai.js (متغيّر NVIDIA_BASE).
+  return 'https://tigerorder.studegy10.workers.dev';
 }
 
 // ═══════════════════════════════════════════════════════════════
