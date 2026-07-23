@@ -42,8 +42,14 @@ async function sendTelegramNotification(type, data) {
       return false;
     }
 
+    // ✅ إصلاح CORS - إضافة خيارات متقدمة
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 ثواني timeout
+
     const response = await fetch(`${TELEGRAM_NOTIFICATIONS.workerUrl}/api/notifications/webhook`, {
       method: 'POST',
+      mode: 'cors',           // ✅ حل مشكلة CORS
+      cache: 'no-cache',      // ✅ ما نعملش cache
       headers: { 
         'Content-Type': 'application/json',
         'Accept': 'application/json'
@@ -53,8 +59,17 @@ async function sendTelegramNotification(type, data) {
         data: data,
         timestamp: new Date().toISOString(),
         source: window.location.pathname
-      })
+      }),
+      signal: controller.signal  // ✅ Timeout
     });
+
+    clearTimeout(timeoutId);
+
+    // ✅ التحقق من الاستجابة
+    if (!response.ok) {
+      console.error(`❌ HTTP Error: ${response.status}`);
+      return false;
+    }
 
     const result = await response.json();
     
@@ -73,6 +88,17 @@ async function sendTelegramNotification(type, data) {
     }
   } catch (error) {
     console.error('❌ خطأ في إرسال الإشعار:', error);
+    
+    // ✅ معلومات تفصيلية عن الخطأ
+    if (error.name === 'AbortError') {
+      console.error('⏰ انتهى وقت الانتظار (10 ثواني)');
+    } else if (error.message.includes('Failed to fetch')) {
+      console.error('🌐 مشكلة في الاتصال - تأكد من:');
+      console.error('   1. رابط Worker صحيح');
+      console.error('   2. CORS مفعّل على Worker');
+      console.error('   3. الإنترنت شغال');
+    }
+    
     return false;
   }
 }
@@ -132,6 +158,35 @@ function notifyNewPayment(paymentData) {
     receiptImage: paymentData.receiptImage || paymentData.image || '',
     notes: paymentData.notes || ''
   });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ✅ إشعار تأكيد الدفع (لما العميل يرفع إيصال)
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * إشعار تأكيد دفع جديد (عند رفع الإيصال)
+ * @param {object} orderData - بيانات الطلب مع الدفع
+ */
+function notifyPaymentConfirmation(orderData) {
+  return sendTelegramNotification(TELEGRAM_NOTIFICATIONS.types.NEW_PAYMENT, {
+    orderId: orderData.orderCode || orderData.code || orderData.id || orderData.orderId || '-',
+    amount: orderData.total || orderData.totalPrice || 0,
+    method: orderData.payment?.method || orderData.paymentMethod || 'vodafone',
+    phone: orderData.customer?.phone || orderData.phone || '',
+    customerName: orderData.customer?.name || orderData.customerName || 'عميل',
+    hasReceipt: !!orderData.payment?.receiptImage,
+    notes: '✅ تم رفع إيصال الدفع - يرجى المراجعة'
+  });
+}
+
+/**
+ * إشعار عام مخصص (لأي استخدام آخر)
+ * @param {string} type - نوع الإشعار
+ * @param {object} data - البيانات
+ */
+function notifyCustom(type, data) {
+  return sendTelegramNotification(type, data);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -215,8 +270,10 @@ window.sendTelegramNotification = sendTelegramNotification;
 window.notifyNewOrder = notifyNewOrder;
 window.notifyNewGiftCard = notifyNewGiftCard;
 window.notifyNewPayment = notifyNewPayment;
+window.notifyPaymentConfirmation = notifyPaymentConfirmation;  // ✅ إشعار تأكيد الدفع
 window.notifyLowStock = notifyLowStock;
+window.notifyCustom = notifyCustom;  // ✅ إشعار مخصص
 window.setNotificationsEnabled = setNotificationsEnabled;
 window.setWorkerUrl = setWorkerUrl;
 
-console.log('📱 Telegram Notifications Module Loaded');
+console.log('📱 Telegram Notifications Module Loaded (v2.0)');

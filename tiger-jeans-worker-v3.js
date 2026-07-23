@@ -815,9 +815,9 @@ export default {
       }
 
       // ════════════════════════════════════════════════════════
-      // 📱 Telegram Webhook
+      // 📱 Telegram Webhook (يدعم عدة مسارات)
       // ════════════════════════════════════════════════════════
-      if (path === '/telegram-webhook' || path === '/webhook') {
+      if (path === '/telegram-webhook' || path === '/webhook' || path === '/api/telegram/webhook') {
         if (request.method !== 'POST') {
           return new Response('Use POST', { status: 200 });
         }
