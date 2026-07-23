@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+
+# Environment files
+.env
+.env.local
+.env.production
+*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Firebase
+.firebase/
+firebase.json
+.firebaserc
+
+# Cloudflare
+.wrangler/
+.dev.vars
+
+# Temporary files
+tmp/
+temp/
+.cache/
+
+# Uploads (if any)
+uploads/
