@@ -934,12 +934,13 @@ async function deductStockForOrder(items) {
       if (result.committed) {
         const newQty = result.snapshot.val();
         // ✅ تنبيه فوري لو المخزون بقى منخفض بعد الخصم (بدل ما ينتظر cron)
-        if (newQty !== null && newQty <= 2 && typeof window.TelegramBot !== 'undefined') {
-          loadTelegramSettings().then(() => {
-            if (TELEGRAM_CONFIG.enabled) {
-              notifyLowStock(item.name, item.size, item.color, newQty).catch(e => console.log('Telegram lowstock notify error:', e));
-            }
-          });
+        if (newQty !== null && newQty <= 2 && typeof notifyLowStock === 'function') {
+          notifyLowStock({
+            productName: item.name,
+            size: item.size,
+            color: item.color,
+            qty: newQty
+          }).catch(e => console.log('Telegram lowstock notify error:', e));
         }
       }
     } catch (e) {
@@ -1100,17 +1101,13 @@ async function submitOrder() {
     document.getElementById("whatsappInvoice").href = generateWhatsAppLink(order);
     
     // Send Telegram notification (async, don't block UI)
-    if (typeof window.TelegramBot !== 'undefined') {
-      loadTelegramSettings().then(() => {
-        if (TELEGRAM_CONFIG.enabled) {
-          notifyNewOrder(order).catch(e => console.log('Telegram notify error:', e));
+    if (typeof notifyNewOrder === 'function') {
+      notifyNewOrder(order).catch(e => console.log('Telegram notify error:', e));
+    }
 
-          // ✅ لو الدفع مش عند الاستلام وفيه إيصال مرفوع، ابعت تأكيد دفع فورًا
-          if (method !== 'cod' && receiptUrl) {
-            notifyPaymentConfirmation(order).catch(e => console.log('Telegram payment notify error:', e));
-          }
-        }
-      });
+    // ✅ لو الدفع مش عند الاستلام وفيه إيصال مرفوع، ابعت تأكيد دفع فورًا
+    if (method !== 'cod' && receiptUrl && typeof notifyPaymentConfirmation === 'function') {
+      notifyPaymentConfirmation(order).catch(e => console.log('Telegram payment notify error:', e));
     }
     
   } catch (err) {

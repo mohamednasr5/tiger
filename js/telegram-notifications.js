@@ -209,6 +209,24 @@ function notifyLowStock(stockData) {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// 🛍️ إشعار إضافة منتج للسلة
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * إشعار عند إضافة منتج للسلة
+ * @param {object} item - المنتج المضاف
+ */
+function notifyCartAdd(item) {
+  return sendTelegramNotification('cart_add', {
+    productName: item.name || item.title || '-',
+    size: item.size || '-',
+    color: item.color || '-',
+    qty: item.qty || 1,
+    price: item.price || 0
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
 // 🔧 دوال مساعدة
 // ═══════════════════════════════════════════════════════════════
 
@@ -272,6 +290,7 @@ window.notifyNewGiftCard = notifyNewGiftCard;
 window.notifyNewPayment = notifyNewPayment;
 window.notifyPaymentConfirmation = notifyPaymentConfirmation;  // ✅ إشعار تأكيد الدفع
 window.notifyLowStock = notifyLowStock;
+window.notifyCartAdd = notifyCartAdd;  // ✅ إشعار إضافة للسلة
 window.notifyCustom = notifyCustom;  // ✅ إشعار مخصص
 window.setNotificationsEnabled = setNotificationsEnabled;
 window.setWorkerUrl = setWorkerUrl;

@@ -153,6 +153,10 @@ function addToCart(item) {
   }
   saveCart(cart);
   showToast("تمت الإضافة إلى السلة ✓");
+
+  if (typeof notifyCartAdd === "function") {
+    notifyCartAdd(item).catch((e) => console.log("Telegram cart notify error:", e));
+  }
 }
 
 function removeFromCart(index) {

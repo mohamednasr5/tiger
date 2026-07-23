@@ -520,31 +520,37 @@ if (typeof window !== 'undefined') {
 // 🌐 دوال عامة متاحة عالمياً (للاستخدام من أي صفحة)
 // ═══════════════════════════════════════════════════════════════
 
-// إرسال إشعار طلب جديد - يمكن استدعاؤها من checkout.html أو أي مكان
-window.notifyNewOrder = async function(orderData) {
-  if (typeof window.TelegramBot !== 'undefined' && typeof window.TelegramBot.notifyNewOrder === 'function') {
-    return await window.TelegramBot.notifyNewOrder(orderData);
-  }
-  console.warn('TelegramBot not loaded yet');
-  return false;
-};
+// ⚠️ لا نعمل override لـ notifyNewOrder / notifyLowStock / sendTelegramNotification
+// لو الصفحة محمّلة telegram-notifications.js بالفعل، لأن ده بيبعت لكل الأدمنز عبر
+// /api/notifications/webhook. هنا بس بنعرّفهم كـ fallback لو الصفحة مفيهاش telegram-notifications.js.
+if (typeof window.notifyNewOrder !== 'function') {
+  window.notifyNewOrder = async function(orderData) {
+    if (typeof window.TelegramBot !== 'undefined' && typeof window.TelegramBot.notifyNewOrder === 'function') {
+      return await window.TelegramBot.notifyNewOrder(orderData);
+    }
+    console.warn('TelegramBot not loaded yet');
+    return false;
+  };
+}
 
-// إرسال تنبيه مخزون منخفض
-window.notifyLowStock = async function(productData) {
-  if (typeof window.TelegramBot !== 'undefined' && typeof window.TelegramBot.notifyLowStock === 'function') {
-    return await window.TelegramBot.notifyLowStock(productData);
-  }
-  console.warn('TelegramBot not loaded yet');
-  return false;
-};
+if (typeof window.notifyLowStock !== 'function') {
+  window.notifyLowStock = async function(productData) {
+    if (typeof window.TelegramBot !== 'undefined' && typeof window.TelegramBot.notifyLowStock === 'function') {
+      return await window.TelegramBot.notifyLowStock(productData);
+    }
+    console.warn('TelegramBot not loaded yet');
+    return false;
+  };
+}
 
-// إرسال إشعار عام
-window.sendTelegramNotification = async function(message) {
-  if (typeof window.TelegramBot !== 'undefined' && typeof window.TelegramBot.notify === 'function') {
-    return await window.TelegramBot.notify(message);
-  }
-  console.warn('TelegramBot not loaded yet');
-  return false;
-};
+if (typeof window.sendTelegramNotification !== 'function') {
+  window.sendTelegramNotification = async function(message) {
+    if (typeof window.TelegramBot !== 'undefined' && typeof window.TelegramBot.notify === 'function') {
+      return await window.TelegramBot.notify(message);
+    }
+    console.warn('TelegramBot not loaded yet');
+    return false;
+  };
+}
 
 console.log('📱 Telegram Bot Module Loaded');
