@@ -1945,6 +1945,34 @@ let tempSizes = [];
 let tempColors = [];
 
 // ====== Auth ======
+// خلي شاشة الدخول مخفية من البداية لحد ما نتأكد هل فيه جلسة محفوظة قبل كده ولا لأ
+// (بيمنع ظهور فورم الدخول لثانية ثم اختفائه لو المستخدم مسجل دخول بالفعل)
+document.getElementById("loginScreen").style.display = "none";
+
+let adminAuthReady = false; // بيمنع تكرار تحميل الداشبورد أكتر من مرة
+
+auth.onAuthStateChanged((user) => {
+  const loginScreen = document.getElementById("loginScreen");
+  const adminLayout = document.getElementById("adminLayout");
+
+  if (user) {
+    // فيه جلسة دخول محفوظة (سواء دلوقتي أو من قبل) → افتح لوحة التحكم على طول من غير ما يطلب البيانات تاني
+    loginScreen.style.display = "none";
+    adminLayout.style.display = "block";
+    if (!adminAuthReady) {
+      adminAuthReady = true;
+      loadDashboardData();
+      initOrdersRealtime();
+      initGiftCardsRealtime();
+    }
+  } else {
+    // مفيش جلسة محفوظة (أو سجل خروج) → اعرض شاشة الدخول
+    adminAuthReady = false;
+    adminLayout.style.display = "none";
+    loginScreen.style.display = "flex";
+  }
+});
+
 function doAdminLogin() {
   const email = document.getElementById("adminEmail").value.trim();
   const pass = document.getElementById("adminPass").value.trim();
@@ -1956,17 +1984,19 @@ function doAdminLogin() {
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> جاري الدخول...';
   
-  auth.signInWithEmailAndPassword(email, pass).then(() => {
-    document.getElementById("loginScreen").style.display = "none";
-    document.getElementById("adminLayout").style.display = "block";
-    loadDashboardData();
-    initOrdersRealtime();
-    initGiftCardsRealtime();
-  }).catch(e => {
-    errEl.textContent = "بيانات الدخول غير صحيحة";
-    btn.disabled = false;
-    btn.innerHTML = "دخول";
-  });
+  // خلي الجلسة محفوظة في المتصفح عشان ميطلبش تسجيل الدخول تاني بعد تحديث الصفحة أو الرجوع لاحقًا
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+    .then(() => auth.signInWithEmailAndPassword(email, pass))
+    .then(() => {
+      errEl.textContent = "";
+      btn.disabled = false;
+      btn.innerHTML = "دخول";
+      // onAuthStateChanged هيتكفل بإظهار لوحة التحكم
+    }).catch(e => {
+      errEl.textContent = "بيانات الدخول غير صحيحة";
+      btn.disabled = false;
+      btn.innerHTML = "دخول";
+    });
 }
 
 function doLogout() {
