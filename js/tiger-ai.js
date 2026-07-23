@@ -2242,7 +2242,7 @@ ${JSON.stringify(context).slice(0, 50000)}
     showTyping();
 
     try {
-      const { messages } = await buildMessages(text, currentImage);
+      let { messages } = await buildMessages(text, currentImage);
       // Tools are only ever sent to the model when the admin explicitly
       // typed "نفذ" in this message, OR clicked the "عملية" button above the
       // input before sending. Otherwise ADMIN_TOOLS is not passed at all —
@@ -2279,10 +2279,43 @@ ${JSON.stringify(context).slice(0, 50000)}
             maxTokens: 1500,
             topP: 0.95,
             stream: false,
-            tools: ADMIN_TOOLS
+            tools: ADMIN_TOOLS,
+            toolChoice: 'auto'
           });
         } else {
           throw forceErr;
+        }
+      }
+
+      // Some models still answer with plain text ("تم التنفيذ") instead of
+      // actually calling a tool, even with toolChoice:"required". We never
+      // trust that claim — retry once with an explicit nudge insisting on a
+      // real tool call before giving up, so "عملية" mode does everything it
+      // can to make the real change happen instead of just describing it.
+      if (executeRequested && !(result.toolCalls && result.toolCalls.length)) {
+        try {
+          const nudgeMessages = messages.concat([
+            { role: 'assistant', content: result.content || '' },
+            { role: 'user', content: 'ده كان رد نصي بس، ومحصلش أي تغيير فعلي. مطلوب منك دلوقتي تستدعي الأداة (tool call) المناسبة فعلياً في نفس الرد، مش تكتب وصف نصي. لو أي بيانة ناقصة (زي id منتج أو طلب)، دوّر عليها في السياق المتاح (products/orders) قبل ما تسأل، ونفذ الأداة فوراً.' }
+          ]);
+          const retryResult = await callNvidiaAPI({
+            apiKey: aiConfig.apiKey,
+            model,
+            messages: nudgeMessages,
+            temperature: 0.3,
+            maxTokens: 1500,
+            topP: 0.95,
+            stream: false,
+            tools: ADMIN_TOOLS,
+            toolChoice: 'required'
+          });
+          if (retryResult.toolCalls && retryResult.toolCalls.length) {
+            messages = nudgeMessages;
+            result = retryResult;
+          }
+        } catch (_) {
+          // Keep the original (text-only) result; the fallback message below
+          // will make it clear that nothing actually happened.
         }
       }
 
@@ -2290,6 +2323,12 @@ ${JSON.stringify(context).slice(0, 50000)}
 
       if (isAdminMode && result.toolCalls && result.toolCalls.length) {
         await handleAdminToolCalls(messages, result, model);
+      } else if (executeRequested) {
+        // Explicit execute/"عملية" request but no tool was ever actually
+        // called, even after the retry above — be honest about it instead
+        // of risking the model's own text claiming a success that never
+        // happened.
+        addAiMessage('⚠️ للأسف مقدرتش أنفّذ العملية فعلياً على قاعدة البيانات. جرّب تحدد الطلب بدقة أكتر (زي اسم المنتج/الطلب أو الـ ID بالظبط، والقيمة الجديدة)، وتأكد إنها عملية متاحة، وحاول تاني بزرار "عملية".');
       } else {
         let content = (result.content || '').trim();
         if (!content) {
