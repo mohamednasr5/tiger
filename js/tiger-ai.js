@@ -32,6 +32,9 @@
   const TIGER_AI_SECRET_PATH = 'aiConfig/secret';
   const TIGER_AI_HISTORY_KEY = 'tj_ai_history';
   const TIGER_AI_OPEN_KEY = 'tj_ai_open';
+  // Same key orders.html uses to remember a guest's phone number so both
+  // pages recognize the same "logged in without an account" customer.
+  const TIGER_AI_PHONE_KEY = 'tj_customer_phone';
 
   // ========= Dismiss State (sessionStorage) =========
   const TIGER_AI_DISMISSED_KEY = 'tj_ai_dismissed';
@@ -239,6 +242,115 @@
     }
   }
 
+  // ========= Current customer identity (for personalization + order lookup) =========
+  // Mirrors the same signals orders.html uses: Firebase Auth user (uid) first,
+  // falling back to a phone number the customer previously entered on
+  // orders.html/track.html and that stayed saved in localStorage.
+  let authUserPromise = null;
+
+  function getAuthUserSync() {
+    try { if (typeof currentUser !== 'undefined' && currentUser) return currentUser; } catch (_) {}
+    try { if (window.currentUser) return window.currentUser; } catch (_) {}
+    try { if (typeof auth !== 'undefined' && auth && auth.currentUser) return auth.currentUser; } catch (_) {}
+    try { if (window.auth && window.auth.currentUser) return window.auth.currentUser; } catch (_) {}
+    return null;
+  }
+
+  // Firebase Auth reports its initial state asynchronously (even on repeat
+  // visits with a saved session), so we wait once for the first
+  // onAuthStateChanged callback instead of trusting auth.currentUser
+  // immediately, with a short timeout fallback so the assistant never hangs
+  // for guests who aren't logged in at all.
+  function waitForAuthUser(timeoutMs = 2500) {
+    if (authUserPromise) return authUserPromise;
+    authUserPromise = new Promise((resolve) => {
+      let done = false;
+      const finish = (u) => { if (!done) { done = true; resolve(u || null); } };
+      try {
+        const a = (typeof auth !== 'undefined' && auth) ? auth : (window.auth || null);
+        if (a && typeof a.onAuthStateChanged === 'function') {
+          const unsub = a.onAuthStateChanged((u) => {
+            finish(u);
+            if (typeof unsub === 'function') unsub();
+          });
+        } else {
+          finish(getAuthUserSync());
+        }
+      } catch (_) {
+        finish(getAuthUserSync());
+      }
+      setTimeout(() => finish(getAuthUserSync()), timeoutMs);
+    });
+    return authUserPromise;
+  }
+
+  function getSavedCustomerPhone() {
+    try { return localStorage.getItem(TIGER_AI_PHONE_KEY) || ''; } catch (_) { return ''; }
+  }
+
+  const SHIPPING_COMPANY_NAMES = {
+    bosta: 'بوستا (Bosta)', aramex: 'أرامكس (Aramex)', smsa: 'سمسا (SMSA)',
+    dhl: 'DHL', fedex: 'FedEx', other: 'شركة شحن'
+  };
+  function getShippingCompanyName(key) { return SHIPPING_COMPANY_NAMES[key] || key || 'شركة شحن'; }
+
+  // Builds the exact same direct carrier tracking link orders.html/track.html
+  // show the customer, so the assistant can hand it over as-is.
+  function getShipmentTrackingUrl(company, trackingNumber) {
+    if (!trackingNumber) return '';
+    const urls = {
+      bosta: `https://bosta.co/ar-eg/tracking-shipments?shipment-number=${trackingNumber}`,
+      aramex: `https://www.aramex.com/track/details?ShipmentNumber=${trackingNumber}`,
+      smsa: `https://smsaexpress.com/tracking?tracknumbers=${trackingNumber}`,
+      dhl: `https://www.dhl.com/eg-en/tracking.html?tracking-id=${trackingNumber}`,
+      fedex: `https://www.fedex.com/fedextrack/?trknbr=${trackingNumber}`,
+      other: ''
+    };
+    return urls[company] || urls.bosta;
+  }
+
+  const ORDER_STATUS_LABELS = {
+    pending: 'بانتظار مراجعة الدفع', confirmed: 'تم تأكيد الطلب',
+    shipping: 'جاري الشحن', delivered: 'تم التسليم', cancelled: 'ملغي'
+  };
+
+  // Loads only the orders belonging to the current customer (by uid and/or
+  // saved phone) — same matching logic as orders.html's fetchMyOrders — so
+  // the assistant can answer "فين طلبي؟" instantly from context instead of
+  // asking the customer to type the order number again.
+  async function loadMyOrders(uid, phone) {
+    if (!uid && !phone) return [];
+    const db = getDb();
+    if (!db) return [];
+    try {
+      const snap = await db.ref('orders').once('value');
+      const val = snap.val() || {};
+      return Object.entries(val)
+        .filter(([id, o]) => (uid && o.uid === uid) || (phone && o.customer && o.customer.phone === phone))
+        .map(([id, o]) => {
+          const trackingUrl = o.status === 'shipping' ? getShipmentTrackingUrl(o.shippingCompany, o.trackingNumber) : '';
+          return {
+            orderId: id,
+            code: o.code || id,
+            customerName: (o.customer && o.customer.name) || '',
+            status: o.status || 'pending',
+            statusLabel: ORDER_STATUS_LABELS[o.status] || o.status || 'pending',
+            lastStatusNote: (o.statusHistory && o.statusHistory.length) ? (o.statusHistory[o.statusHistory.length - 1].note || '') : '',
+            createdAt: o.createdAt || null,
+            total: o.total || 0,
+            itemsSummary: (o.items || []).map(it => `${it.name || ''}${it.qty ? ' x' + it.qty : ''}`).join('، '),
+            shippingCompany: o.status === 'shipping' ? (o.shippingCompany || '') : '',
+            shippingCompanyName: o.status === 'shipping' && o.shippingCompany ? getShippingCompanyName(o.shippingCompany) : '',
+            trackingNumber: o.status === 'shipping' ? (o.trackingNumber || '') : '',
+            trackingUrl
+          };
+        })
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    } catch (e) {
+      return [];
+    }
+  }
+
   // Load settings (shipping rates, promo codes, banners)
   async function loadStoreSettings() {
     const db = getDb();
@@ -422,11 +534,30 @@
     const settings = await loadStoreSettings();
     const cart = typeof getCart === 'function' ? getCart() : [];
 
+    // Identify the current customer (Firebase Auth session, falling back to
+    // a phone number saved earlier on orders.html/track.html) and pull only
+    // their own orders so the assistant can answer "فين طلبي؟" directly.
+    const authUser = await waitForAuthUser();
+    const savedPhone = getSavedCustomerPhone();
+    const myOrders = (authUser || savedPhone) ? await loadMyOrders(authUser ? authUser.uid : null, savedPhone) : [];
+    const customerName = authUser
+      ? (authUser.displayName || (authUser.email ? authUser.email.split('@')[0] : ''))
+      : ((myOrders[0] && myOrders[0].customerName) || '');
+
     return {
       mode: 'customer',
       storeName: 'Tiger Jeans',
       storeUrl: location.origin,
       currentPage: location.pathname,
+      customer: {
+        loggedIn: !!authUser,
+        name: customerName || null,
+        hasKnownIdentity: !!(authUser || savedPhone),
+        ordersPageUrl: `${location.origin}/orders.html`,
+        trackPageUrl: `${location.origin}/track.html`
+      },
+      myOrders: myOrders.slice(0, 15),
+      myOrdersCount: myOrders.length,
       sizeGuide: SIZE_GUIDE_DATA,
       cart: cart.map(c => ({
         name: c.name,
@@ -561,6 +692,32 @@
 - لكل منتج تترشحه، لازم تكتب رابط قابل للنقر بصيغة Markdown بالظبط: [اسم المنتج](${location.origin}/product.html?id=ID)
 - استخدم فقط قيمة id الحقيقية الموجودة في بيانات المنتج بالسياق (products[].id). ممنوع اختراع id أو كتابة رابط بدون id أو كتابة رابط كنص عادي بدون صيغة [نص](رابط).
 - ممنوع نهائياً كتابة أي رابط لمنتج غير موجود في السياق.
+- ممنوع اختراع أي رابط لصفحة غير موجودة (زي "policy.html" أو أي اسم من عندك). لما تتكلم عن صفحة من صفحات المتجر (غير صفحة منتج)، استخدم فقط واحد من الروابط الحقيقية دي بالظبط، ولو مفيش صفحة حقيقية تناسب الموضوع متكتبش رابط خالص:
+  - سياسة الخصوصية: ${location.origin}/privacy-policy.html
+  - سياسة الاسترجاع والاستبدال: ${location.origin}/return-policy.html
+  - الشروط والأحكام: ${location.origin}/terms.html
+  - دليل المقاسات: ${location.origin}/size-guide.html
+  - تتبع الطلب: ${location.origin}/track.html
+  - تواصل معنا: ${location.origin}/contact.html
+  - بطاقات الهدايا: ${location.origin}/gift-cards.html
+  - الصفحة الرئيسية: ${location.origin}/index.html
+
+## نطاق المنتجات المتاحة (إلزامي):
+- المتجر حالياً بيبيع بناطيل جينز بس (زي ما هو موضح في بيانات products بالسياق). مفيش قمصان ولا تيشرتات ولا أحذية ولا إكسسوارات لسه.
+- لو العميل سأل عن قميص، تيشيرت، حذاء، أو أي منتج من غير البناطيل، أو طلب "إطلالة كاملة" أو "لوك كامل": رشّح له بس البناطيل المتاحة اللي تناسب طلبه، واذكر بجملة قصيرة إن باقي المنتجات (قمصان، أحذية، إلخ) هتتضاف قريباً.
+- ممنوع تخترع منتجات (قمصان/أحذية/إكسسوارات) غير موجودة في products بالسياق حتى لو العميل طلبها بالاسم.
+
+## بيانات العميل الحالي وتتبع طلباته (إلزامية):
+- في السياق كائن customer فيه loggedIn و name (لو معروف) و hasKnownIdentity، وكائن myOrders فيه آخر طلبات العميل الحالي فقط (لو معروف الهوية)، كل طلب فيه code وstatus وstatusLabel وlastStatusNote وtotal وitemsSummary وshippingCompanyName وtrackingNumber وtrackingUrl (رابط تتبع مباشر من شركة الشحن — بوستا غالباً — بيتحط بس لما الطلب "جاري الشحن").
+- لو customer.name موجود، خاطب العميل باسمه بشكل طبيعي (مش في كل رسالة، يكفي أول ترحيب أو أول مرة يبقى مفيد).
+- لو العميل سأل عن حالة طلبه أو "فين طلبي" أو "وصل فين" أو "تتبع الطلب" (من غير ما يكتب رقم طلب بنفسه):
+  - لو myOrders فيها طلب واحد بس: رد فوراً بحالته (statusLabel) + ملخص مختصر (itemsSummary، total) — من غير ما تسأله عن رقم الطلب أو تطلب منه يدخل track.html، لأنك عارفه من السياق. لو status = shipping وفيه trackingUrl، اكتب رابط التتبع المباشر بصيغة Markdown: [تتبع الشحنة مباشرة](trackingUrl) مع ذكر اسم شركة الشحن ورقم الشحنة.
+  - لو فيها أكتر من طلب: اعرض آخر طلب (الأحدث) بنفس الطريقة، واذكر بجملة قصيرة إن عنده طلبات تانية (اذكر أكوادها) لو حاب يسأل عن واحد منهم تحديدًا.
+  - لو myOrders فاضية وhasKnownIdentity = true: قوله إنه مفيش طلبات مسجلة بحسابه/رقمه لحد دلوقتي.
+  - لو hasKnownIdentity = false (يعني مش عارفين هويته): ما تخترعش رقم طلب أو رابط تتبع، ووجّهه بجملة قصيرة إما يسجل دخول لحسابه، أو يدخل [تتبع الطلب](${location.origin}/track.html) ويكتب رقم الطلب أو رقم موبايله.
+- ممنوع نهائياً اختراع رقم طلب أو رابط تتبع أو حالة طلب مش موجودة حرفياً في myOrders بالسياق.
+- ممنوع ذكر بيانات طلبات عملاء تانيين غير الموجودة في myOrders.
+- لو العميل عايز كل طلباته بالتفصيل أو يعمل حاجة تانية غير عرض الحالة (زي طلب استرجاع)، وجهه لصفحة [طلباتي](${location.origin}/orders.html).
 
 ## نطاق الإجابة (إلزامي):
 - جاوب فقط من بيانات متجرنا الموجودة في السياق (المنتجات، المقاسات، الشحن، الدفع، الاسترجاع) — ممنوع الإجابة من معلومات عامة أو خارجية غير متعلقة بالمتجر.
@@ -1367,9 +1524,28 @@ ${JSON.stringify(context).slice(0, 50000)}
     textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
   }
 
-  function showWelcomeMessage() {
-    const greeting = isAdminMode
-      ? 'مرحباً 👋 أنا تايجر AI — مساعدك الإداري. اسألني عن المبيعات، الطلبات، المخزون، أو اطلب تحليلات لأي جزء في المتجر.'
+  async function showWelcomeMessage() {
+    if (isAdminMode) {
+      addAiMessage('مرحباً 👋 أنا تايجر AI — مساعدك الإداري. اسألني عن المبيعات، الطلبات، المخزون، أو اطلب تحليلات لأي جزء في المتجر.', false);
+      return;
+    }
+    // Personalize with the customer's name when they're logged in (auth
+    // state resolves fast since init() already kicked it off earlier).
+    let name = '';
+    try {
+      const user = await waitForAuthUser();
+      if (user) {
+        name = user.displayName || (user.email ? user.email.split('@')[0] : '');
+      } else {
+        const phone = getSavedCustomerPhone();
+        if (phone) {
+          const orders = await loadMyOrders(null, phone);
+          name = (orders[0] && orders[0].customerName) || '';
+        }
+      }
+    } catch (_) {}
+    const greeting = name
+      ? `أهلاً يا ${name} 👋 أنا مساعدك الذكي في تايجر جينز 🐯 اسألني عن أي منتج، أو تتبع طلبك، وهساعدك فوراً.`
       : 'أهلاً بيك في تايجر جينز! 🐯 أنا مساعدك الذكي للتسوق. اسألني عن أي منتج، اطلب إطلالة كاملة، أو ارفع صورة وأنا هلاقي لك المنتجات المشابهة.';
     addAiMessage(greeting, false);
   }
