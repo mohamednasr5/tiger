@@ -1,410 +1,341 @@
-/* ==========================================================
-   Tiger AI Admin Panel
-   ----------------------------------------------------------
-   Manages NVIDIA API configuration stored in Firebase at
-   settings/aiConfig. Loads when the AI tab is opened.
-   ========================================================== */
+/**
+ * ╔══════════════════════════════════════════════════════════════╗
+ * ║  Tiger Jeans - AI Admin Panel (NVIDIA)                       ║
+ * ║  ================================                            ║
+ * ║  إعدادات مساعد الذكاء الاصطناعي على الموقع                  ║
+ * ║  يستخدم NVIDIA NIM API فقط (للمساعد على الموقع)             ║
+ * ╚══════════════════════════════════════════════════════════════╝
+ */
 
-(function () {
-  'use strict';
+// ═══════════════════════════════════════════════════════════════
+// ⚙️ الإعدادات الافتراضية
+// ═══════════════════════════════════════════════════════════════
 
-  // Available NVIDIA NIM models (from build.nvidia.com)
-  // Grouped by capability. Each model is OpenAI-compatible.
-  const NVIDIA_MODELS = [
-    // Text / Chat
-    {
-      id: 'meta/llama-3.3-70b-instruct',
-      type: 'نصي',
-      name: 'Llama 3.3 70B',
-      desc: 'متوازن وسريع — مثالي للمحادثات العامة وخدمة العملاء.'
-    },
-    {
-      id: 'meta/llama-3.1-405b-instruct',
-      type: 'نصي',
-      name: 'Llama 3.1 405B',
-      desc: 'أقوى نموذج نصي — جودة عالية جداً للمهام المعقدة.'
-    },
-    {
-      id: 'meta/llama-3.1-70b-instruct',
-      type: 'نصي',
-      name: 'Llama 3.1 70B',
-      desc: 'خيار اقتصادي سريع — جودة جيدة للمحادثات اليومية.'
-    },
-    {
-      id: 'meta/llama-3.1-8b-instruct',
-      type: 'نصي',
-      name: 'Llama 3.1 8B',
-      desc: 'الأسرع والأرخص — للردود الفورية والأسئلة البسيطة.'
-    },
-    {
-      id: 'mistralai/mixtral-8x22b-instruct-v0.1',
-      type: 'نصي',
-      name: 'Mixtral 8x22B',
-      desc: 'نموذج Mixture-of-Experts — قوي وفعّال في التكلفة.'
-    },
-    {
-      id: 'qwen/qwen2.5-coder-32b-instruct',
-      type: 'نصي',
-      name: 'Qwen 2.5 Coder 32B',
-      desc: 'متخصص في الكود والتحليل المنطقي.'
-    },
-    // Vision
-    {
-      id: 'meta/llama-3.2-90b-vision-instruct',
-      type: 'رؤية',
-      name: 'Llama 3.2 90B Vision',
-      desc: 'يحلل الصور بدقة عالية — للبحث بالصور ووصف المنتجات.'
-    },
-    {
-      id: 'meta/llama-3.2-11b-vision-instruct',
-      type: 'رؤية',
-      name: 'Llama 3.2 11B Vision',
-      desc: 'رؤية سريعة واقتصادية — لتحليل الصور بسرعة.'
-    },
-    {
-      id: 'microsoft/phi-3.5-vision-instruct',
-      type: 'رؤية',
-      name: 'Phi 3.5 Vision',
-      desc: 'خفيف وسريع — لتحليل الصور البسيط.'
-    },
-    // Reasoning
-    {
-      id: 'deepseek-ai/deepseek-r1',
-      type: 'تفكير',
-      name: 'DeepSeek R1',
-      desc: 'نموذج تفكير منطقي عميق — للتحليل والاستنتاج والمقارنات.'
-    },
-    {
-      id: 'nvidia/llama-3.1-nemotron-70b-instruct',
-      type: 'تفكير',
-      name: 'Nemotron 70B',
-      desc: 'من NVIDIA — متخصص في التفكير المنطقي والتحليل.'
-    },
-    {
-      id: 'nvidia/llama-3.3-nemotron-super-49b-v1',
-      type: 'تفكير',
-      name: 'Nemotron Super 49B',
-      desc: 'الأحدث من NVIDIA — توازن بين القوة والسرعة.'
-    }
-  ];
+const AI_DEFAULTS = {
+  enabled: false,
+  
+  // NVIDIA API (يتم تخزين المفتاح في Worker Secret)
+  nvidiaApiKey: '',
+  
+  // النماذج
+  textModel: 'meta/llama-3.1-70b-instruct',
+  visionModel: 'meta/llama-3.2-90b-vision-instruct',
+  reasoningModel: 'deepseek-ai/deepseek-r1',
+  
+  // المزايا
+  features: {
+    smartSearch: true,      // بحث ذكي
+    visionSearch: true,     // بحث بالصور
+    outfitAdvisor: true,    // منسق الإطلالات
+    sizeAdvisor: true,      // مستشار المقاسات
+    cartSuggestions: true,  // اقتراحات السلة
+    customerService: true,  // خدمة العملاء
+    giftAssistant: true     // مساعد الهدية
+  },
+  
+  // البرومبتات
+  customerPrompt: `أنت مساعد ذكي لمتجر "Tiger Jeans" للملابس الرجالية. مهمتك:
+  
+1. مساعدة العملاء في العثور على المنتجات المناسبة
+2. تقديم نصائح حول المقاسات والألوان
+3. اقتراح إطلالات كاملة ومتناسقة
+4. الإجابة عن أسعار المنتجات والمخزون المتاح
 
-  const DEFAULT_CUSTOMER_PROMPT = `أنت "تايجر AI" — المساعد الذكي الرسمي لمتجر Tiger Jeans (تايجر جينز) — متجر بناطيل جينز وملابس عصرية في مصر.
+كن ودوداً واحترافياً. أجب بالعربية دائماً.
+استخدم الإيموجي لتنسيق الردود.`,
 
-## مهمتك:
-1. البحث عن المنتجات والترشيح الذكي حسب احتياج العميل (مقاس، لون، مناسبة، ميزانية، أسلوب).
-2. الإجابة عن أسئلة المنتجات (المواصفات، المقاسات، الألوان، التوفر، السعر).
-3. اقتراح إطلالات كاملة من المنتجات المتوفرة فقط.
-4. خدمة العملاء: الشحن، الدفع، الاستبدال والاسترجاع، تتبع الطلب.
-5. اقتراح المقاس المناسب بناءً على جدول sizeGuide الموجود في السياق (وليس تخمينًا).
-6. مقارنة المنتجات وترشيح منتجات مكملة عند الحاجة.
+  adminPrompt: `أنت مساعد إداري ذكي لمتجر "Tiger Jeans". صلاحياتك:
 
-## أسلوب الرد (مهم جداً):
-- كن مختصراً ومباشراً. رد بقد ما يحتاج السؤال بالظبط، بدون حشو أو مقدمات أو تكرار.
-- نظّم الرد بوضوح: نقاط أو قوائم قصيرة بدل فقرات طويلة، خصوصاً عند ترشيح أكثر من منتج.
-- لا تكرر نفس المعلومة مرتين، ولا تضيف جملة ختامية عامة إلا لو فيها فايدة فعلية (مثل سؤال متابعة قصير).
-- ردودك بالعربية المصرية الواضحة، ودودة ومهنية، بدون رموز تعبيرية زايدة.
-- لا تفترض جنس العميل أبداً. خاطبه بصيغة عامة محايدة (زي "حضرتك")، وتجنب صيغ الفعل أو الصفة المخصصة لجنس معين (مثل "عايز/عايزة"، "تقدر/تقدري"، "متأكد/متأكدة"). لو محتاج فعل مضارع للمخاطب، اختار صياغة تصلح للجميع أو أعد صياغة الجملة بدون توجيه مباشر للجنس.
+📊 التحليلات:
+- تحليل المبيعات والأرباح
+- مقارنة الأداء بالفترات السابقة
+- توقع المبيعات القادمة
 
-## قواعد المقاسات (إلزامية):
-- اعتمد فقط على بيانات sizeGuide في السياق (جداول جينز عادي، Slim Fit، وايد ليج) لتحديد المقاس المناسب حسب محيط الوسط/الأرداف أو الوزن اللي يذكره العميل.
-- لا تخترع أرقام مقاسات أو قياسات غير موجودة في sizeGuide.
-- اربط المقاس المقترح بما هو متاح فعلاً في stockAvailable لنفس المنتج، ولو مش متوفر بلغ العميل واقترح مقاس بديل متاح.
-- لو العميل عايز تفاصيل أدق، وجّهه لرابط دليل المقاسات الكامل (استخدم storeUrl الموجود في السياق): /size-guide.html
+📦 المخزون:
+- تنبيهات المخزون المنخفض
+- اقتراحات إعادة الطلب
+- تحليل حركة المنتجات
 
-## قواعد الروابط (إلزامية — لا استثناء):
-- لكل منتج تترشحه، لازم تكتب رابط قابل للنقر بصيغة Markdown بالظبط: [اسم المنتج](product.html?id=ID) (بادئ الرابط بـ storeUrl الموجود في السياق).
-- استخدم فقط قيمة id الحقيقية الموجودة في بيانات المنتج بالسياق (products[].id). ممنوع اختراع id أو كتابة رابط بدون id أو كتابة رابط كنص عادي بدون صيغة [نص](رابط).
-- ممنوع نهائياً كتابة أي رابط لمنتج غير موجود في السياق.
-- ممنوع اختراع أي رابط لصفحة غير موجودة (زي "policy.html" أو أي اسم من عندك). الصفحات الحقيقية الوحيدة في الموقع غير صفحات المنتجات هي: /privacy-policy.html (سياسة الخصوصية)، /return-policy.html (سياسة الاسترجاع والاستبدال)، /terms.html (الشروط والأحكام)، /size-guide.html (دليل المقاسات)، /track.html (تتبع الطلب)، /contact.html (تواصل معنا)، /gift-cards.html (بطاقات الهدايا)، /index.html (الرئيسية). استخدم فقط واحدة منها بالظبط لما تحتاج، ولو مفيش صفحة حقيقية تناسب الموضوع متكتبش رابط خالص.
+👥 العملاء:
+- تحليل سلوك العملاء
+- تقسيم العملاء (Segmentation)
+- اقتراحات للحفاظ على العملاء
 
-## نطاق المنتجات المتاحة (إلزامي):
-- المتجر حالياً بيبيع بناطيل جينز بس (زي ما هو موضح في بيانات products بالسياق). مفيش قمصان ولا تيشرتات ولا أحذية ولا إكسسوارات لسه.
-- لو العميل سأل عن قميص، تيشيرت، حذاء، أو أي منتج من غير البناطيل، أو طلب "إطلالة كاملة" أو "لوك كامل": رشّح له بس البناطيل المتاحة اللي تناسب طلبه، واذكر بجملة قصيرة إن باقي المنتجات (قمصان، أحذية، إلخ) هتتضاف قريباً.
-- ممنوع تخترع منتجات (قمصان/أحذية/إكسسوارات) غير موجودة في products بالسياق حتى لو العميل طلبها بالاسم.
+✍️ المحتوى:
+- كتابة أوصاف SEO
+- إنشاء عروض تسويقية
+- صياغة رسائل التسويق
 
-## نطاق الإجابة (إلزامي):
-- جاوب فقط من بيانات متجرنا الموجودة في السياق (المنتجات، المقاسات، الشحن، الدفع، الاسترجاع) — ممنوع الإجابة من معلومات عامة أو خارجية غير متعلقة بالمتجر.
-- لو السؤال بره نطاق المتجر ومنتجاته وخدماته، اعتذر بجملة قصيرة واحدة واذكر إنك تقدر تساعد فقط في حاجات Tiger Jeans، من غير ما تحاول الإجابة من معلوماتك العامة.
+كن دقيقاً في الأرقام. استخدم الرسوم البيانية النصية عند الحاجة.`
+};
 
-## القواعد العامة:
-- ابحث دائماً في products الموجودة في السياق ولا تخترع منتجات غير موجودة.
-- اذكر السعر بصيغة "X ج.م" فقط من بيانات المنتج.
-- لا تذكر أبداً: تكلفة المنتج (costPrice)، أرباح المتجر، بيانات العملاء الآخرين، معلومات الطلبات الداخلية، إعدادات الأدمن.
-- إذا لم تجد المنتج المطلوب أو المعلومة، اعتذر بإيجاز واعرض بديل متاح إن وجد، ولا تخمن.
-- استخدم Markdown بسيط (قوائم، **تركيز**) لتنظيم الرد فقط عند الحاجة الفعلية.
-- لا تذكر أبداً أنك نموذج لغوي أو AI — أنت مساعد المتجر.
-- إذا أرفق العميل صورة، حللها وابحث عن منتجات مشابهة في المتجر.`;
+let AI_CONFIG = { ...AI_DEFAULTS };
 
-  const DEFAULT_ADMIN_PROMPT = `أنت "تايجر AI" — المساعد الإداري لمتجر Tiger Jeans. لديك صلاحية كاملة لرؤية كل البيانات (التكلفة، الأرباح، الطلبات، العملاء). قدم تحليلات مبنية على الأرقام، تقارير سريعة، اقتراحات لتحسين الأرباح، ووصف SEO للمنتجات. استخدم Markdown لتنظيم الردود.`;
+// ═══════════════════════════════════════════════════════════════
+// 🔄 تحميل الإعدادات
+// ═══════════════════════════════════════════════════════════════
 
-  let currentConfig = null;
-
-  // ========= Init =========
-  function initAiAdmin() {
-    // Hook into existing switchTab
-    const origSwitch = window.switchTab;
-    if (typeof origSwitch === 'function') {
-      window.switchTab = function (tab) {
-        origSwitch.apply(this, arguments);
-        if (tab === 'ai') loadAiSettings();
-      };
-    }
-
-    // If AI tab is the initial tab, load
-    setTimeout(() => {
-      const aiTab = document.getElementById('tab-ai');
-      if (aiTab && !aiTab.classList.contains('hidden')) loadAiSettings();
-    }, 500);
-  }
-
-  // ========= Load settings from Firebase =========
-  // Reads from two paths:
-  //   aiConfig/public  — readable by all (enabled, models, features, advanced params)
-  //   aiConfig/secret  — readable by admin only (apiKey, systemPrompt, adminSystemPrompt)
-  async function loadAiSettings() {
-    try {
-      const [pubSnap, secSnap] = await Promise.all([
-        db.ref('aiConfig/public').once('value'),
-        db.ref('aiConfig/secret').once('value')
-      ]);
-      const pub = pubSnap.val() || {};
-      const sec = secSnap.val() || {};
-
-      currentConfig = {
-        enabled: pub.enabled || false,
-        textModel: pub.textModel || 'meta/llama-3.1-70b-instruct',
-        visionModel: pub.visionModel || 'meta/llama-3.2-90b-vision-instruct',
-        reasoningModel: pub.reasoningModel || 'deepseek-ai/deepseek-r1',
-        maxTokens: pub.maxTokens || 1500,
-        temperature: pub.temperature || 0.6,
-        features: pub.features || {
-          smartSearch: true,
-          imageSearch: true,
-          stylist: true,
-          sizeAdvisor: true,
-          cartSuggest: true,
-          customerService: true,
-          adminAnalytics: true,
-          seoGenerator: true
-        },
-        apiKey: sec.apiKey || '',
-        systemPrompt: pub.systemPrompt || DEFAULT_CUSTOMER_PROMPT,
-        adminSystemPrompt: pub.adminSystemPrompt || DEFAULT_ADMIN_PROMPT
-      };
-
-      renderAiSettings(currentConfig);
-    } catch (e) {
-      console.error('loadAiSettings error:', e);
-      if (typeof showToast === 'function') showToast('خطأ في تحميل إعدادات AI: ' + e.message);
-    }
-  }
-
-  // ========= Render =========
-  function renderAiSettings(cfg) {
-    // Status pill
-    const statusEl = document.getElementById('aiStatusPill');
-    if (statusEl) {
-      if (cfg.enabled) {
-        statusEl.className = 'ai-status-pill ok';
-        statusEl.innerHTML = '<i class=\'bx bx-check-circle\'></i> مُفعّل';
-      } else {
-        statusEl.className = 'ai-status-pill err';
-        statusEl.innerHTML = '<i class=\'bx bx-x-circle\'></i> معطّل';
+async function loadAIConfig() {
+  try {
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+      const db = firebase.database();
+      
+      // تحميل الإعدادات العامة
+      const publicSnap = await db.ref('aiConfig/public').once('value');
+      if (publicSnap.exists()) {
+        const publicData = publicSnap.val();
+        AI_CONFIG = { ...AI_CONFIG, ...publicData };
       }
+      
+      // تحميل الإعدادات السرية (للأدمن فقط)
+      const secretSnap = await db.ref('aiConfig/secret').once('value');
+      if (secretSnap.exists()) {
+        const secretData = secretSnap.val();
+        AI_CONFIG.nvidiaApiKey = secretData.apiKey || '';
+        AI_CONFIG.adminPrompt = secretData.adminPrompt || AI_DEFAULTS.adminPrompt;
+      }
+
+      console.log('✅ تم تحميل إعدادات AI');
+      updateAIUI();
+      return true;
     }
-
-    // Basic fields
-    setVal('aiEnabled', !!cfg.enabled);
-    setVal('aiApiKey', cfg.apiKey || '');
-    setVal('aiTextModel', cfg.textModel || 'meta/llama-3.1-70b-instruct');
-    setVal('aiVisionModel', cfg.visionModel || 'meta/llama-3.2-90b-vision-instruct');
-    setVal('aiReasoningModel', cfg.reasoningModel || 'deepseek-ai/deepseek-r1');
-    setVal('aiSystemPrompt', cfg.systemPrompt || DEFAULT_CUSTOMER_PROMPT);
-    setVal('aiAdminSystemPrompt', cfg.adminSystemPrompt || DEFAULT_ADMIN_PROMPT);
-    setVal('aiMaxTokens', cfg.maxTokens || 1500);
-    setVal('aiTemperature', cfg.temperature || 0.6);
-
-    // Render model cards (visual selection)
-    renderModelCards('aiTextModels', NVIDIA_MODELS.filter(m => m.type === 'نصي'), cfg.textModel, 'aiTextModel');
-    renderModelCards('aiVisionModels', NVIDIA_MODELS.filter(m => m.type === 'رؤية'), cfg.visionModel, 'aiVisionModel');
-    renderModelCards('aiReasoningModels', NVIDIA_MODELS.filter(m => m.type === 'تفكير'), cfg.reasoningModel, 'aiReasoningModel');
-
-    // Features toggles
-    const features = cfg.features || {};
-    setVal('aiFeatSmartSearch', features.smartSearch !== false);
-    setVal('aiFeatImageSearch', features.imageSearch !== false);
-    setVal('aiFeatStylist', features.stylist !== false);
-    setVal('aiFeatSizeAdvisor', features.sizeAdvisor !== false);
-    setVal('aiFeatCartSuggest', features.cartSuggest !== false);
-    setVal('aiFeatCustomerService', features.customerService !== false);
-    setVal('aiFeatAdminAnalytics', features.adminAnalytics !== false);
-    setVal('aiFeatSeoGenerator', features.seoGenerator !== false);
+  } catch (error) {
+    console.error('❌ خطأ في تحميل إعدادات AI:', error);
   }
+  return false;
+}
 
-  function setVal(id, val) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    if (el.type === 'checkbox') el.checked = !!val;
-    else el.value = val;
-  }
+// ═══════════════════════════════════════════════════════════════
+// 💾 حفظ الإعدادات
+// ═══════════════════════════════════════════════════════════════
 
-  function getVal(id) {
-    const el = document.getElementById(id);
-    if (!el) return null;
-    if (el.type === 'checkbox') return el.checked;
-    return el.value;
-  }
+async function saveAIConfig() {
+  // جمع البيانات من الواجهة
+  collectAIFromUI();
 
-  function renderModelCards(containerId, models, selectedId, inputId) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    container.innerHTML = models.map(m => `
-      <div class="ai-model-card ${m.id === selectedId ? 'selected' : ''}" data-model="${m.id}" data-input="${inputId}">
-        <span class="ai-model-type">${m.type}</span>
-        <h4>${m.name}</h4>
-        <p>${m.desc}</p>
-        <code style="font-size:.68rem;color:var(--text-dim);display:block;margin-top:.4rem;word-break:break-all">${m.id}</code>
-      </div>
-    `).join('');
-    container.querySelectorAll('.ai-model-card').forEach(card => {
-      card.addEventListener('click', () => {
-        const modelId = card.dataset.model;
-        const targetInputId = card.dataset.input;
-        container.querySelectorAll('.ai-model-card').forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-        const input = document.getElementById(targetInputId);
-        if (input) input.value = modelId;
+  try {
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+      const db = firebase.database();
+      
+      // حفظ الإعدادات العامة
+      await db.ref('aiConfig/public').set({
+        enabled: AI_CONFIG.enabled,
+        textModel: AI_CONFIG.textModel,
+        visionModel: AI_CONFIG.visionModel,
+        reasoningModel: AI_CONFIG.reasoningModel,
+        features: AI_CONFIG.features,
+        customerPrompt: AI_CONFIG.customerPrompt,
+        updatedAt: new Date().toISOString()
       });
+
+      // حفظ الإعدادات السرية
+      await db.ref('aiConfig/secret').set({
+        apiKey: AI_CONFIG.nvidiaApiKey || '',
+        adminPrompt: AI_CONFIG.adminPrompt,
+        updatedAt: new Date().toISOString()
+      });
+
+      console.log('✅ تم حفظ إعدادات AI');
+      showToast('✅ تم حفظ إعدادات المساعد الذكي');
+      
+      // تحديث الشارة
+      updateAIBadge();
+      
+      return true;
+    }
+  } catch (error) {
+    console.error('❌ خطأ في الحفظ:', error);
+    showToast('❌ فشل حفظ الإعدادات: ' + error.message);
+  }
+  return false;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 🎨 تحديث واجهة المستخدم
+// ═══════════════════════════════════════════════════════════════
+
+function updateAIUI() {
+  // حالة التفعيل
+  const enabledEl = document.getElementById('aiEnabled');
+  if (enabledEl) enabledEl.checked = AI_CONFIG.enabled;
+
+  // النماذج
+  const textModelEl = document.getElementById('aiTextModel');
+  if (textModelEl) textModelEl.value = AI_CONFIG.textModel;
+
+  const visionModelEl = document.getElementById('aiVisionModel');
+  if (visionModelEl) visionModelEl.value = AI_CONFIG.visionModel;
+
+  const reasoningModelEl = document.getElementById('aiReasoningModel');
+  if (reasoningModelEl) reasoningModelEl.value = AI_CONFIG.reasoningModel;
+
+  // البرومبتات
+  const customerPromptEl = document.getElementById('aiCustomerPrompt');
+  if (customerPromptEl) customerPromptEl.value = AI_CONFIG.customerPrompt;
+
+  const adminPromptEl = document.getElementById('aiAdminPrompt');
+  if (adminPromptEl) adminPromptEl.value = AI_CONFIG.adminPrompt;
+
+  // المزايا
+  Object.keys(AI_CONFIG.features).forEach(feature => {
+    const el = document.getElementById(`aiFeature_${feature}`);
+    if (el) el.checked = AI_CONFIG.features[feature];
+  });
+}
+
+function collectAIFromUI() {
+  const enabledEl = document.getElementById('aiEnabled');
+  if (enabledEl) AI_CONFIG.enabled = enabledEl.checked;
+
+  const textModelEl = document.getElementById('aiTextModel');
+  if (textModelEl) AI_CONFIG.textModel = textModelEl.value;
+
+  const visionModelEl = document.getElementById('aiVisionModel');
+  if (visionModelEl) AI_CONFIG.visionModel = visionModelEl.value;
+
+  const reasoningModelEl = document.getElementById('aiReasoningModel');
+  if (reasoningModelEl) AI_CONFIG.reasoningModel = reasoningModelEl.value;
+
+  const customerPromptEl = document.getElementById('aiCustomerPrompt');
+  if (customerPromptEl) AI_CONFIG.customerPrompt = customerPromptEl.value;
+
+  const adminPromptEl = document.getElementById('aiAdminPrompt');
+  if (adminPromptEl) AI_CONFIG.adminPrompt = adminPromptEl.value;
+
+  Object.keys(AI_CONFIG.features).forEach(feature => {
+    const el = document.getElementById(`aiFeature_${feature}`);
+    if (el) AI_CONFIG.features[feature] = el.checked;
+  });
+}
+
+function updateAIBadge() {
+  const badge = document.getElementById('navAiStatus');
+  if (!badge) return;
+  
+  badge.style.display = AI_CONFIG.enabled ? 'inline' : 'none';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 🧪 اختبار الاتصال بـ NVIDIA
+// ═══════════════════════════════════════════════════════════════
+
+async function testNVIDIAConnection() {
+  const apiKey = document.getElementById('nvidiaApiKey')?.value || AI_CONFIG.nvidiaApiKey;
+  
+  if (!apiKey) {
+    showToast('❌ أدخل مفتاح NVIDIA API');
+    return false;
+  }
+
+  const testBtn = document.getElementById('testNvidiaBtn');
+  if (testBtn) {
+    testBtn.disabled = true;
+    testBtn.textContent = 'جاري الاختبار...';
+  }
+
+  try {
+    // استخدام Worker كـ Proxy
+    const response = await fetch(`${getWorkerUrl()}/v1/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'meta/llama-3.1-70b-instruct',
+        messages: [{ role: 'user', content: 'Hello, respond with OK' }],
+        max_tokens: 10
+      })
     });
-  }
 
-  // ========= Save =========
-  // Splits config into two Firebase paths:
-  //   aiConfig/public  — readable by all clients (no secrets)
-  //   aiConfig/secret  — readable by admin only (API key, system prompts)
-  async function saveAiSettings() {
-    const cfg = {
-      enabled: getVal('aiEnabled'),
-      apiKey: (getVal('aiApiKey') || '').trim(),
-      textModel: getVal('aiTextModel') || 'meta/llama-3.1-70b-instruct',
-      visionModel: getVal('aiVisionModel') || 'meta/llama-3.2-90b-vision-instruct',
-      reasoningModel: getVal('aiReasoningModel') || 'deepseek-ai/deepseek-r1',
-      systemPrompt: getVal('aiSystemPrompt') || DEFAULT_CUSTOMER_PROMPT,
-      adminSystemPrompt: getVal('aiAdminSystemPrompt') || DEFAULT_ADMIN_PROMPT,
-      maxTokens: parseInt(getVal('aiMaxTokens')) || 1500,
-      temperature: parseFloat(getVal('aiTemperature')) || 0.6,
-      features: {
-        smartSearch: getVal('aiFeatSmartSearch'),
-        imageSearch: getVal('aiFeatImageSearch'),
-        stylist: getVal('aiFeatStylist'),
-        sizeAdvisor: getVal('aiFeatSizeAdvisor'),
-        cartSuggest: getVal('aiFeatCartSuggest'),
-        customerService: getVal('aiFeatCustomerService'),
-        adminAnalytics: getVal('aiFeatAdminAnalytics'),
-        seoGenerator: getVal('aiFeatSeoGenerator')
+    if (response.ok) {
+      const data = await response.json();
+      if (data.choices && data.choices[0]) {
+        showToast('✅ الاتصال بـ NVIDIA ناجح!');
+        return true;
       }
-    };
-
-    // Public part — no real secrets, safe for all clients (including
-    // anonymous customers) to read. System prompts live here now so a
-    // customized customer-facing prompt actually reaches customers.
-    const publicPart = {
-      enabled: cfg.enabled,
-      textModel: cfg.textModel,
-      visionModel: cfg.visionModel,
-      reasoningModel: cfg.reasoningModel,
-      maxTokens: cfg.maxTokens,
-      temperature: cfg.temperature,
-      features: cfg.features,
-      systemPrompt: cfg.systemPrompt,
-      adminSystemPrompt: cfg.adminSystemPrompt,
-      updatedAt: Date.now()
-    };
-
-    // Secret part — admin-only. The API key here is optional and only used
-    // when testing a key from this panel; the key actually used for every
-    // real customer/admin chat lives server-side as a Worker secret
-    // (NVIDIA_API_KEY), never in Firebase.
-    const secretPart = {
-      apiKey: cfg.apiKey,
-      updatedAt: Date.now()
-    };
-
-    try {
-      // Save both in parallel
-      await Promise.all([
-        db.ref('aiConfig/public').set(publicPart),
-        db.ref('aiConfig/secret').set(secretPart)
-      ]);
-      currentConfig = cfg;
-
-      // Update TigerAI runtime if loaded
-      if (window.TigerAI && window.TigerAI.reloadConfig) {
-        await window.TigerAI.reloadConfig();
-      }
-
-      // Update status pill
-      renderAiSettings(cfg);
-
-      if (typeof showToast === 'function') showToast('تم حفظ إعدادات AI بنجاح ✓');
-    } catch (e) {
-      console.error('saveAiSettings error:', e);
-      if (typeof showToast === 'function') showToast('خطأ في الحفظ: ' + e.message);
+    }
+    
+    throw new Error('Invalid response');
+  } catch (error) {
+    console.error('NVIDIA Test Error:', error);
+    showToast('❌ فشل الاتصال: ' + error.message);
+    return false;
+  } finally {
+    if (testBtn) {
+      testBtn.disabled = false;
+      testBtn.textContent = 'اختبار الاتصال';
     }
   }
+}
 
-  // ========= Test connection =========
-  async function testAiConnection() {
-    const apiKey = (getVal('aiApiKey') || '').trim();
-    const model = getVal('aiTextModel') || 'meta/llama-3.1-70b-instruct';
-    const resultEl = document.getElementById('aiTestResult');
+// ═══════════════════════════════════════════════════════════════
+// 🔄 إعادة تعيين البرومبتات
+// ═══════════════════════════════════════════════════════════════
 
-    resultEl.classList.remove('ok', 'err');
-    resultEl.classList.add('show');
-    resultEl.textContent = 'جاري الاتصال بـ NVIDIA...';
+function resetCustomerPrompt() {
+  const el = document.getElementById('aiCustomerPrompt');
+  if (el) el.value = AI_DEFAULTS.customerPrompt;
+  showToast('📝 تم إعادة تعيين برومبت العملاء');
+}
 
-    try {
-      const result = await window.TigerAI.testNvidiaConnection(apiKey, model);
-      if (result.ok) {
-        resultEl.classList.add('ok');
-        resultEl.textContent = `✓ نجح الاتصال!\n\nالنموذج: ${model}\nالرد: ${result.content}\n\nملاحظة: المفتاح صالح ويعمل بشكل صحيح.`;
-      } else {
-        resultEl.classList.add('err');
-        resultEl.textContent = `✗ فشل الاتصال\n\nالخطأ: ${result.error}\n\nتحقق من:\n1. صحة مفتاح API من https://build.nvidia.com/settings/integrations\n2. اتصال الإنترنت\n3. أن النموذج المختار متاح لحسابك`;
-      }
-    } catch (e) {
-      resultEl.classList.add('err');
-      resultEl.textContent = `✗ خطأ غير متوقع: ${e.message}`;
+function resetAdminPrompt() {
+  const el = document.getElementById('aiAdminPrompt');
+  if (el) el.value = AI_DEFAULTS.adminPrompt;
+  showToast('📝 تم إعادة تعيين برومبت الأدمن');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 🔗 الحصول على رابط Worker
+// ═══════════════════════════════════════════════════════════════
+
+function getWorkerUrl() {
+  // يمكن تغيير هذا حسب إعداداتك
+  return 'https://telegram.studegy10.workers.dev';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 🎯 تصدير الوحدة العامة
+// ═══════════════════════════════════════════════════════════════
+
+window.TigerAIAdmin = {
+  config: AI_CONFIG,
+  
+  load: loadAIConfig,
+  save: saveAIConfig,
+  test: testNVIDIAConnection,
+  
+  resetCustomerPrompt,
+  resetAdminPrompt,
+
+  isEnabled() {
+    return AI_CONFIG.enabled;
+  },
+
+  getModel(type) {
+    switch (type) {
+      case 'text': return AI_CONFIG.textModel;
+      case 'vision': return AI_CONFIG.visionModel;
+      case 'reasoning': return AI_CONFIG.reasoningModel;
+      default: return AI_CONFIG.textModel;
     }
-  }
+  },
 
-  // ========= Reset prompts =========
-  function resetCustomerPrompt() {
-    if (!confirm('استعادة البرومبت الافتراضي للعملاء؟')) return;
-    setVal('aiSystemPrompt', DEFAULT_CUSTOMER_PROMPT);
-    if (typeof showToast === 'function') showToast('تم الاستعادة');
+  isFeatureEnabled(feature) {
+    return AI_CONFIG.features[feature] || false;
   }
+};
 
-  function resetAdminPrompt() {
-    if (!confirm('استعادة البرومبت الافتراضي للأدمن؟')) return;
-    setVal('aiAdminSystemPrompt', DEFAULT_ADMIN_PROMPT);
-    if (typeof showToast === 'function') showToast('تم الاستعادة');
-  }
+// ═══════════════════════════════════════════════════════════════
+// 🚀 التهيئة
+// ═══════════════════════════════════════════════════════════════
 
-  // ========= Public API =========
-  window.TigerAIAdmin = {
-    init: initAiAdmin,
-    load: loadAiSettings,
-    save: saveAiSettings,
-    test: testAiConnection,
-    resetCustomerPrompt,
-    resetAdminPrompt
-  };
+if (typeof window !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      loadAIConfig();
+    }, 2000);
+  });
+}
 
-  // Auto-init
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAiAdmin);
-  } else {
-    initAiAdmin();
-  }
-})();
+console.log('🤖 Tiger AI Admin Module Loaded (NVIDIA)');
