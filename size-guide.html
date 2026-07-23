@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>دليل المقاسات | Tiger Jeans</title>
+<meta name="description" content="دليل مقاسات بناطيل الجينز الرجالي والحريمي والبناتي والشبابي في تايجر جينز - اعرف مقاسك الصحيح قبل الطلب." />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://tiger-jeans.com/size-guide.html" />
+<link rel="shortcut icon" href="images/favicon-32x32.png" type="image/png" />
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+<style>
+/* ====== Hero ====== */
+.sg-hero{
+  padding:3.2rem 0 2.4rem;
+  border-bottom:1px solid var(--line);
+  background:var(--bg-alt);
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.sg-hero .breadcrumb{color:var(--text-dim);font-size:.85rem;margin-bottom:1.2rem}
+.sg-hero .breadcrumb a:hover{color:var(--gold)}
+.sg-eyebrow{
+  display:inline-flex;align-items:center;gap:.5rem;
+  color:var(--gold);font-size:.8rem;font-weight:700;
+  letter-spacing:1px;margin-bottom:.8rem;
+  font-family:'Cairo',sans-serif;
+}
+.sg-hero h1{font-size:2.2rem;font-weight:900;margin-bottom:.7rem}
+.sg-hero p{color:var(--text-dim);max-width:560px;margin:0 auto;font-size:.98rem}
+
+/* Signature: animated tape measure strip */
+.tape{
+  position:relative;
+  height:34px;
+  margin-top:2.2rem;
+  overflow:hidden;
+  background:
+    repeating-linear-gradient(90deg,
+      var(--line) 0 1.5px,
+      transparent 1.5px 20px);
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+}
+.tape::before{
+  content:"";
+  position:absolute;inset:0;
+  background:
+    repeating-linear-gradient(90deg,
+      var(--gold) 0 1.5px,
+      transparent 1.5px 100px);
+  opacity:.5;
+}
+.tape-glow{
+  position:absolute;top:0;bottom:0;width:220px;
+  background:linear-gradient(90deg,transparent,rgba(212,175,55,.35),transparent);
+  animation:tapeMove 5.5s linear infinite;
+}
+@keyframes tapeMove{
+  0%{transform:translateX(-260px)}
+  100%{transform:translateX(calc(100vw + 60px))}
+}
+@media(prefers-reduced-motion:reduce){.tape-glow{animation:none;display:none}}
+
+/* ====== Tabs ====== */
+.sg-tabs-wrap{padding:2.4rem 0 0}
+.sg-tabs{
+  display:flex;gap:.4rem;flex-wrap:wrap;
+  position:relative;
+  border-bottom:1px solid var(--line);
+  padding-bottom:0;
+}
+.sg-tab{
+  display:flex;align-items:center;gap:.5rem;
+  padding:.9rem 1.3rem;
+  font-weight:700;font-size:.92rem;
+  color:var(--text-dim);
+  border-radius:10px 10px 0 0;
+  position:relative;z-index:2;
+  transition:color .2s;
+  font-family:'Cairo',sans-serif;
+}
+.sg-tab i{font-size:1.1rem}
+.sg-tab.active{color:var(--gold)}
+.sg-tab:hover:not(.active){color:var(--text)}
+.sg-indicator{
+  position:absolute;bottom:-1px;height:3px;
+  background:
+    repeating-linear-gradient(90deg,var(--gold) 0 6px,var(--gold-soft) 6px 8px,var(--gold) 8px 14px);
+  border-radius:3px;
+  transition:transform .38s cubic-bezier(.65,0,.35,1), width .38s cubic-bezier(.65,0,.35,1);
+  z-index:1;
+}
+
+/* ====== Content grid ====== */
+.sg-content{
+  display:grid;
+  grid-template-columns:1.4fr .9fr;
+  gap:2.2rem;
+  padding:2.2rem 0 4rem;
+  align-items:start;
+}
+@media(max-width:860px){.sg-content{grid-template-columns:1fr}}
+
+.sg-panel{display:none}
+.sg-panel.active{display:block;animation:panelIn .35s ease both}
+@keyframes panelIn{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.sg-card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:1.6rem;
+}
+.sg-card h3{font-size:1.15rem;margin-bottom:.3rem}
+.sg-card .sg-sub{color:var(--text-dim);font-size:.85rem;margin-bottom:1.3rem}
+
+.sg-table{width:100%;border-collapse:collapse}
+.sg-table th{
+  text-align:center;color:var(--text-dim);font-size:.78rem;
+  padding:.8rem .5rem;border-bottom:1px solid var(--line);
+  font-weight:700;text-transform:uppercase;letter-spacing:.4px;
+  font-family:'Cairo',sans-serif;
+}
+.sg-table td{
+  text-align:center;padding:.85rem .5rem;
+  border-bottom:1px solid var(--line);font-size:.92rem;
+}
+.sg-table tr td:first-child{
+  font-family:'Cairo',sans-serif;font-weight:800;color:var(--gold);
+}
+.sg-table tbody tr{
+  opacity:0;transform:translateY(6px);
+  animation:rowIn .4s ease forwards;
+}
+@keyframes rowIn{to{opacity:1;transform:translateY(0)}}
+.sg-table tbody tr.row-highlight{
+  background:rgba(212,175,55,.12);
+  animation:rowIn .4s ease forwards, pulseRow 1.4s ease 2;
+}
+@keyframes pulseRow{
+  0%,100%{box-shadow:inset 0 0 0 0 rgba(212,175,55,0)}
+  50%{box-shadow:inset 0 0 0 1px rgba(212,175,55,.6)}
+}
+.sg-note{
+  display:flex;gap:.6rem;align-items:flex-start;
+  margin-top:1.2rem;padding:.85rem 1rem;
+  background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.25);
+  border-radius:10px;color:var(--gold-soft);font-size:.83rem;line-height:1.7;
+}
+.sg-note i{font-size:1.1rem;flex-shrink:0;margin-top:.1rem}
+
+/* ====== Calculator ====== */
+.sg-calc{position:sticky;top:100px}
+.sg-calc .calc-icon{
+  width:48px;height:48px;border-radius:50%;
+  background:rgba(212,175,55,.12);color:var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;margin-bottom:1rem;
+}
+.sg-calc label{display:block;font-size:.85rem;font-weight:700;margin-bottom:.5rem}
+.sg-calc-row{display:flex;gap:.6rem}
+.sg-calc-row input{flex:1}
+.sg-calc-row button{
+  background:var(--gold);color:#000;font-weight:800;
+  padding:0 1.3rem;border-radius:10px;font-size:.9rem;
+  white-space:nowrap;transition:.2s;font-family:'Cairo',sans-serif;
+}
+.sg-calc-row button:hover{background:var(--gold-soft)}
+.sg-calc-hint{color:var(--text-dim);font-size:.78rem;margin-top:.6rem}
+
+.sg-result{
+  margin-top:1.4rem;padding:1.3rem;border-radius:12px;
+  background:linear-gradient(135deg,rgba(212,175,55,.12),rgba(212,175,55,.03));
+  border:1px solid rgba(212,175,55,.3);
+  text-align:center;display:none;
+}
+.sg-result.show{display:block;animation:resultIn .45s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes resultIn{
+  from{opacity:0;transform:scale(.85)}
+  to{opacity:1;transform:scale(1)}
+}
+.sg-result .r-label{color:var(--text-dim);font-size:.78rem;margin-bottom:.4rem}
+.sg-result .r-size{
+  font-family:'Cairo',sans-serif;font-weight:900;font-size:2.4rem;color:var(--gold);
+  line-height:1;
+}
+.sg-result .r-note{color:var(--text-dim);font-size:.8rem;margin-top:.6rem;line-height:1.6}
+.sg-result .r-edge{color:var(--warn);font-weight:700}
+
+.sg-error{color:var(--danger);font-size:.82rem;margin-top:.6rem;display:none}
+.sg-error.show{display:block}
+
+/* ====== Weight Field (Optional) ====== */
+.weight-field{
+  margin-top:1.2rem;
+  padding:1.1rem;
+  background:linear-gradient(135deg,rgba(212,175,55,.06),rgba(212,175,55,.02));
+  border:1px dashed rgba(212,175,55,.3);
+  border-radius:12px;
+  transition:border-color .25s ease, background .25s ease;
+}
+.weight-field:hover{
+  border-color:rgba(212,175,55,.5);
+  background:linear-gradient(135deg,rgba(212,175,55,.1),rgba(212,175,55,.04));
+}
+.weight-field label{
+  display:flex;align-items:center;font-size:.85rem;font-weight:700;color:var(--text);
+  margin-bottom:.2rem;
+}
+.weight-field input:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(212,175,55,.15);
+}
+
+/* Weight icon animation */
+.weight-field label i{
+  animation:weightBounce 2s ease-in-out infinite;
+}
+@keyframes weightBounce{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-3px)}
+}
+
+/* ====== Wide Leg Calculator Styles ====== */
+.wideleg-calc-fields{
+  display:flex;flex-direction:column;gap:.8rem;margin-top:1rem
+}
+.wideleg-field{
+  display:flex;flex-direction:column;gap:.3rem
+}
+.wideleg-field label{
+  display:flex;align-items:center;gap:.4rem;font-size:.85rem;font-weight:700;color:var(--text)
+}
+.wideleg-field label i{color:var(--gold);font-size:1rem}
+.wideleg-field input{
+  width:100%;padding:.7rem .9rem;border:1px solid var(--line);
+  border-radius:8px;background:var(--surface);color:var(--text);font-size:.92rem;
+  transition:border-color .2s,box-shadow .2s;font-family:'Cairo',sans-serif
+}
+.wideleg-field input:focus{
+  border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.15);outline:none
+}
+.wideleg-field input::placeholder{color:var(--text-dim);font-size:.8rem
+}
+.wideleg-calc-btn{
+  background:linear-gradient(135deg,var(--gold),#c9a227)!important;color:#000!important;
+  font-weight:800;padding:1rem;border-radius:12px;font-size:1rem;width:100%;
+  margin-top:.5rem;display:flex;align-items:center;justify-content:center;gap:.5rem;
+  transition:all .3s ease;font-family:'Cairo',sans-serif;border:none;cursor:pointer
+}
+.wideleg-calc-btn:hover{
+  transform:translateY(-2px);box-shadow:0 6px 20px rgba(212,175,55,.35)
+}
+
+/* Wide Leg Size Table Special Styling */
+.wideleg-table th{
+  background:linear-gradient(135deg,#1a1a2e,#2d2d44)!important;color:#fff!important
+}
+.wideleg-table td:first-child{
+  background:rgba(212,175,55,.08)!important;font-size:1.1rem!important
+}
+.wideleg-highlight{
+  background:linear-gradient(135deg,rgba(212,175,55,.25),rgba(212,175,55,.1))!important;
+  box-shadow:inset 0 0 0 2px var(--gold)!important;
+}
+
+/* Measurement Guide Diagram */
+.measurement-guide{
+  display:flex;align-items:center;justify-content:center;gap:2rem;
+  padding:1.5rem;background:var(--bg-alt);border-radius:12px;margin-bottom:1.5rem;
+  flex-wrap:wrap;
+}
+.measurement-diagram{
+  position:relative;width:120px;height:180px;flex-shrink:0
+}
+.measure-line{
+  position:absolute;display:flex;align-items:center;gap:.3rem;font-size:.7rem;color:var(--text-dim)
+}
+.measure-line::before{
+  content:'';position:absolute;height:2px;background:var(--gold);
+}
+.measure-line span{
+  background:var(--bg-alt);padding:0 .3rem;white-space:nowrap;z-index:1
+}
+/* Pants diagram */
+.pants-diagram{
+  border:2px solid var(--line);border-radius:8px 8px 20px 20px;
+  position:relative;width:80px;height:150px;margin:0 auto
+}
+.pants-waist{
+  top:10px;left:-30px;right:-30px
+}
+.pants-waist::before{width:calc(100% + 60px);top:50%;left:0}
+.pants-hip{
+  top:40px;left:-35px;right:-35px
+}
+.pants-hip::before{width:calc(100% + 70px);top:50%;left:0}
+.pants-length{
+  top:0;bottom:0;right:-45px
+}
+.pants-length::before{width:2px;height:100%;left:50%;top:0
+}
+
+.measurement-legend{
+  display:flex;flex-direction:column;gap:.6rem;font-size:.82rem
+}
+.legend-item{display:flex;align-items:center;gap:.5rem}
+.legend-num{
+  width:22px;height:22px;border-radius:50%;background:var(--gold);color:#000;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;flex-shrink:0
+}
+
+/* Important Notes */
+.wideleg-notes{
+  margin-top:1.5rem;padding:1.2rem;background:linear-gradient(135deg,rgba(212,175,55,.08),rgba(212,175,55,.02));
+  border:1px dashed rgba(212,175,55,.4);border-radius:12px
+}
+.wideleg-notes h4{margin:0 0 .8rem;color:var(--gold);display:flex;align-items:center;gap:.5rem
+}
+.wideleg-notes ul{margin:0;padding-right:1.2rem;color:var(--text-dim);font-size:.85rem;line-height:1.9
+}
+.wideleg-notes li{margin-bottom:.4rem
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="container">
+    <div class="header-main">
+      <a href="/" class="logo">
+        <img src="images/logo-icon.png" class="logo-icon" alt="Tiger Jeans" />
+        <div class="logo-text"><strong>TIGER JEANS</strong><small>متجر فخم</small></div>
+      </a>
+      <nav class="main-nav">
+        <a href="/">الرئيسية</a>
+        <a href="/#products">المتجر</a>
+        <a href="track.html">تتبع الطلب</a>
+        <a href="gift-cards.html">بطاقات الهدايا</a>
+      </nav>
+      <div class="header-actions">
+        <a href="orders.html" class="action-btn" title="طلباتي"><i class='bx bx-receipt'></i></a>
+        <a href="wishlist.html" class="action-btn wishlist-btn-header"><i class='bx bx-heart'></i><span class="wishlist-badge" style="display:none">0</span></a>
+        <a href="cart.html" class="action-btn cart-btn"><i class='bx bx-cart-alt'></i><span class="cart-badge" style="display:none">0</span></a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Hero -->
+<div class="sg-hero">
+  <div class="container">
+    <div class="breadcrumb"><a href="/">الرئيسية</a> / دليل المقاسات</div>
+    <span class="sg-eyebrow"><i class='bx bx-ruler'></i> دليل المقاسات</span>
+    <h1>مقاسك صح من أول طلب</h1>
+    <p>اختار نوع المنتج، شوف جدول المقاسات بالتفصيل، أو استخدم الحاسبة وهنقترحلك المقاس الأنسب لجسمك.</p>
+  </div>
+  <div class="tape"><div class="tape-glow"></div></div>
+</div>
+
+<!-- Tabs + Content -->
+<div class="container sg-tabs-wrap">
+  <div class="sg-tabs" id="sgTabs">
+    <button class="sg-tab" data-tab="shirts"><i class='bx bxs-tshirt'></i> قمصان</button>
+    <button class="sg-tab" data-tab="slimfit"><i class='bx bx-ruler'></i> بنطلون Slim Fit</button>
+    <button class="sg-tab" data-tab="jeans"><i class='bx bx-ruler'></i> جينز</button>
+    <button class="sg-tab" data-tab="jeansTall"><i class='bx bx-trending-up'></i> جينز أطوال خاص</button>
+    <button class="sg-tab" data-tab="tshirt1"><i class='bx bxs-tshirt'></i> تيشرت</button>
+    <button class="sg-tab" data-tab="tshirt2"><i class='bx bxs-tshirt'></i> تيشرت (جدول تاني)</button>
+    <button class="sg-tab" data-tab="wideLeg" style="color:var(--gold)"><i class='bx bx-expand'></i> بنطلون وايد ليج</button>
+    <div class="sg-indicator" id="sgIndicator"></div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="sg-content" id="sgContent">
+    <!-- Panels injected by JS -->
+    <div id="sgPanels"></div>
+
+    <!-- Calculator -->
+    <div class="sg-calc">
+      <div class="sg-card">
+        <div class="calc-icon"><i class='bx bx-calculator'></i></div>
+        <h3>مش عارف مقاسك؟</h3>
+        <p class="sg-sub" id="calcSub">دخّل قياسك وهنقترحلك المقاس الأنسب</p>
+
+        <label id="calcLabel" for="calcInput">عرض الصدر (سم)</label>
+        <div class="sg-calc-row">
+          <input type="number" id="calcInput" placeholder="مثلاً 62" />
+          <button onclick="calculateSize()"><i class='bx bx-search-alt'></i> احسب</button>
+        </div>
+        
+        <!-- Weight Field (Optional) -->
+        <div class="weight-field" id="weightField">
+          <label for="calcWeight">
+            <i class='bx bx-weight' style="color:var(--gold);margin-left:.3rem"></i>
+            وزنك التقريبي (كجم) - اختيارى
+          </label>
+          <div style="display:flex;gap:.5rem;align-items:center;margin-top:.4rem">
+            <input type="number" id="calcWeight" placeholder="مثلاً 80" style="flex:1" />
+            <span style="font-size:.75rem;color:var(--text-dim);white-space:nowrap">كجم</span>
+          </div>
+          <p class="sg-calc-hint" style="margin-top:.4rem">الوزن يساعد في تحديد المقاس بدقة أكبر للمنتجات المبنية على الوزن</p>
+        </div>
+        
+        <div class="sg-error" id="calcError">من فضلك دخّل رقم صحيح</div>
+        <p class="sg-calc-hint">القياس تقريبي ومبني على جدول المقاسات المعروض بجانب الحاسبة.</p>
+
+        <div class="sg-result" id="calcResult">
+          <div class="r-label">المقاس المقترح ليك</div>
+          <div class="r-size" id="resultSize">—</div>
+          <div class="r-note" id="resultNote"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="container footer-bottom">
+    <div class="footer-legal-links">
+      <a href="about.html">من نحن</a>
+      <a href="contact.html">اتصل بنا</a>
+      <a href="privacy-policy.html">سياسة الخصوصية</a>
+      <a href="terms.html">الشروط والأحكام</a>
+      <a href="return-policy.html">سياسة الاسترجاع والاستبدال</a>
+    </div>
+    <p>جميع الحقوق محفوظة © Tiger Jeans 2026 | تطوير
+        <a href="https://www.facebook.com/en.mohamed.nasr" target="_blank" rel="noopener" class="credit-link">
+          <i class='bx bxs-code-alt'></i> المهندس محمد حماد
+        </a>
+      </p>
+  </div>
+</footer>
+
+<script>
+// ====== Size chart data (from the merchant's official size cards) ======
+const CHARTS = [
+  {
+    id: "shirts", label: "قمصان", type: "measure", measureKey: "chest",
+    title: "جدول مقاسات القميص", sub: "القياس بالسنتيمتر — عرض الصدر وطول الكم",
+    calcLabel: "عرض الصدر (سم)", calcPlaceholder: "مثلاً 62",
+    cols: ["المقاس", "عرض الصدر (سم)", "طول الكم (سم)"],
+    rows: [
+      { size: "XL", chest: 58, sleeve: 65 },
+      { size: "2XL", chest: 60, sleeve: 65.5 },
+      { size: "3XL", chest: 62, sleeve: 66 },
+      { size: "4XL", chest: 64, sleeve: 67 },
+      { size: "5XL", chest: 66, sleeve: 68 },
+      { size: "6XL", chest: 68, sleeve: 68 },
+    ],
+  },
+  {
+    id: "slimfit", label: "بنطلون Slim Fit", type: "measure", measureKey: "waist",
+    title: "جدول مقاسات Slim Fit", sub: "القياس بالسنتيمتر — محيط الوسط والطول",
+    calcLabel: "محيط الوسط (سم)", calcPlaceholder: "مثلاً 88",
+    cols: ["المقاس", "محيط الوسط (سم)", "الطول (سم)"],
+    rows: [
+      { size: "30", waist: 76, length: 108 },
+      { size: "32", waist: 80, length: 108 },
+      { size: "34", waist: 84, length: 109 },
+      { size: "36", waist: 88, length: 109 },
+      { size: "38", waist: 92, length: 109 },
+      { size: "40", waist: 96, length: 110 },
+      { size: "42", waist: 100, length: 110 },
+      { size: "44", waist: 104, length: 110 },
+    ],
+  },
+  {
+    id: "jeans", label: "جينز", type: "measure", measureKey: "waist",
+    title: "جدول مقاسات الجينز", sub: "القياس بالسنتيمتر — محيط الوسط والطول",
+    calcLabel: "محيط الوسط (سم)", calcPlaceholder: "مثلاً 92",
+    cols: ["المقاس", "محيط الوسط (سم)", "الطول (سم)"],
+    rows: [
+      { size: "30", waist: 80, length: 108 },
+      { size: "32", waist: 84, length: 108 },
+      { size: "34", waist: 88, length: 109 },
+      { size: "36", waist: 92, length: 109 },
+      { size: "38", waist: 96, length: 109 },
+      { size: "40", waist: 100, length: 110 },
+      { size: "42", waist: 104, length: 110 },
+      { size: "44", waist: 108, length: 110 },
+      { size: "46", waist: 112, length: 110 },
+    ],
+  },
+  {
+    id: "jeansTall", label: "جينز أطوال خاص", type: "measure", measureKey: "waist",
+    title: "جدول مقاسات جينز أطوال خاص", sub: "جدول خاص بمقاسات الأطوال — الوسط والطول بالسنتيمتر",
+    calcLabel: "قياس الوسط (سم)", calcPlaceholder: "مثلاً 50",
+    cols: ["المقاس", "الوسط (سم)", "الطول (سم)"],
+    rows: [
+      { size: "30", waist: 40, length: 112 },
+      { size: "32", waist: 42, length: 112 },
+      { size: "34", waist: 44, length: 114 },
+      { size: "36", waist: 46, length: 114 },
+      { size: "38", waist: 48, length: 115 },
+      { size: "40", waist: 50, length: 116 },
+      { size: "42", waist: 52, length: 116 },
+      { size: "44", waist: 54, length: 116 },
+      { size: "46", waist: 62, length: 116 },
+      { size: "48", waist: 64, length: 116 },
+      { size: "50", waist: 66, length: 116 },
+      { size: "52", waist: 68, length: 116 },
+    ],
+  },
+  {
+    id: "tshirt1", label: "تيشرت", type: "weight", measureKey: "weight",
+    title: "جدول مقاسات التيشرت", sub: "بناءً على وزن الجسم وعرض الصدر",
+    calcLabel: "الوزن (كجم)", calcPlaceholder: "مثلاً 80",
+    cols: ["المقاس", "عرض الصدر (سم)", "الوزن المناسب (كجم)"],
+    rows: [
+      { size: "L", chest: 56, min: 65, max: 75 },
+      { size: "XL", chest: 58, min: 75, max: 85 },
+      { size: "2XL", chest: 60, min: 85, max: 95 },
+      { size: "3XL", chest: 62, min: 95, max: 105 },
+      { size: "4XL", chest: 64, min: 105, max: 110 },
+      { size: "5XL", chest: 66, min: 110, max: 115 },
+      { size: "6XL", chest: 68, min: 115, max: 120 },
+    ],
+  },
+  {
+    id: "tshirt2", label: "تيشرت (جدول تاني)", type: "weight", measureKey: "weight",
+    title: "جدول مقاسات تيشرت (جدول تاني)", sub: "بناءً على وزن الجسم وعرض الصدر — لتشكيلة مختلفة",
+    calcLabel: "الوزن (كجم)", calcPlaceholder: "مثلاً 90",
+    cols: ["المقاس", "عرض الصدر (سم)", "الوزن المناسب (كجم)"],
+    rows: [
+      { size: "M", chest: 58, min: 75, max: 85 },
+      { size: "L", chest: 60, min: 85, max: 95 },
+      { size: "XL", chest: 62, min: 95, max: 105 },
+      { size: "2XL", chest: 64, min: 105, max: 115 },
+      { size: "3XL", chest: 66, min: 115, max: 125 },
+    ],
+  },
+  {
+    id: "wideLeg", label: "بنطلون وايد ليج", type: "wideleg", measureKey: "waist",
+    title: "دليل مقاسات البنطلون وايد ليج", sub: "مقاسات من 28 إلى 44 — القياس بالسنتيمتر",
+    isWideLeg: true,
+    calcLabel: "حاسبة المقاس", calcPlaceholder: "أدخل قياساتك",
+    cols: ["مقاس (نيمر)", "محيط الخصر (سم)", "محيط الأرداف (سم)", "طول البنطلون (سم)", "الوزن التقريبي (كجم)"],
+    rows: [
+      { size: "28", waistMin: 71, waistMax: 73, hipMin: 94, hipMax: 96, length: "105 - 107", weightMin: 45, weightMax: 52 },
+      { size: "30", waistMin: 77, waistMax: 79, hipMin: 98, hipMax: 100, length: "105 - 107", weightMin: 58, weightMax: 64 },
+      { size: "32", waistMin: 83, waistMax: 85, hipMin: 102, hipMax: 104, length: "105 - 107", weightMin: 70, weightMax: 76 },
+      { size: "34", waistMin: 89, waistMax: 91, hipMin: 106, hipMax: 108, length: "106 - 108", weightMin: 76, weightMax: 82 },
+      { size: "36", waistMin: 94, waistMax: 97, hipMin: 110, hipMax: 113, length: "106 - 108", weightMin: 88, weightMax: 95 },
+      { size: "38", waistMin: 100, waistMax: 103, hipMin: 116, hipMax: 119, length: "106 - 108", weightMin: 95, weightMax: 103 },
+      { size: "40", waistMin: 106, waistMax: 109, hipMin: 122, hipMax: 125, length: "106 - 108", weightMin: 106, weightMax: 112 },
+      { size: "42", waistMin: 112, waistMax: 115, hipMin: 128, hipMax: 131, length: "106 - 108", weightMin: 112, weightMax: 120 },
+      { size: "44", waistMin: 118, waistMax: 121, hipMin: 134, hipMax: 137, length: "106 - 108", weightMin: 120, weightMax: 130 },
+    ],
+  },
+];
+
+let activeChart = CHARTS[0];
+
+// ====== Build panels ======
+function rowCells(chart, r) {
+  if (chart.type === "weight") {
+    return [r.size, r.chest, `${r.min} - ${r.max}`];
+  }
+  
+  // Special handling for Wide Leg pants
+  if (chart.isWideLeg) {
+    return [
+      r.size,
+      `${r.waistMin} - ${r.waistMax}`,
+      `${r.hipMin} - ${r.hipMax}`,
+      r.length,
+      `${r.weightMin} - ${r.weightMax}`
+    ];
+  }
+  
+  const measureCol = chart.measureKey === "chest" ? r.chest : r.waist;
+  const lenCol = r.sleeve !== undefined ? r.sleeve : r.length;
+  return [r.size, measureCol, lenCol];
+}
+
+function buildPanels() {
+  const wrap = document.getElementById("sgPanels");
+  wrap.innerHTML = CHARTS.map((chart) => {
+    // Special panel for Wide Leg with measurement guide
+    if (chart.isWideLeg) {
+      return `
+    <div class="sg-panel" id="panel-${chart.id}">
+      <div class="sg-card">
+        <h3><i class='bx bx-expand' style="margin-left:.5rem;color:var(--gold)"></i>${chart.title}</h3>
+        <p class="sg-sub">${chart.sub}</p>
+        
+        <!-- Measurement Guide -->
+        <div class="measurement-guide">
+          <div class="measurement-diagram">
+            <div class="pants-diagram">
+              <div class="measure-line pants-waist"><span>①</span></div>
+              <div class="measure-line pants-hip"><span>②</span></div>
+              <div class="measure-line pants-length"><span>③</span></div>
+            </div>
+          </div>
+          <div class="measurement-legend">
+            <div class="legend-item"><span class="legend-num">1</span> <b>محيط الخصر</b> - قياس محيط الخصر عند أعلى البنطلون</div>
+            <div class="legend-item"><span class="legend-num">2</span> <b>محيط الأرداف</b> - قياس محيط الأرداف في أوسع نقطة</div>
+            <div class="legend-item"><span class="legend-num">3</span> <b>طول البنطلون</b> - من أعلى الخصر حتى أسفل البنطلون</div>
+          </div>
+        </div>
+        
+        <!-- Size Table -->
+        <div class="sg-table-scroll">
+          <table class="sg-table wideleg-table">
+            <thead><tr>${chart.cols.map(c => `<th>${c}</th>`).join("")}</tr></thead>
+            <tbody>
+              ${chart.rows.map((r, i) => `
+                <tr data-size="${r.size}" style="animation-delay:${i * 45}ms">
+                  ${rowCells(chart, r).map(v => `<td>${v}</td>`).join("")}
+                </tr>`).join("")}
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Important Notes -->
+        <div class="wideleg-notes">
+          <h4><i class='bx bx-star'></i> ملاحظات مهمة</h4>
+          <ul>
+            <li>المقاسات بالسنتيمتر ويمكن أن تختلف ±2 سم حسب نوع القماش</li>
+            <li>في حالة وقوعك بين مقاسين، ننصح باختيار المقاس الأكبر للراحة</li>
+            <li>هذه المقاسات خاصة ببنطلون وايد ليج (Wide Leg) فقط</li>
+            <li>الوزن التقريبي هو دليل مساعد وليس المعيار الأساسي لاختيار المقاس</li>
+            <li>للمساعدة في اختيار المقاس، استخدم الحاسبة المخصصة بجانب الجدول</li>
+          </ul>
+        </div>
+      </div>
+    </div>`;
+    }
+    
+    // Regular panels for other charts
+    return `
+    <div class="sg-panel" id="panel-${chart.id}">
+      <div class="sg-card">
+        <h3>${chart.title}</h3>
+        <p class="sg-sub">${chart.sub}</p>
+        <div class="sg-table-scroll">
+          <table class="sg-table">
+            <thead><tr>${chart.cols.map(c => `<th>${c}</th>`).join("")}</tr></thead>
+            <tbody>
+              ${chart.rows.map((r, i) => `
+                <tr data-size="${r.size}" style="animation-delay:${i * 45}ms">
+                  ${rowCells(chart, r).map(v => `<td>${v}</td>`).join("")}
+                </tr>`).join("")}
+            </tbody>
+          </table>
+        </div>
+        <div class="sg-note">
+          <i class='bx bx-info-circle'></i>
+          <span>${chart.type === "weight"
+            ? "لو وزنك وقع بين مقاسين، اختار المقاس الأكبر للراحة."
+            : "لو مقاسك وقع بين رقمين، اختار المقاس الأكبر لتلبيس مريح، أو الأصغر لتلبيس يلائم الجسم أكتر."}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// ====== Tab switching ======
+function moveIndicator(btn) {
+  const indicator = document.getElementById("sgIndicator");
+  indicator.style.width = btn.offsetWidth + "px";
+  indicator.style.transform = `translateX(${btn.offsetLeft}px)`;
+}
+
+function switchTab(id, btn) {
+  activeChart = CHARTS.find(c => c.id === id);
+
+  document.querySelectorAll(".sg-tab").forEach(t => t.classList.remove("active"));
+  btn.classList.add("active");
+  moveIndicator(btn);
+
+  document.querySelectorAll(".sg-panel").forEach(p => p.classList.remove("active"));
+  document.getElementById("panel-" + id).classList.add("active");
+
+  // Re-trigger the row stagger animation each time the tab is opened
+  document.querySelectorAll(`#panel-${id} tbody tr`).forEach(tr => {
+    tr.style.animation = "none";
+    void tr.offsetWidth;
+    tr.style.animation = "";
+  });
+
+  // Handle calculator display based on chart type
+  const calcCard = document.querySelector(".sg-calc .sg-card");
+  
+  if (activeChart.isWideLeg) {
+    // Show Wide Leg Calculator
+    calcCard.innerHTML = `
+      <div class="calc-icon"><i class='bx bx-calculator'></i></div>
+      <h3>حاسبة مقاس البنطلون وايد ليج</h3>
+      <p class="sg-sub">أدخل قياساتك وهنقترحلك المقاس الأنسب</p>
+      
+      <div class="wideleg-calc-fields">
+        <div class="wideleg-field">
+          <label for="wlWeight"><i class='bx bx-weight'></i> الوزن التقريبي (كجم)</label>
+          <input type="number" id="wlWeight" placeholder="مثلاً: 80" />
+        </div>
+        
+        <div class="wideleg-field">
+          <label for="wlWaist"><i class='bx bx-ruler'></i> محيط الخصر (سم)</label>
+          <input type="number" id="wlWaist" placeholder="مثلاً: 85" />
+        </div>
+        
+        <div class="wideleg-field">
+          <label for="wlHip"><i class='bx bx-move-horizontal'></i> محيط الأرداف (سم)</label>
+          <input type="number" id="wlHip" placeholder="مثلاً: 100" />
+        </div>
+        
+        <div class="wideleg-field">
+          <label for="wlLength"><i class='bx bx-vertical-bottom'></i> طول البنطلون المفضل (سم)</label>
+          <input type="number" id="wlLength" placeholder="مثلاً: 105 (اختياري)" />
+        </div>
+        
+        <button class="wideleg-calc-btn" onclick="calculateWideLegSize()">
+          <i class='bx bx-search-alt'></i> احسب مقاسي المناسب
+        </button>
+      </div>
+      
+      <div class="sg-error" id="calcError">من فضلك أدخل على الأقل قياس واحد (الوزن أو الخصر أو الأرداف)</div>
+      <p class="sg-calc-hint">كلما أدخلت قياسات أكثر، كلما كانت النتيجة أدق.</p>
+
+      <div class="sg-result" id="calcResult">
+        <div class="r-label">المقاس المقترح ليك</div>
+        <div class="r-size" id="resultSize">—</div>
+        <div class="r-note" id="resultNote"></div>
+      </div>
+    `;
+    
+    // Add Enter key support for Wide Leg fields
+    ['wlWeight', 'wlWaist', 'wlHip', 'wlLength'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') { e.preventDefault(); calculateWideLegSize(); }
+        });
+      }
+    });
+    
+  } else {
+    // Show Regular Calculator
+    calcCard.innerHTML = `
+      <div class="calc-icon"><i class='bx bx-calculator'></i></div>
+      <h3>مش عارف مقاسك؟</h3>
+      <p class="sg-sub" id="calcSub">دخّل قياسك وهنقترحلك المقاس الأنسب</p>
+
+      <label id="calcLabel" for="calcInput">${activeChart.calcLabel}</label>
+      <div class="sg-calc-row">
+        <input type="number" id="calcInput" placeholder="${activeChart.calcPlaceholder}" />
+        <button onclick="calculateSize()"><i class='bx bx-search-alt'></i> احسب</button>
+      </div>
+      
+      <!-- Weight Field (Optional) -->
+      <div class="weight-field" id="weightField">
+        <label for="calcWeight">
+          <i class='bx bx-weight' style="color:var(--gold);margin-left:.3rem"></i>
+          وزنك التقريبي (كجم) - اختيارى
+        </label>
+        <div style="display:flex;gap:.5rem;align-items:center;margin-top:.4rem">
+          <input type="number" id="calcWeight" placeholder="مثلاً 80" style="flex:1" />
+          <span style="font-size:.75rem;color:var(--text-dim);white-space:nowrap">كجم</span>
+        </div>
+        <p class="sg-calc-hint" style="margin-top:.4rem">الوزن يساعد في تحديد المقاس بدقة أكبر للمنتجات المبنية على الوزن</p>
+      </div>
+      
+      <div class="sg-error" id="calcError">من فضلك دخّل رقم صحيح</div>
+      <p class="sg-calc-hint">القياس تقريبي ومبني على جدول المقاسات المعروض بجانب الحاسبة.</p>
+
+      <div class="sg-result" id="calcResult">
+        <div class="r-label">المقاس المقترح ليك</div>
+        <div class="r-size" id="resultSize">—</div>
+        <div class="r-note" id="resultNote"></div>
+      </div>
+    `;
+    
+    // Re-add Enter key support
+    document.getElementById("calcInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); calculateSize(); }
+    });
+  }
+}
+
+// ====== Calculator logic ======
+function calculateSize() {
+  const input = document.getElementById("calcInput");
+  const weightInput = document.getElementById("calcWeight");
+  const val = parseFloat(input.value);
+  const weightVal = parseFloat(weightInput.value);
+  const errorBox = document.getElementById("calcError");
+  const resultBox = document.getElementById("calcResult");
+
+  if (!val || val <= 0) {
+    errorBox.classList.add("show");
+    resultBox.classList.remove("show");
+    return;
+  }
+  errorBox.classList.remove("show");
+
+  let matchedRow = null;
+  let edgeNote = "";
+  let weightUsed = false;
+
+  // If weight is provided and chart type is weight-based, use weight for calculation
+  if (weightVal && weightVal > 0 && activeChart.type === "weight") {
+    matchedRow = activeChart.rows.find(r => weightVal >= r.min && weightVal <= r.max);
+    if (!matchedRow) {
+      if (weightVal < activeChart.rows[0].min) {
+        matchedRow = activeChart.rows[0];
+        edgeNote = "وزنك أقل من أصغر مقاس متاح، وده أقرب مقاس ليك.";
+      } else {
+        matchedRow = activeChart.rows[activeChart.rows.length - 1];
+        edgeNote = "وزنك أكبر من أكبر مقاس متاح، تقدر تتواصل معانا لمقاس خاص.";
+      }
+    } else {
+      weightUsed = true;
+    }
+  }
+
+  // If no match by weight or not a weight-based chart, use the main input
+  if (!matchedRow) {
+    if (activeChart.type === "weight") {
+      // For weight charts, try to match by chest measurement as fallback
+      matchedRow = [...activeChart.rows].reverse().find(r => val >= r.chest - 4);
+      if (matchedRow) {
+        edgeNote = weightVal ? `بناءً على وزنك (${weightVal} كجم) وقياسك، المقاس ده الأنسب.` : "المقاس بناءً على قياس الصدر المدخل.";
+      }
+    }
+    
+    if (!matchedRow) {
+      if (activeChart.type === "weight") {
+        matchedRow = activeChart.rows.find(r => val >= r.min && val <= r.max);
+        if (!matchedRow) {
+          if (val < activeChart.rows[0].min) {
+            matchedRow = activeChart.rows[0];
+            edgeNote = "وزنك أقل من أصغر مقاس متاح، وده أقرب مقاس ليك.";
+          } else {
+            matchedRow = activeChart.rows[activeChart.rows.length - 1];
+            edgeNote = "وزنك أكبر من أكبر مقاس متاح، تقدر تتواصل معانا لمقاس خاص.";
+          }
+        }
+      } else {
+        const key = activeChart.measureKey;
+        const sorted = [...activeChart.rows].sort((a, b) => a[key] - b[key]);
+        matchedRow = sorted.find(r => val <= r[key]);
+        if (!matchedRow) {
+          matchedRow = sorted[sorted.length - 1];
+          edgeNote = "قياسك أكبر من أكبر مقاس متاح في الجدول، تقدر تتواصل معانا لمقاس خاص.";
+        } else if (val < sorted[0][key]) {
+          edgeNote = "قياسك أصغر من أصغر مقاس متاح، وده أقرب مقاس ليك.";
+        }
+      }
+    }
+  }
+
+  // Build result note with weight info
+  let resultNoteText = edgeNote
+    ? `<span class="r-edge">${edgeNote}</span>`
+    : "المقاس ده تقريبي بناءً على جدول المقاسات — لو بين مقاسين اختار الأكبر للراحة.";
+  
+  // Add weight confirmation to result
+  if (weightUsed && weightVal) {
+    resultNoteText += `<br><small style="color:var(--success);margin-top:.3rem;display:inline-block">✓ تم الحساب بناءً على وزنك: ${weightVal} كجم</small>`;
+  } else if (weightVal && !weightUsed) {
+    resultNoteText += `<br><small style="color:var(--text-dim);margin-top:.3rem;display:inline-block">⚖️ وزنك (${weightVal} كجم) مأخذ في الاعتبار</small>`;
+  }
+
+  document.getElementById("resultSize").textContent = matchedRow.size;
+  document.getElementById("resultNote").innerHTML = resultNoteText;
+
+  resultBox.classList.remove("show");
+  void resultBox.offsetWidth;
+  resultBox.classList.add("show");
+
+  // Highlight the matching row in the visible table
+  document.querySelectorAll(`#panel-${activeChart.id} tbody tr`).forEach(tr => {
+    tr.classList.toggle("row-highlight", tr.dataset.size === matchedRow.size);
+  });
+  const matchedTr = document.querySelector(`#panel-${activeChart.id} tbody tr[data-size="${matchedRow.size}"]`);
+  if (matchedTr) matchedTr.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+document.getElementById("calcInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") { e.preventDefault(); calculateSize(); }
+});
+
+// ====== Wide Leg Size Calculator ======
+function calculateWideLegSize() {
+  const weight = parseFloat(document.getElementById("wlWeight")?.value) || 0;
+  const waist = parseFloat(document.getElementById("wlWaist")?.value) || 0;
+  const hip = parseFloat(document.getElementById("wlHip")?.value) || 0;
+  const length = parseFloat(document.getElementById("wlLength")?.value) || 0;
+  
+  const errorBox = document.getElementById("calcError");
+  const resultBox = document.getElementById("calcResult");
+  
+  // Validate at least one input
+  if (!weight && !waist && !hip) {
+    errorBox.classList.add("show");
+    resultBox.classList.remove("show");
+    return;
+  }
+  errorBox.classList.remove("show");
+  
+  // Get the wide leg chart data
+  const wideLegChart = CHARTS.find(c => c.id === "wideLeg");
+  if (!wideLegChart) return;
+  
+  let bestMatch = null;
+  let bestScore = -Infinity;
+  let matchDetails = [];
+  
+  // Score each size based on how well it matches the inputs
+  wideLegChart.rows.forEach(row => {
+    let score = 0;
+    let details = [];
+    
+    // Weight scoring (most important)
+    if (weight > 0) {
+      if (weight >= row.weightMin && weight <= row.weightMax) {
+        score += 40; // Perfect weight match
+        details.push(`الوزن (${weight} كجم): مطابق ✓`);
+      } else if (weight < row.weightMin) {
+        score -= Math.abs(weight - row.weightMin) * 0.5;
+        details.push(`الوزن: أقل من النطاق`);
+      } else {
+        score -= Math.abs(weight - row.weightMax) * 0.5;
+        details.push(`الوزن: أكبر من النطاق`);
+      }
+    }
+    
+    // Waist scoring (very important)
+    if (waist > 0) {
+      if (waist >= row.waistMin && waist <= row.waistMax) {
+        score += 35; // Perfect waist match
+        details.push(`الخصر (${waist} سم): مطابق ✓`);
+      } else if (waist < row.waistMin) {
+        score -= Math.abs(waist - row.waistMin) * 0.4;
+      } else {
+        score -= Math.abs(waist - row.waistMax) * 0.4;
+      }
+    }
+    
+    // Hip scoring (important)
+    if (hip > 0) {
+      if (hip >= row.hipMin && hip <= row.hipMax) {
+        score += 25; // Perfect hip match
+        details.push(`الأرداف (${hip} سم): مطابق ✓`);
+      } else if (hip < row.hipMin) {
+        score -= Math.abs(hip - row.hipMin) * 0.3;
+      } else {
+        score -= Math.abs(hip - row.hipMax) * 0.3;
+      }
+    }
+    
+    // Length is same for all sizes, so just check if reasonable
+    if (length > 0) {
+      if (length >= 100 && length <= 110) {
+        score += 5; // Reasonable length
+        details.push(`الطول: مناسب ✓`);
+      } else {
+        details.push(`⚠️ الطول المطلوب (${length} سم) قد يكون مختلف عن المقاسات المتاحة`);
+      }
+    }
+    
+    if (score > bestScore) {
+      bestScore = score;
+      bestMatch = row;
+      matchDetails = details;
+    }
+  });
+  
+  if (!bestMatch) return;
+  
+  // Build result display
+  let resultNoteHTML = "";
+  
+  // Show which measurements matched
+  const matchedCount = matchDetails.filter(d => d.includes("✓")).length;
+  if (matchedCount >= 2) {
+    resultNoteHTML = `<span style="color:var(--success);font-weight:700">✓ تطابق ممتاز!</span><br>`;
+  } else if (matchedCount === 1) {
+    resultNoteHTML = `<span style="color:var(--warn);font-weight:700">تطابق جزئي</span><br>`;
+  } else {
+    resultNoteHTML = `<span style="color:var(--text-dim)">أقرب مقاس متاح</span><br>`;
+  }
+  
+  resultNoteHTML += `<small style="color:var(--text-dim);line-height:1.8;display:block;margin-top:.5rem">`;
+  resultNoteHTML += matchDetails.join("<br>");
+  resultNoteHTML += `</small>`;
+  
+  if (matchedCount < 3) {
+    resultNoteHTML += `<br><span class="r-edge" style="display:block;margin-top:.8rem;font-size:.8rem">💡 نصيحة: كلما أدخلت قياسات أكثر، كانت النتيجة أدق</span>`;
+  }
+  
+  document.getElementById("resultSize").textContent = bestMatch.size;
+  document.getElementById("resultSize").style.fontSize = "3rem";
+  document.getElementById("resultNote").innerHTML = resultNoteHTML;
+  
+  resultBox.classList.remove("show");
+  void resultBox.offsetWidth;
+  resultBox.classList.add("show");
+  
+  // Highlight the matching row in the table
+  document.querySelectorAll("#panel-wideLeg tbody tr").forEach(tr => {
+    tr.classList.remove("row-highlight", "wideleg-highlight");
+    if (tr.dataset.size === bestMatch.size) {
+      tr.classList.add("wideleg-highlight");
+      tr.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  });
+}
+
+// ====== Init ======
+buildPanels();
+
+document.querySelectorAll(".sg-tab").forEach(btn => {
+  btn.addEventListener("click", () => switchTab(btn.dataset.tab, btn));
+});
+
+// Deep-link support: size-guide.html?cat=jeans opens directly on that tab
+const initialCat = new URLSearchParams(location.search).get("cat");
+const initialBtn = document.querySelector(`.sg-tab[data-tab="${initialCat}"]`) || document.querySelector(".sg-tab");
+switchTab(initialBtn.dataset.tab, initialBtn);
+
+window.addEventListener("resize", () => {
+  const activeBtn = document.querySelector(".sg-tab.active");
+  if (activeBtn) moveIndicator(activeBtn);
+});
+</script>
+
+<!-- ====== Bottom Navigation (Mobile, <992px) ====== -->
+<nav class="bottom-nav" aria-label="التنقل السفلي">
+  <div class="bottom-nav-inner">
+    <a href="/" data-nav="home" class=""><i class='bx bx-home-alt'></i><span>الرئيسية</span></a>
+    <a href="/#products" data-nav="search" class="" onclick="if(window.location.pathname==='/'||window.location.pathname.endsWith('/index.html')){event.preventDefault();toggleSearch();}"><i class='bx bx-search'></i><span>بحث</span></a>
+    <a href="/#products" data-nav="categories" class="active"><i class='bx bx-category'></i><span>الأقسام</span></a>
+    <a href="cart.html" data-nav="cart" class=""><i class='bx bx-cart-alt'></i><span>السلة</span><span class="bn-badge cart-badge" style="display:none">0</span></a>
+    <a href="gift-cards.html" data-nav="giftcards"><i class='bx bx-gift'></i><span>هدايا</span></a>
+    <a href="orders.html" id="bottomAccountLink" data-nav="account" class=""><i class='bx bx-user'></i><span>طلباتي</span></a>
+  </div>
+</nav>
+<script src="js/tiger-ai.js"></script>
+</body>
+</html>

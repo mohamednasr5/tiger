@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+<title>إتمام الشراء | Tiger Jeans</title>
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#d4af37" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png" />
+<link rel="shortcut icon" href="images/favicon-32x32.png" type="image/png" />
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+<style>
+.page-hero{padding:2.5rem 0;border-bottom:1px solid var(--line);background:var(--bg-alt)}
+.page-hero h1{font-size:1.8rem;font-weight:800}
+.breadcrumb{color:var(--text-dim);font-size:.85rem;margin-top:.5rem}
+.breadcrumb a:hover{color:var(--gold)}
+.checkout-layout{display:grid;grid-template-columns:1fr .45fr;gap:2rem;padding:3rem 0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:1.8rem}
+.field{margin-bottom:1.2rem}
+.field label{display:block;margin-bottom:.5rem;font-size:.88rem;font-weight:600;color:var(--text-dim)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+
+/* Payment Options */
+.pay-options{display:grid;grid-template-columns:repeat(4,1fr);gap:.8rem;margin-bottom:1.3rem}
+@media(max-width:600px){.pay-options{grid-template-columns:repeat(2,1fr)}}
+.pay-option{
+  border:2px solid var(--line);
+  border-radius:12px;
+  padding:1rem;
+  cursor:pointer;
+  transition:.25s;
+  text-align:center;
+  background:var(--surface);
+}
+.pay-option:hover{border-color:var(--gold-deep)}
+.pay-option.active{
+  border-color:var(--gold);
+  background:rgba(212,175,55,.08);
+}
+.pay-option i{
+  font-size:1.8rem;
+  color:var(--gold);
+  display:block;
+  margin-bottom:.5rem;
+}
+.pay-option-icon{
+  height:34px;
+  max-width:80%;
+  object-fit:contain;
+  display:block;
+  margin:0 auto .5rem;
+  border-radius:5px;
+  transition:transform .25s;
+}
+.pay-option.active .pay-option-icon{transform:scale(1.08)}
+.pay-option div{font-weight:700;font-size:.9rem}
+
+/* Payment Number Box with Copy */
+.pay-number-box{
+  background:var(--surface-2);
+  border:1.5px dashed var(--gold-deep);
+  border-radius:10px;
+  padding:1rem 1.3rem;
+  margin-bottom:1.3rem;
+}
+.pay-number-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:.6rem;
+  flex-wrap:wrap;
+  gap:.5rem;
+}
+.pay-number-label{font-size:.88rem;color:var(--text-dim)}
+.pay-number-value{
+  display:flex;
+  align-items:center;
+  gap:.6rem;
+  flex-wrap:wrap;
+}
+.pay-number-value b{
+  color:var(--gold);
+  font-family:'Cairo',sans-serif;
+  font-size:1.15rem;
+  letter-spacing:1px;
+  direction:ltr;
+}
+
+/* Upload Box */
+.upload-area{
+  border:2px dashed var(--line);
+  border-radius:12px;
+  padding:1.8rem;
+  text-align:center;
+  cursor:pointer;
+  transition:.25s;
+  background:var(--surface);
+}
+.upload-area:hover{border-color:var(--gold);background:rgba(212,175,55,.03)}
+.upload-area img{max-height:150px;margin:0 auto;border-radius:8px;display:block}
+
+/* Order Items */
+.order-item{
+  display:flex;
+  gap:.8rem;
+  padding:.7rem 0;
+  border-bottom:1px solid var(--line);
+  align-items:center;
+}
+.order-item img{width:52px;height:62px;object-fit:cover;border-radius:6px;background:var(--surface-2)}
+.order-item .item-name{flex:1;font-size:.88rem}
+.order-item .item-price{color:var(--gold);font-weight:700;font-size:.88rem}
+
+/* Summary */
+.summary-row{display:flex;justify-content:space-between;padding:.55rem 0;font-size:.92rem;color:var(--text-dim)}
+.summary-row.total{color:var(--text);font-weight:800;font-size:1.15rem;border-top:1px solid var(--line);margin-top:.6rem;padding-top:1.1rem}
+
+/* Success Box */
+.success-container{text-align:center;padding:3.5rem 1rem}
+.success-container i{font-size:4.5rem;color:var(--success);display:block;margin-bottom:1rem}
+.order-code-display{
+  background:var(--surface);
+  border:1.5px dashed var(--gold);
+  padding:1.1rem 2.2rem;
+  border-radius:14px;
+  display:inline-block;
+  margin:1.5rem 0;
+  font-size:1.35rem;
+  font-weight:800;
+  font-family:'Cairo',sans-serif;
+  color:var(--gold);
+}
+.success-actions{display:flex;gap:1rem;justify-content:center;margin-top:2rem;flex-wrap:wrap}
+
+/* WhatsApp Invoice Button */
+.whatsapp-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:.6rem;
+  background:#25D366;
+  color:#fff;
+  padding:.7rem 1.4rem;
+  border-radius:10px;
+  font-weight:700;
+  font-family:'Cairo',sans-serif;
+  font-size:.9rem;
+  text-decoration:none;
+  margin-top:1rem;
+  width:100%;
+  justify-content:center;
+  transition:.25s;
+}
+.instapay-link{
+  display:inline-flex;
+  align-items:center;
+  gap:.6rem;
+  background:linear-gradient(135deg,#00a8e8,#0077b6);
+  color:#fff;
+  padding:.85rem 1.6rem;
+  border-radius:12px;
+  font-weight:800;
+  font-family:'Cairo',sans-serif;
+  font-size:.92rem;
+  text-decoration:none;
+  box-shadow:0 8px 22px -6px rgba(0,168,232,.5);
+  transition:.25s;
+}
+.instapay-link i{font-size:1.15rem}
+.instapay-link:hover{
+  background:linear-gradient(135deg,#0d9fe0,#005f8c);
+  transform:translateY(-2px);
+  box-shadow:0 12px 28px -6px rgba(0,168,232,.65);
+}
+.instapay-link:active{transform:translateY(0) scale(.97)}
+
+.whatsapp-btn:hover{
+  background:#128C7E;
+  transform:translateY(-2px);
+  box-shadow:0 6px 20px rgba(37,211,102,.4);
+}
+
+@media(max-width:900px){.checkout-layout{grid-template-columns:1fr}.row2{grid-template-columns:1fr}.pay-options{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="container">
+    <div class="header-main">
+      <a href="/" class="logo">
+        <img src="images/logo-icon.png" class="logo-icon" alt="Tiger Jeans" />
+        <div class="logo-text"><strong>TIGER JEANS</strong><small>لأرقى الملابس العالمية</small></div>
+      </a>
+      <nav class="main-nav">
+        <a href="/">الرئيسية</a>
+        <a href="track.html">تتبع الطلب</a>
+        <a href="gift-cards.html">بطاقات الهدايا</a>
+      </nav>
+      <div class="header-actions">
+        <a href="orders.html" class="action-btn" title="طلباتي"><i class='bx bx-receipt'></i></a>
+        <a href="wishlist.html" class="action-btn wishlist-btn-header"><i class='bx bx-heart'></i><span class="wishlist-badge" style="display:none">0</span></a>
+        <a href="cart.html" class="action-btn cart-btn"><i class='bx bx-cart-alt'></i><span class="cart-badge" style="display:none">0</span></a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Page Hero -->
+<div class="page-hero">
+  <div class="container">
+    <h1>إتمام الشراء</h1>
+    <div class="breadcrumb"><a href="/">الرئيسية</a> / <a href="cart.html">السلة</a> / إتمام الشراء</div>
+  </div>
+</div>
+
+<!-- Checkout Content -->
+<div class="container" id="checkoutContainer">
+  
+  <!-- Checkout Form -->
+  <div class="checkout-layout" id="checkoutForm">
+    
+    <!-- Left Column - Form -->
+    <div class="card">
+      <h3 style="margin-bottom:1.4rem;font-family:'Cairo',sans-serif">بيانات التوصيل</h3>
+      
+      <div class="row2">
+        <div class="field"><label>الاسم الكامل</label><input id="cName" placeholder="مثال: أحمد محمد" /></div>
+        <div class="field"><label>رقم الموبايل</label><input id="cPhone" placeholder="01xxxxxxxxx" /></div>
+      </div>
+      
+      <div class="row2">
+        <div class="field"><label>المحافظة</label><select id="cCity"><option value="">اختر المحافظة</option></select></div>
+        <div class="field"><label>العنوان بالتفصيل</label><input id="cAddress" placeholder="الشارع، رقم العمارة..." /></div>
+      </div>
+      
+      <div class="field">
+        <label>ملاحظات (اختياري)</label>
+        <textarea id="cNotes" rows="2" placeholder="أي تفاصيل إضافية"></textarea>
+      </div>
+
+      <h3 style="margin:2rem 0 1.2rem;font-family:'Cairo',sans-serif">طريقة الدفع</h3>
+      <div class="pay-options">
+        <div class="pay-option active" data-method="vodafone" onclick="selectPay('vodafone', this)">
+          <img src="images/payments/vodafone-cash.png" alt="فودافون كاش" class="pay-option-icon" />
+          <div>فودافون كاش</div>
+        </div>
+        <div class="pay-option" data-method="instapay" onclick="selectPay('instapay', this)">
+          <img src="images/payments/instapay.png" alt="انستاباي" class="pay-option-icon" />
+          <div>انستاباي</div>
+        </div>
+        <div class="pay-option" data-method="cod" onclick="selectPay('cod', this)">
+          <img src="images/payments/cash-on-delivery.png" alt="الدفع عند الاستلام" class="pay-option-icon" />
+          <div>عند الاستلام</div>
+        </div>
+        <div class="pay-option" data-method="giftcard" onclick="selectPay('giftcard', this)">
+          <img src="images/payments/gift-card.png" alt="بطاقة هدايا" class="pay-option-icon" />
+          <div>بطاقة هدايا</div>
+        </div>
+      </div>
+
+      <!-- Payment Details (Dynamic) -->
+      <div class="pay-number-box" id="payNumberBox">
+        <!-- Vodafone / Instapay / COD Details -->
+        <div id="traditionalPayDetails">
+          <div class="pay-number-header">
+            <span class="pay-number-label" id="payLabel">حوّل المبلغ على رقم فودافون كاش:</span>
+          </div>
+          <div class="pay-number-value">
+            <b id="payNumberVal">جاري التحميل...</b>
+            <button class="copy-btn" id="copyPhoneBtn" onclick="copyToClipboard(document.getElementById('payNumberVal').textContent, this)">
+              <i class='bx bx-copy'></i> نسخ
+            </button>
+          </div>
+          
+          <!-- Owner Name Display -->
+          <div id="ownerNameDisplay" style="margin-top:.7rem;padding:.6rem .8rem;background:rgba(212,175,55,.08);border-radius:8px;display:none">
+            <span style="font-size:.82rem;color:var(--text-dim)">اسم صاحب الحساب: </span>
+            <b id="ownerNameText" style="font-size:.9rem;color:var(--gold);font-family:'Cairo',sans-serif"></b>
+          </div>
+          
+          <!-- Instapay Link (shown when instapay selected) -->
+          <div id="instapaySection" style="display:none;margin-top:1rem;padding-top:1rem;border-top:1px dashed var(--line)">
+            <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:.6rem">أو اضغط للدفع مباشرة عبر إنستاباي:</p>
+            <a href="#" target="_blank" class="instapay-link" id="instapayLink">
+              <i class='bx bx-link-external'></i> فتح رابط الدفع
+            </a>
+          </div>
+        </div>
+
+        <!-- Gift Card Payment Details -->
+        <div id="giftCardPayDetails" style="display:none">
+          <div class="gc-pay-inputs">
+            <div class="field">
+              <label><i class='bx bx-credit-card' style="color:var(--gold)"></i> رقم البطاقة</label>
+              <input type="text" id="gcCardNumberInput" placeholder="TG9A-KD82-XP91-LQW7" style="direction:ltr;text-align:center;font-family:'Cairo',sans-serif;letter-spacing:1px" maxlength="19" />
+            </div>
+            <div class="field">
+              <label><i class='bx bx-lock' style="color:var(--gold)"></i> الرقم السري (PIN)</label>
+              <input type="password" id="gcPinInput" placeholder="••••••" style="direction:ltr;text-align:center;letter-spacing:4px" maxlength="6" />
+            </div>
+          </div>
+          <div id="gcPayStatusMsg" style="font-size:.85rem;margin-top:.6rem;padding:.5rem .8rem;border-radius:8px;display:none"></div>
+          
+          <!-- Partial Payment Section (shown when card doesn't cover full amount) -->
+          <div id="partialPaymentSection" style="display:none;margin-top:1.2rem;padding:1rem;background:rgba(212,175,55,.06);border:1px dashed var(--gold);border-radius:12px">
+            <h4 style="margin:0 0 .8rem;color:var(--gold);font-family:'Cairo',sans-serif;display:flex;align-items:center;gap:.5rem">
+              <i class='bx bx-info-circle'></i> دفع المتبقي
+            </h4>
+            <div id="partialPaymentInfo" style="margin-bottom:1rem;font-size:.9rem"></div>
+            <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:.8rem">اختر طريقة الدفع لاستكمال المبلغ:</p>
+            <div class="partial-pay-options" style="display:flex;gap:.6rem;flex-wrap:wrap">
+              <button class="btn-secondary partial-pay-btn active" data-pmethod="vodafone" onclick="selectPartialPay('vodafone',this)">
+                <img src="images/payments/vodafone-cash.png" style="width:20px;height:20px;margin-left:4px" /> فودافون كاش
+              </button>
+              <button class="btn-secondary partial-pay-btn" data-pmethod="instapay" onclick="selectPartialPay('instapay',this)">
+                <img src="images/payments/instapay.png" style="width:20px;height:20px;margin-left:4px" /> انستاباي
+              </button>
+            </div>
+            <div id="partialPayDetails" style="margin-top:1rem"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Receipt Upload (hidden for giftcard payment method) -->
+      <div class="field" id="receiptField">
+        <label id="receiptLabel">ارفع صورة إيصال التحويل (اختياري للدفع عند الاستلام)</label>
+        <div class="upload-area" onclick="document.getElementById('receiptInput').click()">
+          <img id="receiptPreview" style="display:none" alt="" />
+          <div id="receiptPlaceholder">
+            <i class='bx bx-cloud-upload' style="font-size:2.2rem;color:var(--gold)"></i>
+            <p style="margin-top:.6rem;color:var(--text-dim)">اضغط لرفع صورة الإيصال</p>
+          </div>
+          <div id="receiptStatus"></div>
+        </div>
+        <input type="file" id="receiptInput" accept="image/*" style="display:none" onchange="onReceiptChange()" />
+      </div>
+
+      <button class="btn-primary full-width" style="margin-top:1.5rem" onclick="submitOrder()" id="submitBtn">تأكيد الدفع <i class='bx bx-check-double'></i></button>
+    </div>
+
+    <!-- Right Column - Order Summary -->
+    <div class="card" style="height:fit-content;position:sticky;top:100px">
+      <h3 style="margin-bottom:1.2rem;font-family:'Cairo',sans-serif">طلبك</h3>
+      <div id="orderItemsList"></div>
+      <div class="summary-row"><span>المجموع الفرعي</span><span id="sSub">0 ج.م</span></div>
+      <div class="summary-row"><span>الشحن</span><span id="sShip">يحدد لاحقاً</span></div>
+      <div id="discountRow" class="summary-row" style="display:none"><span>الخصم</span><span id="sDiscount" style="color:var(--success)">-0 ج.م</span></div>
+      <div id="giftCardRow" class="summary-row" style="display:none"><span>بطاقة الهدايا</span><span id="sGiftCard" style="color:var(--success)">-0 ج.م</span></div>
+      <div class="summary-row total"><span>الإجمالي</span><span id="sTotal">0 ج.م</span></div>
+      
+      <div class="field" style="margin-top:1.3rem">
+        <label>كود الخصم (إن وجد)</label>
+        <div style="display:flex;gap:.6rem">
+          <input id="promoCode" placeholder="أدخل الكود" style="flex:1" />
+          <button class="btn-primary" style="padding:0 1.2rem" onclick="applyPromo()">تطبيق</button>
+        </div>
+      </div>
+
+      <div class="field" id="giftCardField">
+        <label><i class='bx bx-gift' style="color:var(--gold)"></i> ادفع ببطاقة هدايا (اختياري)</label>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+          <input id="giftCardNumberInput" placeholder="TG9A-KD82-XP91-LQW7" style="flex:1;min-width:140px;direction:ltr" />
+          <input id="giftCardPinInput" placeholder="PIN" style="width:90px;direction:ltr" maxlength="6" />
+          <button class="btn-secondary" style="padding:0 1.1rem" onclick="applyGiftCardAtCheckout()">تطبيق</button>
+        </div>
+        <div id="giftCardStatusMsg" style="font-size:.8rem;margin-top:.4rem"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Message + WhatsApp Invoice -->
+  <div id="successBox" style="display:none" class="success-container">
+    <i class='bx bx-badge-check'></i>
+    <h2 style="margin-top:1rem;font-family:'Cairo',sans-serif">تم استلام طلبك بنجاح!</h2>
+    <p style="color:var(--text-dim);margin-top:.6rem">سيتم مراجعة إيصال الدفع وتأكيد الطلب خلال وقت قصير</p>
+    <div class="order-code-display" id="orderCodeDisplay"></div>
+    <p style="color:var(--text-dim);font-size:.85rem;margin-top:.8rem">احتفظ برقم الطلب لمتابعة حالة الشحن</p>
+    
+    <!-- WhatsApp Invoice Button -->
+    <a href="#" class="whatsapp-btn" id="whatsappInvoice" target="_blank">
+      <i class='bx bxl-whatsapp'></i> إرسال الفاتورة على واتساب
+    </a>
+    
+    <div class="success-actions">
+      <a href="track.html" class="btn-secondary">تتبع الطلب</a>
+      <a href="/" class="btn-primary">متابعة التسوق</a>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="container footer-bottom">
+    <div class="footer-legal-links">
+      <a href="about.html">من نحن</a>
+      <a href="contact.html">اتصل بنا</a>
+      <a href="privacy-policy.html">سياسة الخصوصية</a>
+      <a href="terms.html">الشروط والأحكام</a>
+      <a href="return-policy.html">سياسة الاسترجاع والاستبدال</a>
+    </div>
+    <p>جميع الحقوق محفوظة © Tiger Jeans 2026 | تطوير
+        <a href="https://www.facebook.com/en.mohamed.nasr" target="_blank" rel="noopener" class="credit-link">
+          <i class='bx bxs-code-alt'></i> المهندس محمد حماد
+        </a>
+      </p>
+  </div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="js/config.js"></script>
+<script src="js/upload.js"></script>
+<script src="js/telegram-bot.js"></script>
+<script>
+let method = "vodafone";
+let receiptUrl = "";
+let paySettings = {};
+let discountAmount = 0;
+let appliedGiftCard = null; // { key, cardNumber, deduction }
+let partialPayMethod = "vodafone"; // for partial payment when gift card doesn't cover full amount
+let gcPaymentData = null; // stores validated gift card data when used as primary payment
+
+const cart = getCart();
+if (!cart.length) location.href = "cart.html";
+
+// Populate governorates dropdown
+document.getElementById("cCity").innerHTML =
+  '<option value="">اختر المحافظة</option>' +
+  EGYPT_GOVERNORATES.map((g) => `<option value="${g}">${g}</option>`).join("");
+document.getElementById("cCity").addEventListener("change", () => {
+  updatePayNumber();
+  updateTotals();
+});
+
+// Render order items
+function renderOrder() {
+  document.getElementById("orderItemsList").innerHTML = cart
+    .map((i) => `<div class="order-item">
+      <img src="${i.image || "images/product-1.png"}" alt="${i.name}" />
+      <div class="item-name">${i.name}${i.size ? " - " + i.size : ""} × ${i.qty}</div>
+      <div class="item-price">${fmtPrice(i.price * i.qty)}</div>
+    </div>`).join("");
+  
+  updateTotals();
+}
+renderOrder();
+
+// Initial call to show payment info with defaults (before Firebase loads)
+updatePayNumber();
+
+// Load payment settings from Firebase (controllable from admin)
+db.ref("settings/payment").once("value").then((snap) => {
+  paySettings = snap.val() || {};
+  // Default values if not set in admin
+  if (!paySettings.vodafone) paySettings.vodafone = "01012345678";
+  if (!paySettings.instapay) paySettings.instapay = "engmohamednasr";
+  if (!paySettings.instapayLink) paySettings.instapayLink = "https://ipn.eg/S/engmohamednasr/instapay/8NShbl";
+  updatePayNumber();
+});
+
+// Load payment methods status (enabled/disabled) from admin
+let availablePaymentMethods = ['vodafone', 'instapay', 'cod', 'giftcard']; // default all enabled
+db.ref("settings/paymentMethods").once("value").then((snap) => {
+  const methodsStatus = snap.val() || {};
+  
+  // Check each method status - INCLUDING GIFTCARD!
+  const methods = {
+    vodafone: methodsStatus.vodafone !== false,
+    instapay: methodsStatus.instapay !== false,
+    cod: methodsStatus.cod !== false,
+    giftcard: methodsStatus.giftcard !== false  // ✅ تمت إضافة بطاقة الهدايا
+  };
+  
+  // Hide disabled payment options
+  Object.keys(methods).forEach(m => {
+    const optionEl = document.querySelector(`.pay-option[data-method="${m}"]`);
+    if (optionEl && !methods[m]) {
+      optionEl.style.display = 'none';
+    }
+  });
+  
+  // Get only enabled methods
+  availablePaymentMethods = Object.keys(methods).filter(m => methods[m]);
+  
+  // If current selected method is disabled, switch to first available
+  if (availablePaymentMethods.indexOf(method) === -1 && availablePaymentMethods.length > 0) {
+    const firstAvailable = document.querySelector(`.pay-option[data-method="${availablePaymentMethods[0]}"]`);
+    if (firstAvailable) {
+      selectPay(availablePaymentMethods[0], firstAvailable);
+    }
+  }
+  
+  // Show warning if no payment methods available
+  if (availablePaymentMethods.length === 0) {
+    document.querySelector('.pay-options').innerHTML = `
+      <div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--text-dim)">
+        <i class='bx bx-error-circle' style="font-size:2rem;color:var(--danger);margin-bottom:.5rem;display:block"></i>
+        <p>لا توجد طرق دفع متاحة حالياً</p>
+        <p style="font-size:.8rem;margin-top:.3rem">يرجى المحاولة لاحقاً أو التواصل معنا</p>
+      </div>
+    `;
+  }
+});
+
+// Load shipping rates per governorate (managed from admin > الشحن)
+let shippingRates = {}; // { governate: cost } — only active rates included
+db.ref("shippingRates").once("value").then((snap) => {
+  const val = snap.val() || {};
+  shippingRates = {};
+  Object.values(val).forEach((r) => {
+    if (r && r.governate && r.active !== false) {
+      shippingRates[r.governate] = r.cost;
+    }
+  });
+  updatePayNumber();
+  updateTotals();
+});
+
+// Returns the shipping cost for the currently selected governorate.
+// Falls back to 0 if no city selected yet, or no rate was set for it in admin.
+function getShippingCost() {
+  const city = document.getElementById("cCity").value;
+  if (!city) return 0;
+  if (Object.prototype.hasOwnProperty.call(shippingRates, city)) {
+    return shippingRates[city];
+  }
+  return 0;
+}
+
+function selectPay(m, el) {
+  method = m;
+  document.querySelectorAll(".pay-option").forEach((p) => p.classList.remove("active"));
+  el.classList.add("active");
+  // Ensure payNumberBox is visible
+  const payNumberBox = document.getElementById("payNumberBox");
+  if (payNumberBox) payNumberBox.style.display = "block";
+  updatePayNumber();
+  updateTotals();
+}
+
+function updatePayNumber() {
+  const traditionalDetails = document.getElementById("traditionalPayDetails");
+  const gcDetails = document.getElementById("giftCardPayDetails");
+  const receiptField = document.getElementById("receiptField");
+  const label = document.getElementById("payLabel");
+  const val = document.getElementById("payNumberVal");
+  const instapaySec = document.getElementById("instapaySection");
+  const copyBtn = document.getElementById("copyPhoneBtn");
+  const ownerNameDisplay = document.getElementById("ownerNameDisplay");
+  const ownerNameText = document.getElementById("ownerNameText");
+  const payNumberBox = document.getElementById("payNumberBox");
+  const receiptLabel = document.getElementById("receiptLabel");
+  
+  // Safety check - ensure elements exist
+  if (!traditionalDetails || !label || !val) {
+    console.warn("updatePayNumber: Required elements not found");
+    return;
+  }
+  
+  // Make sure payNumberBox is visible
+  if (payNumberBox) payNumberBox.style.display = "block";
+  
+  // Hide all special sections first
+  instapaySec.style.display = "none";
+  ownerNameDisplay.style.display = "none";
+  
+  // Reset gift card payment data when switching methods
+  if (method !== "giftcard") {
+    gcPaymentData = null;
+  }
+  
+  if (method === "giftcard") {
+    // Show gift card input fields, hide traditional payment details
+    traditionalDetails.style.display = "none";
+    gcDetails.style.display = "block";
+    const partialSection = document.getElementById("partialPaymentSection");
+    if (gcPaymentData && gcPaymentData.remaining > 0) {
+      // Partial payment already in progress — keep the section and the mandatory receipt field visible
+      if (partialSection) partialSection.style.display = "block";
+      showReceiptFieldForPartialGiftCard();
+    } else {
+      receiptField.style.display = "none";
+      const gcStatusMsg = document.getElementById("gcPayStatusMsg");
+      if (partialSection) partialSection.style.display = "none";
+      if (gcStatusMsg) gcStatusMsg.style.display = "none";
+    }
+  } else {
+    // Show traditional payment details, hide gift card
+    traditionalDetails.style.display = "block";
+    gcDetails.style.display = "none";
+    receiptField.style.display = "block";
+    
+    if (method === "vodafone") {
+      label.textContent = "حوّل المبلغ على رقم فودافون كاش:";
+      val.textContent = paySettings.vodafone || "01012345678";
+      copyBtn.style.display = "inline-flex";
+      // Show Vodafone owner name if available
+      if (paySettings.vodafoneName) {
+        ownerNameText.textContent = paySettings.vodafoneName;
+        ownerNameDisplay.style.display = "block";
+      }
+      if (receiptLabel) receiptLabel.textContent = "ارفع صورة إيصال التحويل (إلزامي)";
+    } else if (method === "instapay") {
+      label.textContent = "حوّل المبلغ على انستاباي للمستخدم:";
+      val.textContent = "@" + (paySettings.instapay || "engmohamednasr");
+      copyBtn.style.display = "inline-flex";
+      // Show Instapay section with link
+      instapaySec.style.display = "block";
+      // Update the link from admin settings
+      document.getElementById("instapayLink").href = paySettings.instapayLink || "#";
+      // Show InstaPay owner name if available
+      if (paySettings.instapayOwner) {
+        ownerNameText.textContent = paySettings.instapayOwner;
+        ownerNameDisplay.style.display = "block";
+      }
+      if (receiptLabel) receiptLabel.textContent = "ارفع صورة إيصال التحويل (إلزامي)";
+    } else {
+      label.textContent = "الدفع عند الاستلام:";
+      const city = document.getElementById("cCity").value;
+      const cost = getShippingCost();
+      val.textContent = city ? `مصاريف الشحن: ${fmtPrice(cost)}` : "اختر المحافظة لمعرفة مصاريف الشحن";
+      copyBtn.style.display = "none";
+      if (receiptLabel) receiptLabel.textContent = "ارفع صورة إيصال التحويل (اختياري للدفع عند الاستلام)";
+    }
+  }
+}
+
+// ====== Gift Card as Primary Payment Method ======
+async function validateGiftCardForPayment() {
+  const rawNumber = document.getElementById("gcCardNumberInput").value.trim().toUpperCase();
+  const pin = document.getElementById("gcPinInput").value.trim();
+  const msgEl = document.getElementById("gcPayStatusMsg");
+  const key = rawNumber.replace(/-/g, "");
+  const partialSection = document.getElementById("partialPaymentSection");
+  const partialInfo = document.getElementById("partialPaymentInfo");
+  
+  if (!key || !pin) {
+    showGcPayMsg("warning", "أدخل رقم البطاقة والرقم السري");
+    return null;
+  }
+  
+  showGcPayMsg("", "جاري التحقق من البطاقة...");
+  
+  try {
+    const snap = await db.ref("giftCards/" + key).once("value");
+    const card = snap.val();
+    
+    if (!card) { showGcPayMsg("error", "رقم البطاقة غير صحيح"); return null; }
+    if (String(card.pin) !== pin) { showGcPayMsg("error", "الرقم السري غير صحيح"); return null; }
+    if (card.status === "expired" || (card.expiresAt && card.expiresAt < Date.now())) { showGcPayMsg("error", "انتهت صلاحية هذه البطاقة"); return null; }
+    if (card.status === "frozen") { showGcPayMsg("error", "هذه البطاقة موقوفة مؤقتًا"); return null; }
+    if (card.status === "used" || card.balance <= 0) { showGcPayMsg("error", "تم استخدام رصيد هذه البطاقة بالكامل"); return null; }
+    if (card.status !== "active") { showGcPayMsg("error", "هذه البطاقة غير مفعّلة"); return null; }
+    
+    // Card is valid - calculate coverage
+    const orderTotal = Math.max(0, cartTotal() + getShippingCost() - discountAmount);
+    const cardBalance = card.balance;
+    const remaining = Math.max(0, orderTotal - cardBalance);
+    
+    gcPaymentData = { key, cardNumber: card.cardNumber, balance: cardBalance, pin, remaining, orderTotal, coversFull: remaining <= 0 };
+    
+    if (remaining <= 0) {
+      // Card covers full amount
+      showGcPayMsg("success", `✓ البطاقة تغطي المبلغ بالكامل! الرصيد المتاح: ${fmtPrice(cardBalance)}`);
+      partialSection.style.display = "none";
+    } else {
+      // Partial payment needed
+      showGcPayMsg("info", `البطاقة تغطي ${fmtPrice(cardBalance)} - يتبقى ${fmtPrice(remaining)} من فضلك اختر وسيلة دفع أخرى لاستكمال المبلغ`);
+      partialInfo.innerHTML = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:.4rem">
+          <span>إجمالي الطلب:</span><b>${fmtPrice(orderTotal)}</b>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:.4rem;color:var(--success)">
+          <span>مدفوع بالبطاقة:</span><b>- ${fmtPrice(cardBalance)}</b>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding-top:.4rem;border-top:1px solid var(--line);color:var(--danger)">
+          <span>المتبقي للدفع:</span><b>${fmtPrice(remaining)}</b>
+        </div>
+      `;
+      partialSection.style.display = "block";
+      updatePartialPayDetails();
+      // Receipt upload is mandatory to complete the remaining amount — open it right away
+      showReceiptFieldForPartialGiftCard();
+    }
+    
+    return gcPaymentData;
+  } catch (err) {
+    console.error(err);
+    showGcPayMsg("error", "تعذر التحقق من البطاقة الآن");
+    return null;
+  }
+}
+
+function showGcPayMsg(type, text) {
+  const el = document.getElementById("gcPayStatusMsg");
+  el.style.display = "block";
+  el.textContent = text;
+  el.className = ""; // reset
+  if (type === "error") el.style.color = "var(--danger)";
+  else if (type === "success") el.style.color = "var(--success)";
+  else if (type === "warning") el.style.color = "#e6a000";
+  else el.style.color = "var(--text-dim)";
+}
+
+// Auto-validate when user finishes entering card details
+document.addEventListener("DOMContentLoaded", () => {
+  const gcCardInput = document.getElementById("gcCardNumberInput");
+  const gcPinInput = document.getElementById("gcPinInput");
+  if (gcCardInput) {
+    gcCardInput.addEventListener("blur", () => { if (method === "giftcard" && gcCardInput.value && gcPinInput.value) validateGiftCardForPayment(); });
+  }
+  if (gcPinInput) {
+    gcPinInput.addEventListener("blur", () => { if (method === "giftcard" && gcCardInput.value && gcPinInput.value) validateGiftCardForPayment(); });
+  }
+});
+
+// ====== Partial Payment Methods ======
+function selectPartialPay(m, el) {
+  partialPayMethod = m;
+  document.querySelectorAll(".partial-pay-btn").forEach((b) => b.classList.remove("active"));
+  el.classList.add("active");
+  updatePartialPayDetails();
+  showReceiptFieldForPartialGiftCard();
+}
+
+// Opens the receipt-upload field and sets a clear mandatory label when
+// a gift card only partially covers the order and the customer must
+// complete the remaining amount via Vodafone Cash / InstaPay
+function showReceiptFieldForPartialGiftCard() {
+  if (!gcPaymentData || gcPaymentData.remaining <= 0) return;
+  const receiptField = document.getElementById("receiptField");
+  const receiptLabel = document.getElementById("receiptLabel");
+  const methodName = partialPayMethod === "vodafone" ? "فودافون كاش" : "انستاباي";
+  if (receiptField) receiptField.style.display = "block";
+  if (receiptLabel) receiptLabel.textContent = `ارفع صورة إيصال تحويل المتبقي (${fmtPrice(gcPaymentData.remaining)}) عبر ${methodName} — إلزامي`;
+}
+
+function updatePartialPayDetails() {
+  const container = document.getElementById("partialPayDetails");
+  if (!container || !gcPaymentData) return;
+  
+  if (partialPayMethod === "vodafone") {
+    container.innerHTML = `
+      <div style="padding:.8rem;background:var(--surface);border-radius:8px;border:1px solid var(--line)">
+        <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:.4rem">حوّل المتبقي (${fmtPrice(gcPaymentData.remaining)}) على:</p>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <b style="font-family:'Cairo',sans-serif;direction:ltr">${paySettings.vodafone || "01012345678"}</b>
+          <button class="copy-btn" style="padding:.4rem .8rem;font-size:.8rem" onclick="copyToClipboard('${paySettings.vodafone || "01012345678"}', this)"><i class='bx bx-copy'></i> نسخ</button>
+        </div>
+        ${paySettings.vodafoneName ? `<p style="font-size:.8rem;color:var(--gold);margin-top:.4rem">اسم الحساب: ${paySettings.vodafoneName}</p>` : ''}
+      </div>
+    `;
+  } else if (partialPayMethod === "instapay") {
+    container.innerHTML = `
+      <div style="padding:.8rem;background:var(--surface);border-radius:8px;border:1px solid var(--line)">
+        <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:.4rem">حوّل المتبقي (${fmtPrice(gcPaymentData.remaining)}) عبر إنستاباي:</p>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <b style="font-family:'Cairo',sans-serif;direction:ltr">@${paySettings.instapay || "engmohamednasr"}</b>
+          <button class="copy-btn" style="padding:.4rem .8rem;font-size:.8rem" onclick="copyToClipboard('@${paySettings.instapay || "engmohamednasr"}', this)"><i class='bx bx-copy'></i> نسخ</button>
+        </div>
+        ${paySettings.instapayOwner ? `<p style="font-size:.8rem;color:var(--gold);margin-top:.4rem">اسم الحساب: ${paySettings.instapayOwner}</p>` : ''}
+        ${paySettings.instapayLink ? `<a href="${paySettings.instapayLink}" target="_blank" class="instapay-link" style="margin-top:.8rem;padding:.65rem 1.2rem;font-size:.85rem"><i class='bx bx-link-external'></i> فتح رابط الدفع المباشر</a>` : ''}
+      </div>
+    `;
+  }
+}
+
+function updateTotals() {
+  let subtotal = cartTotal();
+  let shippingCost = getShippingCost();
+  let preGiftTotal = Math.max(0, subtotal + shippingCost - discountAmount);
+
+  // Recompute gift card deduction against the current total (in case cart/promo changed after applying)
+  let giftDeduction = 0;
+  if (appliedGiftCard) {
+    giftDeduction = Math.min(appliedGiftCard.balance, preGiftTotal);
+    appliedGiftCard.deduction = giftDeduction;
+  }
+
+  let total = preGiftTotal - giftDeduction;
+  const city = document.getElementById("cCity").value;
+  
+  document.getElementById("sSub").textContent = fmtPrice(subtotal);
+  document.getElementById("sShip").textContent = city ? fmtPrice(shippingCost) : "يحدد حسب المحافظة";
+  document.getElementById("sTotal").textContent = fmtPrice(Math.max(0, total));
+  
+  if (discountAmount > 0) {
+    document.getElementById("discountRow").style.display = "flex";
+    document.getElementById("sDiscount").textContent = "-" + fmtPrice(discountAmount);
+  } else {
+    document.getElementById("discountRow").style.display = "none";
+  }
+
+  const giftRow = document.getElementById("giftCardRow");
+  if (appliedGiftCard && giftDeduction > 0) {
+    giftRow.style.display = "flex";
+    document.getElementById("sGiftCard").textContent = "-" + fmtPrice(giftDeduction);
+  } else {
+    giftRow.style.display = "none";
+  }
+}
+
+// ====== Gift Card redemption at checkout ======
+async function applyGiftCardAtCheckout() {
+  const rawNumber = document.getElementById("giftCardNumberInput").value.trim().toUpperCase();
+  const pin = document.getElementById("giftCardPinInput").value.trim();
+  const msgEl = document.getElementById("giftCardStatusMsg");
+  const key = rawNumber.replace(/-/g, "");
+
+  if (!key || !pin) {
+    msgEl.style.color = "var(--danger)";
+    msgEl.textContent = "أدخل رقم البطاقة والرقم السري";
+    return;
+  }
+
+  msgEl.style.color = "var(--text-dim)";
+  msgEl.textContent = "جاري التحقق...";
+
+  try {
+    const snap = await db.ref("giftCards/" + key).once("value");
+    const card = snap.val();
+
+    if (!card) { msgEl.style.color = "var(--danger)"; msgEl.textContent = "رقم البطاقة غير صحيح"; return; }
+    if (String(card.pin) !== pin) { msgEl.style.color = "var(--danger)"; msgEl.textContent = "الرقم السري غير صحيح"; return; }
+    if (card.status === "expired" || (card.expiresAt && card.expiresAt < Date.now())) { msgEl.style.color = "var(--danger)"; msgEl.textContent = "انتهت صلاحية هذه البطاقة"; return; }
+    if (card.status === "frozen") { msgEl.style.color = "var(--danger)"; msgEl.textContent = "هذه البطاقة موقوفة مؤقتًا"; return; }
+    if (card.status === "used" || card.balance <= 0) { msgEl.style.color = "var(--danger)"; msgEl.textContent = "تم استخدام رصيد هذه البطاقة بالكامل"; return; }
+    if (card.status !== "active") { msgEl.style.color = "var(--danger)"; msgEl.textContent = "هذه البطاقة غير مفعّلة"; return; }
+
+    appliedGiftCard = { key, cardNumber: card.cardNumber, balance: card.balance };
+    updateTotals();
+    msgEl.style.color = "var(--success)";
+    msgEl.textContent = `تم تطبيق البطاقة ✓ الرصيد المتاح: ${fmtPrice(card.balance)}`;
+  } catch (err) {
+    console.error(err);
+    msgEl.style.color = "var(--danger)";
+    msgEl.textContent = "تعذر التحقق من البطاقة الآن";
+  }
+}
+
+// Apply promo code
+async function applyPromo() {
+  const code = document.getElementById("promoCode").value.trim().toUpperCase();
+  if (!code) { showToast("أدخل كود الخصم"); return; }
+  
+  try {
+    const snap = await db.ref("promoCodes/" + code).once("value");
+    const promo = snap.val();
+    
+    if (!promo || !promo.active) {
+      showToast("كود الخصم غير صالح");
+      return;
+    }
+    
+    if (promo.discountType === "percentage") {
+      discountAmount = Math.round(cartTotal() * promo.discountValue / 100);
+    } else {
+      discountAmount = promo.discountValue;
+    }
+    
+    showToast(`تم تطبيق خصم ${fmtPrice(discountAmount)} ✓`);
+    updateTotals();
+  } catch (err) {
+    showToast("حدث خطأ في التحقق من الكود");
+  }
+}
+
+// Receipt upload
+async function onReceiptChange() {
+  const input = document.getElementById("receiptInput");
+  const file = input.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    document.getElementById("receiptPreview").src = e.target.result;
+    document.getElementById("receiptPreview").style.display = "block";
+    document.getElementById("receiptPlaceholder").style.display = "none";
+  };
+  reader.readAsDataURL(file);
+  
+  await handleImageInput(input, (url) => { receiptUrl = url; }, document.getElementById("receiptStatus"));
+}
+
+// Generate WhatsApp Invoice
+function generateWhatsAppLink(orderData) {
+  const phone = "201012345678"; // Can be controlled from admin
+  
+  let message = `🛒 *طلب جديد من Tiger Jeans*\n\n`;
+  message += `📋 *رقم الطلب:* ${orderData.code}\n`;
+  message += `👤 *العميل:* ${orderData.customer.name}\n`;
+  message += `📱 *الموبايل:* ${orderData.customer.phone}\n`;
+  message += `🏙️ *المدينة:* ${orderData.customer.city}\n`;
+  message += `📍 *العنوان:* ${orderData.customer.address}\n\n`;
+  message += `📦 *المنتجات:*\n`;
+  
+  orderData.items.forEach((item, idx) => {
+    message += `${idx+1}. ${item.name} ×${item.qty} = ${fmtPrice(item.price * item.qty)}\n`;
+  });
+  
+  message += `\n💰 *المجموع:* ${fmtPrice(orderData.total)}\n`;
+  message += `💳 *طريقة الدفع:* ${getPaymentMethodName(orderData.payment.method)}\n\n`;
+  message += `_تم إنشاء هذا الطلب تلقائياً_`;
+  
+  return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+}
+
+function getPaymentMethodName(method) {
+  const names = { vodafone: "فودافون كاش", instapay: "إنستاباي", cod: "الدفع عند الاستلام", giftcard: "بطاقة هدايا" };
+  return names[method] || method;
+}
+
+// ====== ✅ خصم المخزون تلقائيًا لحظة تأكيد الطلب ======
+// بيستخدم Firebase transaction عشان يمنع أي تعارض لو حصل طلبين على نفس المقاس/اللون في نفس اللحظة
+async function deductStockForOrder(items) {
+  for (const item of items) {
+    if (!item.id || !item.size || !item.color) continue;
+    const key = `${item.size}_${item.color}`;
+    const stockRef = db.ref(`products/${item.id}/stock/${key}`);
+
+    try {
+      const result = await stockRef.transaction((current) => {
+        const currentQty = typeof current === 'number' ? current : 0;
+        return Math.max(0, currentQty - item.qty);
+      });
+
+      if (result.committed) {
+        const newQty = result.snapshot.val();
+        // ✅ تنبيه فوري لو المخزون بقى منخفض بعد الخصم (بدل ما ينتظر cron)
+        if (newQty !== null && newQty <= 2 && typeof window.TelegramBot !== 'undefined') {
+          loadTelegramSettings().then(() => {
+            if (TELEGRAM_CONFIG.enabled) {
+              notifyLowStock(item.name, item.size, item.color, newQty).catch(e => console.log('Telegram lowstock notify error:', e));
+            }
+          });
+        }
+      }
+    } catch (e) {
+      console.error('Stock transaction failed for', item.name, e);
+    }
+  }
+}
+
+// Submit order
+async function submitOrder() {
+  const name = document.getElementById("cName").value.trim();
+  const phone = document.getElementById("cPhone").value.trim();
+  const city = document.getElementById("cCity").value.trim();
+  const address = document.getElementById("cAddress").value.trim();
+  const notes = document.getElementById("cNotes").value.trim();
+
+  // Validation
+  if (!name || !phone || !city || !address) {
+    showToast("من فضلك أكمل بيانات التوصيل");
+    return;
+  }
+  if (!/^01[0125][0-9]{8}$/.test(phone)) {
+    showToast("رقم الموبايل غير صحيح");
+    return;
+  }
+  
+  // Special validation for gift card payment method
+  if (method === "giftcard") {
+    if (!gcPaymentData) {
+      const valid = await validateGiftCardForPayment();
+      if (!valid) return;
+    }
+    // If partial payment needed, require receipt
+    if (gcPaymentData && gcPaymentData.remaining > 0 && !receiptUrl) {
+      showToast(`من فضلك ارفع إيصال تحويل المتبقي (${fmtPrice(gcPaymentData.remaining)})`);
+      // Show receipt field temporarily
+      document.getElementById("receiptField").style.display = "block";
+      document.getElementById("receiptLabel").textContent = `ارفع إيصال تحويل المتبقي (${fmtPrice(gcPaymentData.remaining)}) via ${partialPayMethod === 'vodafone' ? 'فودافون كاش' : 'انستاباي'}`;
+      return;
+    }
+  }
+  
+  const preGiftTotal = Math.max(0, cartTotal() + getShippingCost() - discountAmount);
+  
+  // Calculate gift card deduction (from optional gift card field OR primary payment method)
+  let giftDeduction = 0;
+  let primaryGcData = null;
+  
+  if (method === "giftcard" && gcPaymentData) {
+    // Gift card is the primary payment method
+    giftDeduction = Math.min(gcPaymentData.balance, preGiftTotal);
+    primaryGcData = gcPaymentData;
+  } else if (appliedGiftCard) {
+    // Optional gift card applied in summary
+    giftDeduction = Math.min(appliedGiftCard.balance, preGiftTotal);
+  }
+  
+  const remainingAfterGift = Math.max(0, preGiftTotal - giftDeduction);
+  
+  // For non-giftcard methods (and non-COD), require receipt if there's remaining amount
+  if (method !== "giftcard" && method !== "cod" && remainingAfterGift > 0 && !receiptUrl) {
+    showToast("من فضلك ارفع صورة إيصال التحويل");
+    return;
+  }
+
+  const btn = document.getElementById("submitBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> جاري إرسال الطلب...';
+
+  const code = genOrderCode();
+  const shippingCost = getShippingCost();
+  let total = remainingAfterGift;
+
+  // ✅ خصم رصيد بطاقة الهدايا فورًا وبشكل ذرّي (transaction) لمنع استخدام نفس الرصيد مرتين
+  // يشمل الحالتين: البطاقة كوسيلة دفع أساسية (primaryGcData) أو مطبقة اختياريًا (appliedGiftCard)
+  const giftCardToCharge = primaryGcData || appliedGiftCard;
+  let giftCardResult = null;
+  if (giftCardToCharge && giftDeduction > 0) {
+    try {
+      const balanceRef = db.ref(`giftCards/${giftCardToCharge.key}/balance`);
+      const txResult = await balanceRef.transaction((current) => {
+        if (typeof current !== "number" || current <= 0) return current; // abort, nothing to deduct
+        return Math.max(0, current - giftDeduction);
+      });
+      if (!txResult.committed) {
+        showToast("تعذر تطبيق رصيد بطاقة الهدايا الآن، حاول مرة أخرى");
+        btn.disabled = false;
+        btn.innerHTML = "تأكيد الطلب <i class='bx bx-check-double'></i>";
+        return;
+      }
+      const newBalance = txResult.snapshot.val();
+      const actualUsed = giftCardToCharge.balance - newBalance;
+      giftCardResult = { cardNumber: giftCardToCharge.cardNumber, amountUsed: actualUsed, remainingBalance: newBalance };
+      total = Math.max(0, preGiftTotal - actualUsed);
+
+      if (newBalance <= 0) {
+        await db.ref(`giftCards/${giftCardToCharge.key}`).update({ status: "used" });
+      }
+      // Redemption log (best-effort, not blocking order creation)
+      db.ref(`giftCards/${giftCardToCharge.key}/redemptions`).push({
+        orderId: code, amount: actualUsed, ts: Date.now()
+      }).catch((e) => console.error("gift card redemption log error", e));
+    } catch (e) {
+      console.error("gift card transaction failed", e);
+      showToast("حدث خطأ أثناء تطبيق بطاقة الهدايا");
+      btn.disabled = false;
+      btn.innerHTML = "تأكيد الطلب <i class='bx bx-check-double'></i>";
+      return;
+    }
+  }
+  
+  const order = {
+    code,
+    items: cart,
+    subtotal: cartTotal(),
+    shippingCost,
+    discount: discountAmount,
+    total: Math.max(0, total),
+    customer: { name, phone, city, address, notes },
+    uid: (typeof currentUser !== "undefined" && currentUser) ? currentUser.uid : null,
+    payment: { 
+      method, 
+      receiptImage: receiptUrl || null,
+      status: (total <= 0) ? "paid" : (method === "cod" ? "pending_payment" : "pending_verification"),
+      giftCard: giftCardResult
+    },
+    status: "pending",
+    statusHistory: [{ 
+      status: "pending", 
+      note: method === "cod" ? "تم استلام الطلب - في انتظار الدفع عند الاستلام" : "تم استلام الطلب وفي انتظار مراجعة الدفع", 
+      ts: Date.now() 
+    }],
+    createdAt: Date.now()
+  };
+
+  try {
+    const orderRef = await db.ref("orders").push(order);
+    const orderId = orderRef.key;
+    
+    // Add orderCode and ID for Telegram notification
+    order.orderCode = code;
+    order.id = orderId;
+    order.totalPrice = order.total;
+    
+    localStorage.setItem("tj_customer_phone", phone);
+
+    // ✅ خصم المخزون فورًا لحظة تأكيد الطلب (كان بيتم يدوي بس من الأدمن)
+    deductStockForOrder(order.items).catch(e => console.error('Stock deduction error:', e));
+
+    clearCart();
+    
+    // Hide form, show success
+    document.getElementById("checkoutForm").style.display = "none";
+    document.getElementById("successBox").style.display = "block";
+    document.getElementById("orderCodeDisplay").textContent = code;
+    
+    // Set WhatsApp invoice link
+    document.getElementById("whatsappInvoice").href = generateWhatsAppLink(order);
+    
+    // Send Telegram notification (async, don't block UI)
+    if (typeof window.TelegramBot !== 'undefined') {
+      loadTelegramSettings().then(() => {
+        if (TELEGRAM_CONFIG.enabled) {
+          notifyNewOrder(order).catch(e => console.log('Telegram notify error:', e));
+
+          // ✅ لو الدفع مش عند الاستلام وفيه إيصال مرفوع، ابعت تأكيد دفع فورًا
+          if (method !== 'cod' && receiptUrl) {
+            notifyPaymentConfirmation(order).catch(e => console.log('Telegram payment notify error:', e));
+          }
+        }
+      });
+    }
+    
+  } catch (err) {
+    showToast("حدث خطأ أثناء إرسال الطلب، حاول مرة أخرى");
+    btn.disabled = false;
+    btn.innerHTML = "تأكيد الطلب <i class='bx bx-check-double'></i>";
+  }
+}
+
+// ====== Copy to Clipboard ======
+function copyToClipboard(text, btnElement) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      showCopySuccess(btnElement);
+    }).catch(() => fallbackCopy(text, btnElement));
+  } else {
+    fallbackCopy(text, btnElement);
+  }
+}
+
+function fallbackCopy(text, btnElement) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+  try {
+    document.execCommand('copy');
+    showCopySuccess(btnElement);
+  } catch (err) {
+    showToast("فشل النسخ");
+  }
+  document.body.removeChild(textarea);
+}
+
+function showCopySuccess(btn) {
+  const originalText = btn.innerHTML;
+  btn.classList.add('copied');
+  btn.innerHTML = '<i class=\'bx bx-check\'></i> تم النسخ!';
+  setTimeout(() => {
+    btn.classList.remove('copied');
+    btn.innerHTML = originalText;
+  }, 2000);
+}
+</script>
+
+<!-- ====== Bottom Navigation (Mobile, <992px) ====== -->
+<nav class="bottom-nav" aria-label="التنقل السفلي">
+  <div class="bottom-nav-inner">
+    <a href="/" data-nav="home" class=""><i class='bx bx-home-alt'></i><span>الرئيسية</span></a>
+    <a href="/#products" data-nav="search" class="" onclick="if(window.location.pathname==='/'||window.location.pathname.endsWith('/index.html')){event.preventDefault();toggleSearch();}"><i class='bx bx-search'></i><span>بحث</span></a>
+    <a href="/#products" data-nav="categories" class=""><i class='bx bx-category'></i><span>الأقسام</span></a>
+    <a href="cart.html" data-nav="cart" class="active"><i class='bx bx-cart-alt'></i><span>السلة</span><span class="bn-badge cart-badge" style="display:none">0</span></a>
+    <a href="gift-cards.html" data-nav="giftcards"><i class='bx bx-gift'></i><span>هدايا</span></a>
+    <a href="orders.html" id="bottomAccountLink" data-nav="account" class=""><i class='bx bx-user'></i><span>طلباتي</span></a>
+  </div>
+</nav>
+<script src="js/tiger-ai.js"></script>
+</body>
+</html>

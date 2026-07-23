@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>تتبع الطلب | Tiger Jeans</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="shortcut icon" href="images/favicon-32x32.png" type="image/png" />
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+<style>
+.page-hero{padding:2.5rem 0;border-bottom:1px solid var(--line);background:var(--bg-alt)}
+.page-hero h1{font-size:1.8rem;font-weight:800}
+.breadcrumb{color:var(--text-dim);font-size:.85rem;margin-top:.5rem}
+.breadcrumb a:hover{color:var(--gold)}
+
+.track-container{max-width:680px;margin:3rem auto}
+.search-box{
+  display:flex;
+  gap:.8rem;
+  margin-bottom:2.5rem;
+}
+.search-box input{
+  flex:1;
+  padding:1rem 1.3rem;
+  font-size:1rem;
+}
+
+.order-card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:1.6rem;
+  margin-bottom:1.2rem;
+}
+.order-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:1.2rem;
+  flex-wrap:wrap;
+  gap:.7rem;
+}
+.order-code-text{
+  font-family:'Cairo',sans-serif;
+  color:var(--gold);
+  font-weight:800;
+  font-size:1.05rem;
+}
+.order-date{
+  color:var(--text-dim);
+  font-size:.88rem;
+  margin-bottom:1rem;
+}
+.order-total{
+  color:var(--gold);
+  font-weight:700;
+  font-family:'Cairo',sans-serif;
+}
+
+/* Status Badge */
+.status-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:.4rem;
+  padding:.4rem .9rem;
+  border-radius:999px;
+  font-size:.8rem;
+  font-weight:700;
+}
+.status-pending{background:rgba(224,166,60,.15);color:var(--warn)}
+.status-confirmed{background:rgba(62,207,142,.15);color:var(--success)}
+.status-shipping{background:rgba(58,77,112,.4);color:#9db3e0}
+.status-delivered{background:rgba(62,207,142,.25);color:var(--success)}
+.status-cancelled{background:rgba(224,85,75,.15);color:var(--danger)}
+
+/* Timeline */
+.timeline{
+  border-right:2px solid var(--line);
+  margin-right:12px;
+  padding-right:1.8rem;
+  margin-top:1.5rem;
+}
+.timeline-item{
+  position:relative;
+  padding-bottom:1.8rem;
+}
+.timeline-item::before{
+  content:'';
+  position:absolute;
+  right:-1.6rem;
+  top:.25rem;
+  width:14px;height:14px;
+  border-radius:50%;
+  background:var(--line);
+  border:3px solid var(--bg);
+}
+.timeline-item.done::before{background:var(--gold)}
+.timeline-item b{display:block;font-size:.92rem;margin-bottom:.3rem}
+.timeline-item .note{color:var(--text-dim);font-size:.82rem}
+
+/* Tracking Button */
+.tracking-btn{
+  display:inline-flex;align-items:center;gap:.4rem;
+  background:linear-gradient(135deg,#3b82f6,#1d4ed8);
+  color:#fff !important;
+  padding:.6rem 1.2rem;border-radius:10px;
+  font-size:.88rem;font-weight:700;
+  text-decoration:none;transition:.2s;margin-top:1rem;
+  box-shadow:0 2px 8px rgba(59,130,246,.3);
+}
+.tracking-btn:hover{
+  transform:translateY(-1px);box-shadow:0 4px 12px rgba(59,130,246,.4);
+  text-decoration:none !important;
+}
+.tracking-btn i{font-size:1.1rem}
+
+.tracking-info-bar{
+  background:rgba(59,130,246,.08);
+ border:1px solid rgba(59,130,246,.2);
+ border-radius:10px;padding:.8rem 1rem;
+ margin-top:1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.7rem;
+}
+.tracking-info-bar .company-name{font-weight:700;color:#3b82f6;font-size:.9rem}
+.tracking-info-bar .tracking-num{font-family:'Cairo',monospace;direction:ltr;text-align:left;color:var(--text)}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="container">
+    <div class="header-main">
+      <a href="/" class="logo">
+        <img src="images/logo-icon.png" class="logo-icon" alt="Tiger Jeans" />
+        <div class="logo-text"><strong>TIGER JEANS</strong><small>لأرقى الملابس العالمية</small></div>
+      </a>
+      <nav class="main-nav">
+        <a href="/">الرئيسية</a>
+        <a href="/#products">المتجر</a>
+        <a href="track.html" class="active">تتبع الطلب</a>
+        <a href="gift-cards.html">بطاقات الهدايا</a>
+      </nav>
+      <div class="header-actions">
+        <a href="orders.html" class="action-btn" title="طلباتي"><i class='bx bx-receipt'></i></a>
+        <a href="wishlist.html" class="action-btn wishlist-btn-header"><i class='bx bx-heart'></i><span class="wishlist-badge" style="display:none">0</span></a>
+        <a href="cart.html" class="action-btn cart-btn"><i class='bx bx-cart-alt'></i><span class="cart-badge" style="display:none">0</span></a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Page Hero -->
+<div class="page-hero">
+  <div class="container">
+    <h1>تتبع طلبك</h1>
+    <div class="breadcrumb"><a href="/">الرئيسية</a> / تتبع الطلب</div>
+  </div>
+</div>
+
+<!-- Track Content -->
+<div class="container">
+  <div class="track-container">
+    <div class="search-box">
+      <input id="trackInput" placeholder="أدخل رقم الطلب (مثال: TJ-123456) أو رقم الموبايل" />
+      <button class="btn-primary" onclick="doTrack()">بحث</button>
+    </div>
+    <div id="trackResults"></div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="container footer-bottom">
+    <div class="footer-legal-links">
+      <a href="about.html">من نحن</a>
+      <a href="contact.html">اتصل بنا</a>
+      <a href="privacy-policy.html">سياسة الخصوصية</a>
+      <a href="terms.html">الشروط والأحكام</a>
+      <a href="return-policy.html">سياسة الاسترجاع والاستبدال</a>
+    </div>
+    <p>جميع الحقوق محفوظة © Tiger Jeans 2026 | تطوير
+        <a href="https://www.facebook.com/en.mohamed.nasr" target="_blank" rel="noopener" class="credit-link">
+          <i class='bx bxs-code-alt'></i> المهندس محمد حماد
+        </a>
+      </p>
+  </div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="js/config.js"></script>
+<script>
+const STATUS_LABELS = {
+  pending: "بانتظار مراجعة الدفع",
+  confirmed: "تم تأكيد الطلب",
+  shipping: "جاري الشحن",
+  delivered: "تم التسليم",
+  cancelled: "ملغي"
+};
+const STATUS_ORDER = ["pending", "confirmed", "shipping", "delivered"];
+
+// ====== Tracking URL Helper ======
+function getTrackingUrl(company, trackingNumber) {
+  if (!trackingNumber) return "#";
+  const urls = {
+    bosta: `https://bosta.co/ar-eg/tracking-shipments?shipment-number=${trackingNumber}`,
+    aramex: `https://www.aramex.com/track/details?ShipmentNumber=${trackingNumber}`,
+    smsa: `https://smsaexpress.com/tracking?tracknumbers=${trackingNumber}`,
+    dhl: `https://www.dhl.com/eg-en/tracking.html?tracking-id=${trackingNumber}`,
+    fedex: `https://www.fedex.com/fedextrack/?trknbr=${trackingNumber}`,
+    other: "#"
+  };
+  return urls[company] || urls.bosta;
+}
+
+function getShippingCompanyName(companyKey) {
+  const companies = {
+    bosta: "بوستا (Bosta)",
+    aramex: "أرامكس (Aramex)",
+    smsa: "سمسا (SMSA)",
+    dhl: "DHL",
+    fedex: "FedEx",
+    other: "شركة شحن"
+  };
+  return companies[companyKey] || companyKey;
+}
+
+async function doTrack() {
+  const q = document.getElementById("trackInput").value.trim();
+  const results = document.getElementById("trackResults");
+  
+  if (!q) { showToast("اكتب رقم الطلب أو رقم الموبايل"); return; }
+  
+  results.innerHTML = `<div class="loading-state"><i class='bx bx-loader-alt bx-spin' style="font-size:2rem"></i><p style="margin-top:1rem">جاري البحث...</p></div>`;
+
+  try {
+    const snap = await db.ref("orders").once("value");
+    const all = snap.val() || {};
+    
+    const matches = Object.entries(all).filter(([id, o]) =>
+      o.code === q || (o.customer && o.customer.phone === q)
+    );
+
+    if (!matches.length) {
+      results.innerHTML = `
+        <div class="empty-state">
+          <i class='bx bx-search-alt'></i>
+          <p>لم يتم العثور على أي طلب بهذه البيانات</p>
+        </div>`;
+      return;
+    }
+
+    results.innerHTML = matches.map(([id, o]) => {
+      const cls = o.status === "cancelled" ? "cancelled" : o.status;
+      const currentIdx = STATUS_ORDER.indexOf(o.status);
+      
+      return `
+      <div class="order-card">
+        <div class="order-header">
+          <div>رقم الطلب: <b class="order-code-text">${o.code}</b></div>
+          <span class="status-badge status-${cls}">${STATUS_LABELS[o.status] || o.status}</span>
+        </div>
+        <div class="order-date">
+          ${new Date(o.createdAt).toLocaleDateString("ar-EG", {year:'numeric',month:'long',day:'numeric'})} 
+          — الإجمالي: <span class="order-total">${fmtPrice(o.total)}</span>
+        </div>
+        ${o.status === 'shipping' && o.trackingNumber ? `
+        <div class="tracking-info-bar">
+          <div>
+            <div class="company-name"><i class='bx bx-truck'></i> ${getShippingCompanyName(o.shippingCompany)}</div>
+            <div class="tracking-num">رقم الشحنة: ${o.trackingNumber}</div>
+          </div>
+          <a href="${getTrackingUrl(o.shippingCompany, o.trackingNumber)}" target="_blank" rel="noopener" class="tracking-btn">
+            <i class='bx bx-target-lock'></i> تتبع طلبك لحظة بلحظة
+          </a>
+        </div>` : ''}
+        ${o.status === "cancelled" ? "" : `
+        <div class="timeline">
+          ${STATUS_ORDER.map((s, i) => `
+            <div class="timeline-item ${i <= currentIdx ? 'done' : ''}">
+              <b>${STATUS_LABELS[s]}</b>
+              ${i === currentIdx && o.statusHistory && o.statusHistory.length ? 
+                `<div class="note">${o.statusHistory[o.statusHistory.length - 1].note || ""}</div>` : ""}
+            </div>`).join("")}
+        </div>`}
+      </div>`;
+    }).join("");
+    
+  } catch (err) {
+    showToast("حدث خطأ أثناء البحث");
+    results.innerHTML = '<div class="empty-state"><i class="bx bx-error"></i><p>حدث خطأ، حاول مرة أخرى</p></div>';
+  }
+}
+
+// Enter key support
+document.getElementById("trackInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") doTrack();
+});
+</script>
+
+<!-- ====== Bottom Navigation (Mobile, <992px) ====== -->
+<nav class="bottom-nav" aria-label="التنقل السفلي">
+  <div class="bottom-nav-inner">
+    <a href="/" data-nav="home" class=""><i class='bx bx-home-alt'></i><span>الرئيسية</span></a>
+    <a href="/#products" data-nav="search" class="" onclick="if(window.location.pathname==='/'||window.location.pathname.endsWith('/index.html')){event.preventDefault();toggleSearch();}"><i class='bx bx-search'></i><span>بحث</span></a>
+    <a href="/#products" data-nav="categories" class=""><i class='bx bx-category'></i><span>الأقسام</span></a>
+    <a href="cart.html" data-nav="cart" class=""><i class='bx bx-cart-alt'></i><span>السلة</span><span class="bn-badge cart-badge" style="display:none">0</span></a>
+    <a href="gift-cards.html" data-nav="giftcards"><i class='bx bx-gift'></i><span>هدايا</span></a>
+    <a href="orders.html" id="bottomAccountLink" data-nav="account" class="active"><i class='bx bx-user'></i><span>طلباتي</span></a>
+  </div>
+</nav>
+<script src="js/tiger-ai.js"></script>
+</body>
+</html>

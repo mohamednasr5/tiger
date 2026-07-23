@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+<title>بطاقة هداياك | Tiger Jeans</title>
+<meta name="description" content="بطاقة هدايا فاخرة من Tiger Jeans - اكتشف هديتك الخاصة" />
+<meta name="robots" content="noindex, follow" />
+<meta name="theme-color" content="#d4af37" />
+<link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png" />
+<link rel="shortcut icon" href="images/favicon-32x32.png" type="image/png" />
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --gold: #d4af37;
+  --gold-deep: #b8962e;
+  --gold-light: #f5d97c;
+  --bg: #0a0a0f;
+  --surface: #14141c;
+  --text: #ffffff;
+  --text-dim: #9ca3af;
+  --success: #22c55e;
+  --danger: #ef4444;
+  --line: rgba(255,255,255,0.08);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Tajawal', 'Cairo', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ====== LOADING SCREEN ====== */
+.loading-screen {
+  position:fixed; inset:0; z-index:9999;
+  background:linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
+  display:flex; align-items:center; justify-content:center;
+  flex-direction:column; transition:opacity .8s ease, visibility .8s ease;
+}
+.loading-screen.hidden { opacity:0; visibility:hidden; }
+.gift-loader {
+  width:80px; height:80px; position:relative;
+}
+.gift-loader::before {
+  content:'🎁'; font-size:48px;
+  animation:giftBounce 1s ease-in-out infinite;
+}
+@keyframes giftBounce {
+  0%,100%{ transform:translateY(0) scale(1); }
+  50%{ transform:translateY(-20px) scale(1.1); }
+}
+.loading-text { margin-top:1rem; color:var(--gold); font-size:.9rem; letter-spacing:2px; }
+
+/* ====== MAIN CONTAINER ====== */
+.gc-page {
+  min-height:100vh;
+  position:relative;
+  padding-bottom:3rem;
+}
+
+/* ====== ANIMATED BACKGROUND ====== */
+.bg-canvas {
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:radial-gradient(ellipse at center, rgba(212,175,55,0.03) 0%, transparent 70%);
+}
+
+/* Floating particles */
+.particles-container {
+  position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden;
+}
+.particle {
+  position:absolute; opacity:0; animation:floatUp linear infinite;
+}
+.particle.rose::before { content:'🌹'; font-size:20px; }
+.particle.star::before { content:'✨'; font-size:16px; }
+.particle.sparkle::before { content:'⭐'; font-size:14px; }
+.particle.heart::before { content:'💝'; font-size:18px; }
+.particle.confetti::before { content:'🎊'; font-size:22px; }
+
+@keyframes floatUp {
+  0%{ transform:translateY(100vh) rotate(0deg); opacity:0; }
+  10%{ opacity:1; }
+  90%{ opacity:.8; }
+  100%{ transform:translateY(-10vh) rotate(360deg); opacity:0; }
+}
+
+/* ====== ENVELOPE OPENING ANIMATION ====== */
+.envelope-stage {
+  position:fixed; inset:0; z-index:100;
+  display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg, #0a0a0f 0%, #16213e 100%);
+  transition:opacity 1s ease, visibility 1s ease;
+}
+.envelope-stage.hidden { opacity:0; visibility:hidden; pointer-events:none; }
+
+.envelope-wrapper {
+  perspective:1000px; cursor:pointer;
+}
+.envelope {
+  width:320px; height:200px;
+  position:relative;
+  transform-style:preserve-3d;
+  transition:transform .5s ease;
+}
+.envelope:hover { transform:scale(1.02); }
+
+.envelope-body {
+  width:100%; height:100%;
+  background:linear-gradient(135deg, #8b0000 0%, #b22222 50%, #8b0000 100%);
+  border-radius:8px;
+  box-shadow:0 20px 60px rgba(139,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.1);
+  position:relative;
+  overflow:hidden;
+}
+.envelope-body::before {
+  content:''; position:absolute; inset:0;
+  background:repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(255,255,255,0.02) 10px,
+    rgba(255,255,255,0.02) 20px
+  );
+}
+
+/* Envelope flap */
+.envelope-flap {
+  position:absolute; top:0; left:0; right:0;
+  height:100px;
+  background:linear-gradient(180deg, #a00 0%, #900 100%);
+  clip-path:polygon(0 0, 50% 70%, 100% 0);
+  transform-origin:top center;
+  transition:transform .8s cubic-bezier(.68,-.55,.265,1.55);
+  z-index:3;
+}
+.envelope.opened .envelope-flap {
+  transform:rotateX(-180deg);
+}
+
+/* Wax seal */
+.wax-seal {
+  position:absolute; top:40px; left:50%;
+  transform:translateX(-50%);
+  width:50px; height:50px;
+  background:radial-gradient(circle at 30% 30%, #d4af37, #b8962e);
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:24px;
+  box-shadow:0 4px 15px rgba(212,175,55,0.4), inset 0 2px 4px rgba(255,255,255,0.3);
+  z-index:4;
+  cursor:pointer;
+  transition:transform .3s ease;
+}
+.wax-seal:hover { transform:translateX(-50%) scale(1.1); }
+
+/* Envelope open state */
+.envelope.opened .envelope-body {
+  animation:envelopeGlow 2s ease-in-out infinite alternate;
+}
+@keyframes envelopeGlow {
+  from{ box-shadow:0 20px 60px rgba(139,0,0,0.5), 0 0 30px rgba(212,175,55,0.2); }
+  to{ box-shadow:0 20px 60px rgba(139,0,0,0.5), 0 0 50px rgba(212,175,55,0.4); }
+}
+
+.tap-hint {
+  text-align:center; margin-top:2rem;
+  color:var(--gold); font-size:.9rem;
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100%{ opacity:.6; transform:scale(1); }
+  50%{ opacity:1; transform:scale(1.05); }
+}
+
+/* ====== GIFT CARD DISPLAY ====== */
+.card-reveal-section {
+  min-height:100vh;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:2rem 1rem;
+  position:relative; z-index:10;
+  opacity:0; transform:translateY(30px);
+  transition:all 1s ease .5s;
+}
+.card-reveal-section.visible {
+  opacity:1; transform:translateY(0);
+}
+
+/* Sender message */
+.sender-message {
+  text-align:center; max-width:500px; margin-bottom:2rem;
+  animation:fadeInUp 1s ease .7s both;
+}
+@keyframes fadeInUp {
+  from{ opacity:0; transform:translateY(20px); }
+  to{ opacity:1; transform:translateY(0); }
+}
+.sender-message h1 {
+  font-family:'Cairo', sans-serif;
+  font-size:1.6rem; font-weight:800;
+  background:linear-gradient(135deg, var(--gold), var(--gold-light));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+  margin-bottom:.8rem;
+  line-height:1.6;
+}
+.sender-message p {
+  color:var(--text-dim); font-size:1rem; line-height:1.8;
+}
+
+/* Credit Card Style Gift Card */
+.gift-card-visual {
+  width:380px; max-width:95vw;
+  aspect-ratio:1.586; /* Credit card ratio */
+  border-radius:20px;
+  position:relative;
+  transform-style:preserve-3d;
+  perspective:1000px;
+  animation:cardEntrance 1.2s cubic-bezier(.34,1.56,.64,1) 1s both;
+  cursor:default;
+}
+@keyframes cardEntrance {
+  from{ opacity:0; transform:rotateY(-30deg) translateZ(-100px) scale(0.8); }
+  to{ opacity:1; transform:rotateY(0) translateZ(0) scale(1); }
+}
+
+.gift-card-inner {
+  width:100%; height:100%;
+  position:relative;
+  border-radius:20px;
+  overflow:hidden;
+  background:linear-gradient(135deg, #1a1a2e 0%, #16213e 30%, #0f3460 60%, #1a1a2e 100%);
+  box-shadow:
+    0 25px 50px rgba(0,0,0,0.5),
+    0 0 0 2px rgba(212,175,55,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+  transition:transform .3s ease;
+}
+.gift-card-visual:hover .gift-card-inner {
+  transform:rotateY(-5deg) rotateX(5deg);
+}
+
+/* Card shine effect */
+.gift-card-inner::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255,255,255,0.08) 45%,
+    rgba(255,255,255,0.15) 50%,
+    rgba(255,255,255,0.08) 55%,
+    transparent 60%
+  );
+  pointer-events:none;
+  animation:cardShine 4s ease-in-out infinite;
+}
+@keyframes cardShine {
+  0%,100%{ transform:translateX(-100%); }
+  50%{ transform:translateX(100%); }
+}
+
+/* Card pattern overlay */
+.gift-card-inner::after {
+  content:''; position:absolute; inset:0;
+  background-image:
+    radial-gradient(circle at 20% 80%, rgba(212,175,55,0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(212,175,55,0.05) 0%, transparent 50%);
+  pointer-events:none;
+}
+
+/* Brand logo on card */
+.card-brand {
+  position:absolute; top:20px; left:24px;
+  display:flex; align-items:center; gap:8px;
+}
+.card-brand-logo {
+  width:36px; height:36px;
+  background:linear-gradient(135deg, var(--gold), var(--gold-deep));
+  border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-weight:900; font-size:14px; color:#000;
+}
+.card-brand-name {
+  font-family:'Cairo', sans-serif;
+  font-size:1.1rem; font-weight:800;
+  color:var(--gold); letter-spacing:2px;
+}
+
+/* Chip */
+.card-chip {
+  position:absolute; top:65px; left:24px;
+  width:45px; height:34px;
+  background:linear-gradient(135deg, #d4af37 0%, #f5d97c 50%, #d4af37 100%);
+  border-radius:6px;
+  box-shadow:inset 0 2px 4px rgba(0,0,0,0.2);
+  position:relative;
+}
+.card-chip::before {
+  content:''; position:absolute; inset:4px;
+  background:repeating-linear-gradient(
+    90deg,
+    #c9a227 0px, #c9a227 2px,
+    #e8c547 2px, #e8c547 4px
+  );
+  border-radius:3px;
+}
+
+/* Contactless */
+.card-contactless {
+  position:absolute; top:72px; right:24px;
+  width:28px; height:28px;
+  border:2px solid rgba(212,175,55,0.6);
+  border-radius:50%;
+  background:radial-gradient(circle, transparent 40%, rgba(212,175,55,0.3) 50%, transparent 51%),
+              radial-gradient(circle at 33% 33%, transparent 35%, rgba(212,175,55,0.3) 36%, transparent 37%),
+              radial-gradient(circle at 66% 33%, transparent 35%, rgba(212,175,55,0.3) 36%, transparent 37%),
+              radial-gradient(circle at 33% 66%, transparent 35%, rgba(212,175,55,0.3) 36%, transparent 37%),
+              radial-gradient(circle at 66% 66%, transparent 35%, rgba(212,175,55,0.3) 36%, transparent 37%);
+  opacity:.7;
+}
+
+/* Card number */
+.card-number-container {
+  position:absolute; bottom:75px; left:24px; right:24px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.card-number {
+  font-family:'Cairo', monospace;
+  font-size:1.25rem; font-weight:700;
+  letter-spacing:3px; direction:ltr;
+  color:#fff; text-shadow:0 2px 4px rgba(0,0,0,0.3);
+}
+.copy-btn-mini {
+  background:rgba(212,175,55,0.2); border:1px solid rgba(212,175,55,0.4);
+  color:var(--gold); padding:4px 10px; border-radius:6px;
+  font-size:.7rem; cursor:pointer;
+  display:flex; align-items:center; gap:4px;
+  transition:all .2s ease;
+}
+.copy-btn-mini:hover { background:rgba(212,175,55,0.3); }
+
+/* Card holder & expiry */
+.card-details-row {
+  position:absolute; bottom:22px; left:24px; right:24px;
+  display:flex; justify-content:space-between; align-items:flex-end;
+}
+.card-holder-label, .card-expiry-label {
+  font-size:.65rem; text-transform:uppercase; letter-spacing:1px;
+  color:rgba(255,255,255,0.5); margin-bottom:4px;
+}
+.card-holder-value {
+  font-family:'Cairo', sans-serif;
+  font-size:.85rem; font-weight:600; color:#fff;
+}
+.card-expiry-value {
+  font-family:'Cairo', monospace;
+  font-size:.85rem; font-weight:700; color:var(--gold);
+  direction:ltr;
+}
+
+/* PIN Section below card */
+.pin-section {
+  margin-top:1.5rem; text-align:center;
+  animation:fadeInUp 1s ease 1.3s both;
+}
+.pin-display {
+  display:inline-flex; align-items:center; gap:1rem;
+  background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.2);
+  padding:1rem 2rem; border-radius:16px;
+}
+.pin-label { color:var(--text-dim); font-size:.85rem; }
+.pin-value {
+  font-family:'Cairo', monospace;
+  font-size:1.8rem; font-weight:800; letter-spacing:6px;
+  color:var(--gold); direction:ltr;
+}
+
+/* ====== CARD INFO SECTION ====== */
+.card-info-section {
+  max-width:500px; width:95%; margin:2rem auto 0;
+  background:rgba(20,20,28,0.8); backdrop-filter:blur(10px);
+  border:1px solid var(--line); border-radius:20px;
+  padding:2rem; position:relative; z-index:10;
+  animation:fadeInUp 1s ease 1.5s both;
+}
+
+.info-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:1rem;
+  margin-bottom:1.5rem;
+}
+.info-item {
+  background:rgba(255,255,255,0.03); padding:1rem;
+  border-radius:12px; border:1px solid var(--line);
+}
+.info-item-label {
+  font-size:.78rem; color:var(--text-dim); margin-bottom:.3rem;
+}
+.info-item-value {
+  font-family:'Cairo', sans-serif;
+  font-size:1.1rem; font-weight:700; color:var(--gold);
+}
+
+/* Usage history */
+.usage-history {
+  border-top:1px solid var(--line); padding-top:1.5rem;
+}
+.usage-history h3 {
+  font-family:'Cairo', sans-serif; font-size:1rem;
+  margin-bottom:1rem; color:var(--text-dim);
+}
+.usage-entry {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:.8rem; background:rgba(255,255,255,0.02);
+  border-radius:8px; margin-bottom:.5rem; font-size:.88rem;
+}
+.usage-entry-amount { color:var(--danger); font-weight:600; }
+.usage-entry-date { color:var(--text-dim); font-size:.8rem; }
+
+/* Countdown timer */
+.countdown-section {
+  text-align:center; margin-top:1.5rem;
+  padding:1.5rem; background:rgba(212,175,55,0.05);
+  border:1px dashed rgba(212,175,55,0.3); border-radius:12px;
+}
+.countdown-title {
+  font-size:.85rem; color:var(--text-dim); margin-bottom:1rem;
+}
+.countdown-timer {
+  display:flex; justify-content:center; gap:.8rem;
+  direction:ltr;
+}
+.countdown-unit {
+  background:rgba(0,0,0,0.3); padding:.8rem .6rem;
+  border-radius:10px; min-width:60px;
+  text-align:center;
+}
+.countdown-value {
+  font-family:'Cairo', sans-serif;
+  font-size:1.8rem; font-weight:800; color:var(--gold);
+  line-height:1;
+}
+.countdown-label {
+  font-size:.7rem; color:var(--text-dim); margin-top:.4rem;
+}
+
+/* ====== EXPIRED/OVERLAY STATE ====== */
+.card-overlay-state {
+  position:absolute; inset:0; z-index:50;
+  background:rgba(10,10,15,0.95); backdrop-filter:blur(8px);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  border-radius:20px; display:none;
+}
+.card-overlay-state.visible { display:flex; }
+.overlay-icon { font-size:4rem; margin-bottom:1rem; }
+.overlay-title {
+  font-family:'Cairo', sans-serif;
+  font-size:1.5rem; font-weight:800; margin-bottom:.5rem;
+}
+.overlay-title.expired { color:var(--danger); }
+.overlay-title.used { color:var(--text-dim); }
+.overlay-text { color:var(--text-dim); text-align:center; max-width:280px; line-height:1.6; }
+.overlay-btn {
+  margin-top:1.5rem; padding:.8rem 2rem;
+  background:linear-gradient(135deg, var(--gold), var(--gold-deep));
+  color:#000; border:none; border-radius:10px;
+  font-family:'Cairo', sans-serif; font-weight:700;
+  cursor:pointer; text-decoration:none; display:inline-flex;
+  align-items:center; gap:.5rem;
+  transition:transform .2s ease;
+}
+.overlay-btn:hover { transform:scale(1.05); }
+
+/* Glass blur effect for expired cards */
+.blur-overlay {
+  filter:blur(8px); pointer-events:none; opacity:.6;
+}
+
+/* ====== MARKETING SECTION ====== */
+.marketing-section {
+  max-width:600px; margin:3rem auto 0; padding:0 1rem;
+  text-align:center; position:relative; z-index:10;
+  animation:fadeInUp 1s ease 1.8s both;
+}
+.marketing-section h2 {
+  font-family:'Cairo', sans-serif;
+  font-size:1.4rem; margin-bottom:1rem;
+  background:linear-gradient(135deg, var(--gold), var(--gold-light));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.marketing-phrases {
+  display:flex; flex-direction:column; gap:.8rem;
+}
+.phrase-card {
+  background:rgba(20,20,28,0.6); border:1px solid var(--line);
+  padding:1.2rem; border-radius:14px;
+  transition:transform .3s ease, border-color .3s ease;
+}
+.phrase-card:hover {
+  transform:translateY(-3px); border-color:rgba(212,175,55,0.3);
+}
+.phrase-icon { font-size:1.8rem; margin-bottom:.5rem; }
+.phrase-text { font-size:.92rem; color:var(--text-dim); line-height:1.6; }
+.phrase-highlight { color:var(--gold); font-weight:600; }
+
+/* CTA Button */
+.cta-button {
+  display:inline-flex; align-items:center; gap:.6rem;
+  margin-top:2rem; padding:1rem 2.5rem;
+  background:linear-gradient(135deg, var(--gold), var(--gold-deep));
+  color:#000; text-decoration:none; border-radius:14px;
+  font-family:'Cairo', sans-serif; font-weight:800; font-size:1rem;
+  transition:all .3s ease; box-shadow:0 8px 30px rgba(212,175,55,0.3);
+}
+.cta-button:hover {
+  transform:translateY(-3px); box-shadow:0 12px 40px rgba(212,175,55,0.4);
+}
+
+/* ====== MUSIC TOGGLE ====== */
+.music-toggle {
+  position:fixed; bottom:20px; left:20px; z-index:200;
+  width:48px; height:48px; border-radius:50%;
+  background:rgba(20,20,28,0.9); border:1px solid var(--line);
+  color:var(--gold); display:flex; align-items:center;
+  justify-content:center; cursor:pointer; font-size:1.3rem;
+  transition:all .3s ease; backdrop-filter:blur(10px);
+}
+.music-toggle:hover { background:rgba(212,175,55,0.15); transform:scale(1.1); }
+.music-toggle.playing { animation:musicPulse 2s ease-in-out infinite; }
+@keyframes musicPulse {
+  0%,100%{ box-shadow:0 0 0 0 rgba(212,175,55,0.4); }
+  50%{ box-shadow:0 0 0 10px rgba(212,175,55,0); }
+}
+
+/* ====== RESPONSIVE ====== */
+@media(max-width:480px) {
+  .gift-card-visual { width:340px; }
+  .card-number { font-size:1rem; letter-spacing:2px; }
+  .info-grid { grid-template-columns:1fr; }
+  .countdown-unit { min-width:50px; padding:.6rem .4rem; }
+  .countdown-value { font-size:1.4rem; }
+  .sender-message h1 { font-size:1.3rem; }
+}
+
+/* ====== CONFETTI CANVAS ====== */
+#confettiCanvas {
+  position:fixed; inset:0; z-index:99; pointer-events:none;
+  opacity:0; transition:opacity .5s ease;
+}
+#confettiCanvas.active { opacity:1; }
+</style>
+</head>
+<body>
+
+<!-- Loading Screen -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="gift-loader"></div>
+  <div class="loading-text">جاري تحضير هديتك...</div>
+</div>
+
+<!-- Background Canvas -->
+<canvas class="bg-canvas" id="bgCanvas"></canvas>
+
+<!-- Particles Container -->
+<div class="particles-container" id="particlesContainer"></div>
+
+<!-- Confetti Canvas -->
+<canvas id="confettiCanvas"></canvas>
+
+<!-- Envelope Opening Stage -->
+<div class="envelope-stage" id="envelopeStage">
+  <div style="text-align:center">
+    <div class="envelope-wrapper" id="envelopeWrapper">
+      <div class="envelope" id="envelope">
+        <div class="envelope-body">
+          <div class="wax-seal" id="waxSeal" title="اضغط لفتح الظرف">🎁</div>
+        </div>
+        <div class="envelope-flap"></div>
+      </div>
+    </div>
+    <p class="tap-hint" id="tapHint">اضغط على الظرف لفتح هديتك 💌</p>
+  </div>
+</div>
+
+<!-- Main Content (Hidden until envelope opens) -->
+<div class="gc-page" id="gcPage" style="display:none">
+
+  <!-- Sender Message -->
+  <div class="card-reveal-section" id="cardRevealSection">
+    
+    <div class="sender-message" id="senderMessage">
+      <!-- Will be populated by JS -->
+    </div>
+
+    <!-- Gift Card Visual -->
+    <div class="gift-card-visual" id="giftCardVisual">
+      <div class="gift-card-inner" id="cardInner">
+        <!-- Brand -->
+        <div class="card-brand">
+          <div class="card-brand-logo">TJ</div>
+          <span class="card-brand-name">TIGER JEANS</span>
+        </div>
+
+        <!-- Chip -->
+        <div class="card-chip"></div>
+
+        <!-- Contactless -->
+        <div class="card-contactless"></div>
+
+        <!-- Card Number -->
+        <div class="card-number-container">
+          <span class="card-number" id="displayCardNumber">•••• •••• •••• ••••</span>
+          <button class="copy-btn-mini" onclick="copyCardNumber()">
+            <i class='bx bx-copy'></i> نسخ
+          </button>
+        </div>
+
+        <!-- Details Row -->
+        <div class="card-details-row">
+          <div>
+            <div class="card-holder-label">صاحب البطاقة</div>
+            <div class="card-holder-value" id="displayHolderName">GIFT CARD</div>
+          </div>
+          <div style="text-align:left">
+            <div class="card-expiry-label">صالح حتى</div>
+            <div class="card-expiry-value" id="displayExpiry">--/--</div>
+          </div>
+        </div>
+
+        <!-- Overlay State (Expired/Used) -->
+        <div class="card-overlay-state" id="cardOverlayState">
+          <div class="overlay-icon" id="overlayIcon">⏰</div>
+          <div class="overlay-title" id="overlayTitle">منتهية الصلاحية</div>
+          <div class="overlay-text" id="overlayText">تم استخدام هذه البطاقة بالكامل أو انتهت صلاحيتها</div>
+          <a href="https://tiger-jeans.com/gift-cards.html" class="overlay-btn">
+            <i class='bx bx-gift'></i> اشتري بطاقة جديدة
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- PIN Section -->
+    <div class="pin-section" id="pinSection">
+      <span class="pin-label">الرقم السري (PIN)</span>
+      <div class="pin-display">
+        <span class="pin-value" id="displayPin">••••••</span>
+        <button class="copy-btn-mini" onclick="copyPin()">
+          <i class='bx bx-copy'></i> نسخ
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Card Info Section -->
+  <div class="card-info-section" id="cardInfoSection">
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="info-item-label">مبلغ البطاقة</div>
+        <div class="info-item-value" id="infoOriginalAmount">-- ج.م</div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-label">الرصيد المتبقي</div>
+        <div class="info-item-value" id="infoBalance">-- ج.م</div>
+      </div>
+    </div>
+
+    <!-- Usage History -->
+    <div class="usage-history" id="usageHistory" style="display:none">
+      <h3><i class='bx bx-history'></i> سجل الاستخدام</h3>
+      <div id="usageList"></div>
+    </div>
+
+    <!-- Countdown Timer -->
+    <div class="countdown-section" id="countdownSection">
+      <div class="countdown-title"><i class='bx bx-time-five'></i> باقي على انتهاء الصلاحية</div>
+      <div class="countdown-timer" id="countdownTimer">
+        <div class="countdown-unit">
+          <div class="countdown-value" id="cdDays">--</div>
+          <div class="countdown-label">يوم</div>
+        </div>
+        <div class="countdown-unit">
+          <div class="countdown-value" id="cdHours">--</div>
+          <div class="countdown-label">ساعة</div>
+        </div>
+        <div class="countdown-unit">
+          <div class="countdown-value" id="cdMinutes">--</div>
+          <div class="countdown-label">دقيقة</div>
+        </div>
+        <div class="countdown-unit">
+          <div class="countdown-value" id="cdSeconds">--</div>
+          <div class="countdown-label">ثانية</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Marketing Section -->
+  <div class="marketing-section" id="marketingSection">
+    <h2><i class='bx bx-star' style="color:var(--gold)"></i> لماذا Tiger Jeans؟</h2>
+    <div class="marketing-phrases">
+      <div class="phrase-card">
+        <div class="phrase-icon">👗</div>
+        <div class="phrase-text">
+          اكتشف أحدث صيحات <span class="phrase-highlight">الموضة العالمية</span> بأفضل الأسعار
+        </div>
+      </div>
+      <div class="phrase-card">
+        <div class="phrase-icon">🚚</div>
+        <div class="phrase-text">
+          توصيل <span class="phrase-highlight">سريع ومجاني</span> لجميع المحافظات
+        </div>
+      </div>
+      <div class="phrase-card">
+        <div class="phrase-icon">✨</div>
+        <div class="phrase-text">
+          جودة <span class="phrase-highlight">فاخرة</span> تليق بك وبذوقك الرفيع
+        </div>
+      </div>
+      <div class="phrase-card">
+        <div class="phrase-icon">🎁</div>
+        <div class="phrase-text">
+          أهدِ من تحب <span class="phrase-highlight">بطاقة هدايا</span> واختارهم ينفسوا
+        </div>
+      </div>
+    </div>
+    <a href="https://tiger-jeans.com/" class="cta-button">
+      <i class='bx bx-shopping-bag'></i> تسوق الآن
+    </a>
+  </div>
+
+</div>
+
+<!-- Music Toggle Button -->
+<button class="music-toggle" id="musicToggle" onclick="toggleMusic()" title="تشغيل/إيقاف الموسيقى">
+  <i class='bx bx-music' id="musicIcon"></i>
+</button>
+
+<!-- Audio Element (Background Music) -->
+<audio id="bgMusic" loop preload="auto">
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+</audio>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+// Firebase Config
+const firebaseConfig = {
+  apiKey: "AIzaSyCzkn2CQrhgtuqxy1t-lUWgbzUmmQhznN8",
+  authDomain: "tiger-d1433.firebaseapp.com",
+  databaseURL: "https://tiger-d1433-default-rtdb.firebaseio.com",
+  projectId: "tiger-d1433",
+  storageBucket: "tiger-d1433.firebasestorage.app",
+  messagingSenderId: "421931992267",
+  appId: "1:421931992267:web:a2262dbb2984b3b158074e"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// ====== GLOBALS ======
+let giftCardData = null;
+let cardId = null;
+let isMusicPlaying = false;
+
+// ====== INITIALIZATION ======
+document.addEventListener('DOMContentLoaded', () => {
+  // Extract card ID from URL (supports both formats):
+  // Format 1: /gift-card/XXXXX (via 404 redirect)
+  // Format 2: gift-card.html?id=XXXXX (direct link)
+  const path = window.location.pathname;
+  const pathMatch = path.match(/\/gift-card\/([a-zA-Z0-9_-]+)/);
+  const urlParams = new URLSearchParams(window.location.search);
+  const queryId = urlParams.get('id');
+  
+  cardId = pathMatch ? pathMatch[1] : queryId;
+  
+  if (!cardId) {
+    showError('رابط البطاقة غير صحيح');
+    return;
+  }
+  
+  // Load card data
+  loadGiftCardData();
+  
+  // Initialize effects
+  initParticles();
+  initBgCanvas();
+  
+  // Setup envelope interaction
+  setupEnvelope();
+});
+
+// ====== LOAD GIFT CARD DATA (WITH FALLBACK) ======
+async function loadGiftCardData() {
+  try {
+    let card = null;
+    let source = ''; // 'giftCards' or 'giftCardRequests'
+    
+    // === ATTEMPT 1: Try giftCards collection (primary) ===
+    const snap1 = await db.ref('giftCards/' + cardId).once('value');
+    card = snap1.val();
+    
+    if (card) {
+      source = 'giftCards';
+      console.log('✅ Card found in giftCards collection');
+    } else {
+      // === ATTEMPT 2: Search in giftCardRequests (fallback) ===
+      console.log('⚠️ Not in giftCards, searching giftCardRequests...');
+      
+      // Normalize cardId - could be with or without dashes
+      const normalizedId = cardId.replace(/-/g, '').toUpperCase();
+      
+      // Query all requests and find matching cardNumber
+      const requestsSnap = await db.ref('giftCardRequests').once('value');
+      const requests = requestsSnap.val();
+      
+      if (requests) {
+        for (const reqId of Object.keys(requests)) {
+          const req = requests[reqId];
+          const reqCardNum = (req.cardNumber || '').replace(/-/g, '').toUpperCase();
+          
+          // Match by normalized card number
+          if (reqCardNum === normalizedId) {
+            console.log(`✅ Found matching request: ${reqId}`);
+            
+            // Check if request is approved
+            if (req.status === 'approved' || req.status === 'activated') {
+              // Construct card object from request data
+              const now = Date.now();
+              const oneYearFromNow = now + (365 * 24 * 60 * 60 * 1000);
+              
+              card = {
+                cardNumber: req.cardNumber,
+                originalAmount: req.amount,
+                balance: req.amount,
+                pin: generatePINForDisplay(),
+                recipientName: req.recipientName,
+                senderName: req.senderName,
+                message: req.message,
+                occasion: req.occasion,
+                status: 'active',
+                createdAt: req.createdAt || now,
+                activatedAt: req.approvedAt || now,
+                expiresAt: oneYearFromNow,
+                ownerPhone: req.senderPhone,
+                ownerUid: req.uid,
+                requestId: reqId,
+                _fromRequest: true, // Flag indicating this came from requests
+                timeline: [
+                  { event: 'created', ts: req.createdAt || now },
+                  { event: 'approved', ts: req.approvedAt || now },
+                  { event: 'activated', ts: req.approvedAt || now }
+                ]
+              };
+              
+              source = 'giftCardRequests';
+              break;
+            } else if (req.status === 'pending') {
+              // Request exists but not approved yet
+              showPendingApproval(req);
+              return;
+            }
+          }
+        }
+      }
+    }
+    
+    // === FINAL CHECK ===
+    if (!card) {
+      showError('بطاقة غير موجودة أو تم إلغاؤها');
+      return;
+    }
+    
+    giftCardData = { ...card, key: cardId, _source: source };
+    
+    // Log source for debugging
+    if (source === 'giftCardRequests') {
+      console.log('📦 Card loaded from giftCardRequests (fallback mode)');
+      // Show subtle notification that this is from fallback
+      showFallbackNotice();
+    }
+    
+    // Hide loading screen
+    setTimeout(() => {
+      document.getElementById('loadingScreen').classList.add('hidden');
+    }, 1500);
+    
+    // Populate UI
+    populateCardUI(card);
+    
+  } catch (err) {
+    console.error(err);
+    showError('حدث خطأ أثناء تحميل البطاقة');
+  }
+}
+
+// Generate a placeholder PIN display for fallback cards
+function generatePINForDisplay() {
+  return '------';
+}
+
+// Show notice when card loaded from fallback
+function showFallbackNotice() {
+  const notice = document.createElement('div');
+  notice.style.cssText = `
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(135deg, #d4af37, #b8962e); color: #000;
+    padding: 12px 24px; border-radius: 12px; font-family: 'Cairo', sans-serif;
+    font-size: 0.9rem; font-weight: 700; z-index: 10000;
+    box-shadow: 0 10px 40px rgba(212,175,55,0.4);
+    animation: slideDown 0.5s ease;
+  `;
+  notice.innerHTML = '🎁 بطاقتك محملة بنجاح! <span style="font-size:0.8rem;font-weight:400">(جاري التحقق)';
+  document.body.appendChild(notice);
+  
+  setTimeout(() => {
+    notice.style.animation = 'slideUp 0.5s ease forwards';
+    setTimeout(() => notice.remove(), 500);
+  }, 3000);
+  
+  // Add animations
+  if (!document.getElementById('fallbackStyles')) {
+    const style = document.createElement('style');
+    style.id = 'fallbackStyles';
+    style.textContent = `
+      @keyframes slideDown { from{opacity:0;top:-50px;} to{opacity:1;top:20px;} }
+      @keyframes slideUp { from{opacity:1;top:20px;} to{opacity:0;top:-50px;} }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+// Show pending approval message
+function showPendingApproval(req) {
+  document.getElementById('loadingScreen').classList.add('hidden');
+  
+  const container = document.querySelector('.gc-page') || document.body;
+  container.innerHTML = `
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;text-align:center;">
+      <div style="max-width:450px;">
+        <div style="font-size:80px;margin-bottom:1.5rem;">⏳</div>
+        <h1 style="font-family:'Cairo',sans-serif;font-size:1.8rem;color:#d4af37;margin-bottom:1rem;">
+          البطاقة قيد المراجعة!
+        </h1>
+        <p style="color:#9ca3af;font-size:1.05rem;line-height:1.9;margin-bottom:1.5rem;">
+          بطاقة هدايا برقم <strong style="color:#fff">${req.cardNumber}</strong><br>
+          لـ <strong style="color:#d4af37">${req.recipientName}</strong> لا تزال تنتظر الموافقة.
+        </p>
+        <p style="color:#9ca3af;font-size:0.95rem;margin-bottom:2rem;">
+          سيتم تفعيلها بمجرد تأكيد الدفع من الإدارة.
+        </p>
+        <a href="https://tiger-jeans.com/" style="
+          display:inline-flex;align-items:center;gap:.5rem;
+          padding:1rem 2rem;background:linear-gradient(135deg,#d4af37,#b8962e);
+          color:#000;text-decoration:none;border-radius:12px;
+          font-family:'Cairo',sans-serif;font-weight:700;
+        ">
+          <i class='bx bx-home'></i> العودة للمتجر
+        </a>
+      </div>
+    </div>
+  `;
+}
+
+// ====== POPULATE UI ======
+function populateCardUI(card) {
+  // Sender Message
+  const senderMsg = document.getElementById('senderMessage');
+  const occasion = card.occasion || 'مناسبة خاصة';
+  const recipient = card.recipientName || '';
+  const sender = card.senderName || 'شخص عزيز';
+  const personalMsg = card.message || '';
+  
+  let greeting = '';
+  if (occasion.includes('عيد ميلاد') || occasion.includes('مولد')) {
+    greeting = `عيد ميلاد سعيد${recipient ? ' يا ' + recipient : ''}! 🎂`;
+  } else if (occasion.includes('زفاف') || occasion.includes('عرس')) {
+    greeting = `زفاف سعيد${recipient ? ' يا ' + recipient : ''}! 💒`;
+  } else {
+    greeting = `${occasion} سعيد${recipient ? ' يا ' + recipient : ''}! 🎉`;
+  }
+  
+  senderMsg.innerHTML = `
+    <h1>${greeting}</h1>
+    <p><strong style="color:var(--gold)">${sender}</strong> لأنه بيحبك وأنت عزيز/ه ارسل لك/ي هذه البطاقة وبيقولك :</p>
+    ${personalMsg ? `<p style="margin-top:.8rem;font-style:italic;color:var(--gold-light)">"${personalMsg}"</p>` : ''}
+  `;
+  
+  // Card Visual
+  document.getElementById('displayCardNumber').textContent = formatCardNumber(card.cardNumber);
+  document.getElementById('displayHolderName').textContent = recipient || 'GIFT CARD HOLDER';
+  document.getElementById('displayExpiry').textContent = card.expiresAt 
+    ? new Date(card.expiresAt).toLocaleDateString('ar-EG', {month:'2-digit', year:'2-digit'})
+    : '--/--';
+  
+  // PIN
+  document.getElementById('displayPin').textContent = card.pin || '••••••';
+  
+  // Info Section
+  document.getElementById('infoOriginalAmount').textContent = fmtPrice(card.originalAmount || card.balance);
+  document.getElementById('infoBalance').textContent = fmtPrice(card.balance);
+  
+  // Check card status
+  checkCardStatus(card);
+  
+  // Usage History
+  if (card.redemptions) {
+    renderUsageHistory(card.redemptions);
+  }
+  
+  // Start countdown if not expired
+  if (card.expiresAt && card.expiresAt > Date.now()) {
+    startCountdown(card.expiresAt);
+  } else {
+    showExpiredState();
+  }
+}
+
+// ====== CHECK CARD STATUS ======
+function checkCardStatus(card) {
+  const now = Date.now();
+  const isExpired = card.expiresAt && card.expiresAt < now;
+  const isEmpty = card.status === 'used' || card.balance <= 0;
+  const isFrozen = card.status === 'frozen';
+  
+  if (isExpired || isEmpty || isFrozen) {
+    showCardOverlay(isExpired ? 'expired' : 'used', isFrozen);
+  }
+}
+
+function showCardOverlay(type, isFrozen = false) {
+  const overlay = document.getElementById('cardOverlayState');
+  const icon = document.getElementById('overlayIcon');
+  const title = document.getElementById('overlayTitle');
+  const text = document.getElementById('overlayText');
+  const cardInner = document.getElementById('cardInner');
+  
+  overlay.classList.add('visible');
+  cardInner.classList.add('blur-overlay');
+  
+  if (type === 'expired') {
+    icon.textContent = '⏰';
+    title.textContent = 'منتهية الصلاحية';
+    title.className = 'overlay-title expired';
+    text.textContent = 'انتهت صلاحية هذه البطاقة. يمكنك شراء بطاقة جديدة!';
+  } else {
+    icon.textContent = '✅';
+    title.textContent = isFrozen ? 'موقوفة مؤقتاً' : 'تم الاستخدام بالكامل';
+    title.className = 'overlay-title used';
+    text.textContent = isFrozen 
+      ? 'هذه البطاقة موقوفة مؤقتاً. يرجى التواصل مع الدعم.'
+      : 'تم استخدام رصيد هذه البطاقة بالكامل. شكراً لتسوقك معنا!';
+  }
+}
+
+function showExpiredState() {
+  const countdownSection = document.getElementById('countdownSection');
+  countdownSection.innerHTML = `
+    <div style="text-align:center;padding:1rem">
+      <i class='bx bx-x-circle' style="font-size:2.5rem;color:var(--danger)"></i>
+      <p style="margin-top:.8rem;color:var(--danger);font-weight:600;font-family:'Cairo',sans-serif">
+        انتهت صلاحية البطاقة
+      </p>
+    </div>
+  `;
+}
+
+// ====== USAGE HISTORY ======
+function renderUsageHistory(redemptions) {
+  const section = document.getElementById('usageHistory');
+  const list = document.getElementById('usageList');
+  
+  const entries = Object.entries(redemptions).map(([k, v]) => ({id:k, ...v}))
+    .sort((a,b) => b.ts - a.ts);
+  
+  if (entries.length === 0) return;
+  
+  section.style.display = 'block';
+  list.innerHTML = entries.map(entry => `
+    <div class="usage-entry">
+      <div>
+        <span>استُخدم في طلب ${entry.orderId || entry.id.slice(0,8)}</span>
+        <span class="usage-entry-date">${new Date(entry.ts).toLocaleString('ar-EG')}</span>
+      </div>
+      <span class="usage-entry-amount">-${fmtPrice(entry.amount)}</span>
+    </div>
+  `).join('');
+}
+
+// ====== COUNTDOWN TIMER ======
+function startCountdown(expiresAt) {
+  function update() {
+    const now = Date.now();
+    const diff = Math.max(0, expiresAt - now);
+    
+    if (diff <= 0) {
+      showExpiredState();
+      showCardOverlay('expired');
+      return;
+    }
+    
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    
+    document.getElementById('cdDays').textContent = String(days).padStart(2, '0');
+    document.getElementById('cdHours').textContent = String(hours).padStart(2, '0');
+    document.getElementById('cdMinutes').textContent = String(minutes).padStart(2, '0');
+    document.getElementById('cdSeconds').textContent = String(seconds).padStart(2, '0');
+  }
+  
+  update();
+  setInterval(update, 1000);
+}
+
+// ====== ENVELOPE INTERACTION ======
+function setupEnvelope() {
+  const envelope = document.getElementById('envelope');
+  const waxSeal = document.getElementById('waxSeal');
+  const envelopeStage = document.getElementById('envelopeStage');
+  const gcPage = document.getElementById('gcPage');
+  
+  function openEnvelope() {
+    envelope.classList.add('opened');
+    
+    // Play sound effect (visual feedback instead)
+    waxSeal.style.transform = 'translateX(-50%) scale(1.3)';
+    setTimeout(() => {
+      waxSeal.style.opacity = '0';
+    }, 300);
+    
+    // Show confetti
+    triggerConfetti();
+    
+    // Transition to main content
+    setTimeout(() => {
+      envelopeStage.classList.add('hidden');
+      gcPage.style.display = 'block';
+      
+      // Trigger reveal animations
+      setTimeout(() => {
+        document.getElementById('cardRevealSection').classList.add('visible');
+        
+        // Try autoplay music
+        playMusic();
+      }, 300);
+    }, 1200);
+  }
+  
+  waxSeal.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openEnvelope();
+  });
+  
+  envelope.addEventListener('click', openEnvelope);
+}
+
+// ====== PARTICLES EFFECT ======
+function initParticles() {
+  const container = document.getElementById('particlesContainer');
+  const types = ['rose', 'star', 'sparkle', 'heart', 'confetti'];
+  
+  for (let i = 0; i < 25; i++) {
+    const particle = document.createElement('div');
+    particle.className = `particle ${types[Math.floor(Math.random() * types.length)]}`;
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.animationDuration = (8 + Math.random() * 12) + 's';
+    particle.style.animationDelay = (Math.random() * 10) + 's';
+    container.appendChild(particle);
+  }
+}
+
+// ====== BACKGROUND CANVAS ======
+function initBgCanvas() {
+  const canvas = document.getElementById('bgCanvas');
+  const ctx = canvas.getContext('2d');
+  
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  
+  // Draw subtle gradient animation
+  let hue = 0;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const gradient = ctx.createRadialGradient(
+      canvas.width / 2, canvas.height / 2, 0,
+      canvas.width / 2, canvas.height / 2, canvas.width / 2
+    );
+    gradient.addColorStop(0, `hsla(${hue}, 50%, 15%, 0.3)`);
+    gradient.addColorStop(1, 'transparent');
+    
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    hue = (hue + 0.2) % 360;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ====== CONFETTI EFFECT ======
+function triggerConfetti() {
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.classList.add('active');
+  
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  
+  const colors = ['#d4af37', '#f5d97c', '#e8cc6f', '#ff6b6b', '#4ecdc4', '#fff'];
+  const pieces = Array.from({ length: 150 }, () => ({
+    x: canvas.width / 2,
+    y: canvas.height * 0.3,
+    vx: (Math.random() - 0.5) * 15,
+    vy: Math.random() * -12 - 5,
+    size: 6 + Math.random() * 8,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    rot: Math.random() * Math.PI * 2,
+    vr: (Math.random() - 0.5) * 0.3,
+    life: 1
+  }));
+  
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let alive = false;
+    
+    pieces.forEach(p => {
+      if (p.life <= 0) return;
+      alive = true;
+      
+      p.vy += 0.25;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vr;
+      p.life -= 0.008;
+      
+      ctx.save();
+      ctx.globalAlpha = Math.max(p.life, 0);
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+      ctx.restore();
+    });
+    
+    if (alive) requestAnimationFrame(animate);
+    else canvas.classList.remove('active');
+  }
+  
+  animate();
+}
+
+// ====== MUSIC CONTROL ======
+function toggleMusic() {
+  const audio = document.getElementById('bgMusic');
+  const btn = document.getElementById('musicToggle');
+  const icon = document.getElementById('musicIcon');
+  
+  if (isMusicPlaying) {
+    audio.pause();
+    btn.classList.remove('playing');
+    icon.className = 'bx bx-music';
+  } else {
+    audio.play().catch(() => {});
+    btn.classList.add('playing');
+    icon.className = 'bx bx-pause';
+  }
+  isMusicPlaying = !isMusicPlaying;
+}
+
+function playMusic() {
+  const audio = document.getElementById('bgMusic');
+  audio.volume = 0.3;
+  audio.play().catch(() => {
+    // Autoplay blocked, user needs to click music button
+  }).then(() => {
+    if (isMusicPlaying === false) {
+      isMusicPlaying = true;
+      document.getElementById('musicToggle').classList.add('playing');
+      document.getElementById('musicIcon').className = 'bx bx-pause';
+    }
+  });
+}
+
+// ====== UTILITY FUNCTIONS ======
+function fmtPrice(n) {
+  return Number(n || 0).toLocaleString('ar-EG') + ' ج.م';
+}
+
+function formatCardNumber(num) {
+  if (!num) return '•••• •••• •••• ••••';
+  const cleaned = num.replace(/[^A-Z0-9]/g, '');
+  return cleaned.replace(/(.{4})/g, '$1 ').trim();
+}
+
+function copyCardNumber() {
+  if (!giftCardData) return;
+  navigator.clipboard.writeText(giftCardData.cardNumber).then(() => {
+    showToast('تم نسخ رقم البطاقة ✓');
+  });
+}
+
+function copyPin() {
+  if (!giftCardData) return;
+  navigator.clipboard.writeText(giftCardData.pin).then(() => {
+    showToast('تم نسخ الرقم السري ✓');
+  });
+}
+
+function showToast(msg) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:rgba(212,175,55,0.95);color:#000;padding:.8rem 1.5rem;border-radius:10px;z-index:1000;font-family:"Cairo",sans-serif;font-weight:600;font-size:.9rem;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => t.style.display = 'none', 2500);
+}
+
+function showError(msg) {
+  document.getElementById('loadingScreen').innerHTML = `
+    <div style="text-align:center;padding:2rem">
+      <i class='bx bx-error-circle' style="font-size:3rem;color:var(--danger)"></i>
+      <h2 style="margin:1rem 0;font-family:'Cairo',sans-serif;color:var(--danger)">${msg}</h2>
+      <a href="https://tiger-jeans.com/gift-cards.html" style="display:inline-block;margin-top:1rem;padding:.8rem 1.5rem;background:var(--gold);color:#000;text-decoration:none;border-radius:10px;font-weight:600;">
+        صفحة بطاقات الهدايا
+      </a>
+    </div>
+  `;
+}
+</script>
+<script src="js/tiger-ai.js"></script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>المفضلة | Tiger Jeans</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="shortcut icon" href="images/favicon-32x32.png" type="image/png" />
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+<style>
+.page-hero{padding:2.5rem 0;border-bottom:1px solid var(--line);background:var(--bg-alt)}
+.page-hero h1{font-size:1.8rem;font-weight:800}
+.breadcrumb{color:var(--text-dim);font-size:.85rem;margin-top:.5rem}
+.breadcrumb a:hover{color:var(--gold)}
+.wishlist-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1.5rem;
+  padding:3rem 0;
+}
+.wl-card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  transition:transform .35s cubic-bezier(.16,1,.3,1), box-shadow .35s ease;
+}
+.wl-card:hover{transform:translateY(-6px);box-shadow:0 20px 40px -20px rgba(0,0,0,.55)}
+.wl-card .wl-image{position:relative;aspect-ratio:3/4;overflow:hidden;background:var(--surface-2)}
+.wl-card .wl-image img{width:100%;height:100%;object-fit:cover;transition:.5s}
+.wl-card:hover .wl-image img{transform:scale(1.08)}
+.wl-remove{
+  position:absolute;top:.6rem;left:.6rem;width:34px;height:34px;border-radius:50%;
+  background:rgba(10,10,12,.6);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;
+  color:#fff;transition:.2s;z-index:2;
+}
+.wl-remove:hover{background:var(--danger);color:#fff;transform:scale(1.1)}
+.wl-body{padding:1.1rem;display:flex;flex-direction:column;gap:.6rem;flex:1}
+.wl-body h4{font-size:.98rem;font-weight:600;min-height:2.4em}
+.wl-price{color:var(--gold);font-weight:800;font-family:'Cairo',sans-serif;font-size:1.05rem}
+@media(max-width:1024px){.wishlist-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:768px){.wishlist-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.wishlist-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="container">
+    <div class="header-main">
+      <a href="/" class="logo">
+        <img src="images/logo-icon.png" class="logo-icon" alt="Tiger Jeans" />
+        <div class="logo-text"><strong>TIGER JEANS</strong><small>لأرقى الملابس العالمية</small></div>
+      </a>
+      <nav class="main-nav">
+        <a href="/">الرئيسية</a>
+        <a href="/#products">المتجر</a>
+        <a href="track.html">تتبع الطلب</a>
+        <a href="gift-cards.html">بطاقات الهدايا</a>
+      </nav>
+      <div class="header-actions">
+        <a href="orders.html" class="action-btn" title="طلباتي"><i class='bx bx-receipt'></i></a>
+        <a href="wishlist.html" class="action-btn wishlist-btn-header active"><i class='bx bxs-heart'></i><span class="wishlist-badge" style="display:none">0</span></a>
+        <a href="cart.html" class="action-btn cart-btn"><i class='bx bx-cart-alt'></i><span class="cart-badge" style="display:none">0</span></a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Page Hero -->
+<div class="page-hero">
+  <div class="container">
+    <h1><i class='bx bxs-heart gold-text'></i> المفضلة</h1>
+    <div class="breadcrumb"><a href="/">الرئيسية</a> / المفضلة</div>
+  </div>
+</div>
+
+<!-- Wishlist Content -->
+<div class="container">
+  <div class="wishlist-grid" id="wishlistGrid"></div>
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="container footer-bottom">
+    <div class="footer-legal-links">
+      <a href="about.html">من نحن</a>
+      <a href="contact.html">اتصل بنا</a>
+      <a href="privacy-policy.html">سياسة الخصوصية</a>
+      <a href="terms.html">الشروط والأحكام</a>
+      <a href="return-policy.html">سياسة الاسترجاع والاستبدال</a>
+    </div>
+    <p>جميع الحقوق محفوظة © Tiger Jeans 2026 | تطوير
+        <a href="https://www.facebook.com/en.mohamed.nasr" target="_blank" rel="noopener" class="credit-link">
+          <i class='bx bxs-code-alt'></i> المهندس محمد حماد
+        </a>
+      </p>
+  </div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="js/config.js"></script>
+<script>
+function renderWishlist() {
+  const list = getWishlist();
+  const grid = document.getElementById("wishlistGrid");
+
+  if (!list.length) {
+    grid.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1">
+        <i class='bx bx-heart'></i>
+        <p>قائمة المفضلة فارغة حالياً</p>
+        <a href="/" class="btn-primary" style="margin-top:1.2rem">تصفح المنتجات</a>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = list
+    .map((item, i) => `
+    <div class="wl-card reveal in">
+      <div class="wl-image">
+        <button class="wl-remove" onclick="removeItem('${item.id}')" title="إزالة"><i class='bx bx-x'></i></button>
+        <a href="product.html?id=${item.id}">
+          <img src="${item.image || "images/product-1.png"}" alt="${item.name}" />
+        </a>
+      </div>
+      <div class="wl-body">
+        <h4><a href="product.html?id=${item.id}">${item.name}</a></h4>
+        <div class="wl-price">${fmtPrice(item.price)}</div>
+        <button class="btn-primary full-width" style="margin-top:auto" onclick="moveToCart('${item.id}')"><i class='bx bx-cart-add'></i> أضف إلى السلة</button>
+      </div>
+    </div>`)
+    .join("");
+}
+
+function removeItem(id) {
+  removeFromWishlist(id);
+  renderWishlist();
+  showToast("تمت الإزالة من المفضلة");
+}
+
+function moveToCart(id) {
+  const item = getWishlist().find((w) => w.id === id);
+  if (!item) return;
+  addToCart({ id: item.id, name: item.name, price: item.price, image: item.image, size: "", color: "", qty: 1 });
+}
+
+renderWishlist();
+</script>
+
+<!-- ====== Bottom Navigation (Mobile, <992px) ====== -->
+<nav class="bottom-nav" aria-label="التنقل السفلي">
+  <div class="bottom-nav-inner">
+    <a href="/" data-nav="home" class=""><i class='bx bx-home-alt'></i><span>الرئيسية</span></a>
+    <a href="/#products" data-nav="search" class="" onclick="if(window.location.pathname==='/'||window.location.pathname.endsWith('/index.html')){event.preventDefault();toggleSearch();}"><i class='bx bx-search'></i><span>بحث</span></a>
+    <a href="/#products" data-nav="categories" class=""><i class='bx bx-category'></i><span>الأقسام</span></a>
+    <a href="cart.html" data-nav="cart" class=""><i class='bx bx-cart-alt'></i><span>السلة</span><span class="bn-badge cart-badge" style="display:none">0</span></a>
+    <a href="gift-cards.html" data-nav="giftcards"><i class='bx bx-gift'></i><span>هدايا</span></a>
+    <a href="orders.html" id="bottomAccountLink" data-nav="account" class="active"><i class='bx bx-user'></i><span>طلباتي</span></a>
+  </div>
+</nav>
+<script src="js/tiger-ai.js"></script>
+</body>
+</html>
