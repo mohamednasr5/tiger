@@ -1755,11 +1755,11 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
 .tm-browse .tm-card{
   background:var(--surface);border-radius:8px;border:1px solid var(--line);
   position:relative;display:flex;align-items:flex-end;justify-content:center;padding-bottom:.3rem;
-  background-size:cover;background-position:center;
+  background-size:cover;background-position:center;overflow:hidden;
 }
-.tm-browse .tm-card:nth-child(1){background-image:linear-gradient(rgba(0,0,0,.08),rgba(0,0,0,.08)),url('images/product-4.png')}
-.tm-browse .tm-card:nth-child(3){background-image:linear-gradient(rgba(0,0,0,.08),rgba(0,0,0,.08)),url('images/product-6.png')}
-.tm-browse .tm-card:nth-child(4){background-image:linear-gradient(rgba(0,0,0,.08),rgba(0,0,0,.08)),url('images/product-7.png')}
+.tm-browse .tm-card:nth-child(1){background-image:linear-gradient(rgba(0,0,0,.15),rgba(0,0,0,.15)),url('https://tiger-jeans.com/info.jpg');filter:blur(3px);transform:scale(1.08)}
+.tm-browse .tm-card:nth-child(3){background-image:linear-gradient(rgba(0,0,0,.15),rgba(0,0,0,.15)),url('https://tiger-jeans.com/info.jpg');filter:blur(3px);transform:scale(1.08)}
+.tm-browse .tm-card:nth-child(4){background-image:linear-gradient(rgba(0,0,0,.15),rgba(0,0,0,.15)),url('https://tiger-jeans.com/info.jpg');filter:blur(3px);transform:scale(1.08)}
 .tm-browse .tm-price{font-size:.6rem;color:var(--gold);font-weight:800;opacity:0;transition:.2s}
 .tm-browse .tm-target{animation:tmTargetPulse 2.6s ease-in-out infinite}
 .tm-browse .tm-target .tm-price{animation:tmPriceShow 2.6s ease-in-out infinite}
@@ -1768,7 +1768,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
   55%,80%{transform:scale(1.1);border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.25)}
 }
 .tm-target-jeans{
-  background-image:url('images/product-3.png');
+  background-image:url('https://tiger-jeans.com/info.jpg');
   background-size:cover;background-position:center;
 }
 .tm-target-jeans .tm-price{background:rgba(0,0,0,.55);border-radius:5px;padding:0 .3rem;color:#fff}
@@ -1790,7 +1790,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
   position:relative;overflow:hidden;
 }
 .tm-jeans-photo{
-  background-image:url('images/product-3.png');
+  background-image:url('https://tiger-jeans.com/info.jpg');
   background-size:150%;background-position:center;
   animation:tmPhotoZoom 2.6s ease-in-out infinite;
 }
