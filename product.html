@@ -212,6 +212,40 @@
   opacity:1;visibility:visible;
 }
 @media(max-width:900px){.product-detail{grid-template-columns:1fr}}
+
+/* ===== Inline Size Guide (opens directly under the product) ===== */
+.size-guide-inline{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  margin:0 0 3rem;
+  overflow:hidden;
+  animation:sgi-open .35s ease;
+}
+@keyframes sgi-open{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.sgi-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1rem 1.4rem;
+  border-bottom:1px solid var(--line);
+  background:var(--bg-alt);
+}
+.sgi-header h3{margin:0;font-family:'Cairo',sans-serif;font-size:1.05rem;display:flex;align-items:center;gap:.5rem}
+.sgi-header h3 i{color:var(--gold)}
+.sgi-close{
+  width:34px;height:34px;border-radius:50%;
+  border:1px solid var(--line);background:var(--surface);color:var(--text-dim);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.1rem;
+  transition:.2s;
+}
+.sgi-close:hover{color:var(--gold);border-color:var(--gold)}
+.sgi-frame-wrap{position:relative;min-height:520px}
+.sgi-frame-wrap iframe{width:100%;height:900px;border:0;display:block;background:var(--surface)}
+.sgi-loading{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:.7rem;color:var(--text-dim);background:var(--surface);
+}
+.sgi-loading i{font-size:2rem;color:var(--gold)}
+@media(max-width:600px){.sgi-frame-wrap iframe{height:1400px}}
 </style>
 </head>
 <body>
@@ -250,6 +284,20 @@
 <div class="container">
   <div class="product-detail" id="pdDetail">
     <div class="loading-state">جاري التحميل...</div>
+  </div>
+</div>
+
+<!-- Size Guide (opens inline, directly under the product, on demand) -->
+<div class="container" id="sizeGuidePanelWrap" style="display:none">
+  <div class="size-guide-inline">
+    <div class="sgi-header">
+      <h3><i class='bx bx-ruler'></i> دليل المقاسات</h3>
+      <button class="sgi-close" onclick="closeInlineSizeGuide()" title="إغلاق"><i class='bx bx-x'></i></button>
+    </div>
+    <div class="sgi-frame-wrap">
+      <div class="sgi-loading" id="sgiLoading"><i class='bx bx-loader-alt bx-spin'></i><span>جاري تحميل دليل المقاسات...</span></div>
+      <iframe id="sizeGuideFrame" title="دليل المقاسات" loading="lazy" onload="document.getElementById('sgiLoading').style.display='none'"></iframe>
+    </div>
   </div>
 </div>
 
@@ -496,7 +544,7 @@ function render() {
       <div class="option-group">
         <label style="display:flex;align-items:center;justify-content:space-between;gap:.6rem">
           <span>المقاس</span>
-          <a href="size-guide.html?cat=${guessSizeGuideCategory()}" target="_blank" style="font-size:.8rem;font-weight:600;color:var(--gold);display:flex;align-items:center;gap:.3rem"><i class='bx bx-ruler'></i> مش عارف مقاسك؟ اضغط هنا</a>
+          <a href="size-guide.html?cat=${guessSizeGuideCategory()}" target="_blank" onclick="return openInlineSizeGuide(event, '${guessSizeGuideCategory()}')" style="font-size:.8rem;font-weight:600;color:var(--gold);display:flex;align-items:center;gap:.3rem"><i class='bx bx-ruler'></i> مش عارف مقاسك؟ اضغط هنا</a>
         </label>
         <div class="option-list" id="sizeList">
           ${PRODUCT.sizes.map(s => `<button class="option-btn ${s === selSize ? 'active' : ''}" onclick="pickSize('${s}', this)">${s}</button>`).join("")}
@@ -575,6 +623,33 @@ function pickColor(c, img, el) {
 function changeQty(d) {
   qty = Math.max(1, qty + d);
   document.getElementById("qtyValue").textContent = qty;
+}
+
+// ====== Inline Size Guide (opens directly under the product instead of a new tab) ======
+function openInlineSizeGuide(evt, cat) {
+  // Let the user open it in a real new tab if they explicitly asked to (ctrl/cmd/middle-click)
+  if (evt && (evt.ctrlKey || evt.metaKey || evt.shiftKey || evt.button === 1)) return true;
+  if (evt) evt.preventDefault();
+
+  const wrap = document.getElementById("sizeGuidePanelWrap");
+  const frame = document.getElementById("sizeGuideFrame");
+  if (!wrap || !frame) return false;
+
+  // Lazy-load the guide the first time it's opened
+  if (!frame.dataset.loaded) {
+    document.getElementById("sgiLoading").style.display = "flex";
+    frame.src = `size-guide.html?cat=${cat}&embed=1`;
+    frame.dataset.loaded = "1";
+  }
+
+  wrap.style.display = "block";
+  wrap.scrollIntoView({ behavior: "smooth", block: "start" });
+  return false;
+}
+
+function closeInlineSizeGuide() {
+  const wrap = document.getElementById("sizeGuidePanelWrap");
+  if (wrap) wrap.style.display = "none";
 }
 
 function addToCartNow() {

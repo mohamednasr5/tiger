@@ -327,9 +327,23 @@
 }
 .wideleg-notes li{margin-bottom:.4rem
 }
+/* Embed mode (used when this page is shown inline inside product.html via ?embed=1) */
+body.embed-mode .site-header,
+body.embed-mode .sg-hero,
+body.embed-mode .site-footer,
+body.embed-mode .bottom-nav{display:none !important}
+body.embed-mode .sg-tabs-wrap{padding-top:1rem}
 </style>
 </head>
 <body>
+
+<script>
+  // Opt-in embed mode: only activates when explicitly requested via ?embed=1,
+  // so normal (non-embedded) visits to this page are completely unaffected.
+  if (new URLSearchParams(location.search).get("embed") === "1") {
+    document.body.classList.add("embed-mode");
+  }
+</script>
 
 <!-- Header -->
 <header class="site-header">

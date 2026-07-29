@@ -498,27 +498,6 @@
 </header>
 
 <main>
-<!-- ====== Marquee Banner ====== -->
-<div class="marquee-bar">
-  <div class="marquee-content" id="marqueeContent">
-    <span class="marquee-item">  🐯 Tiger Jeans  👋</span>
-    <span class="marquee-sep">✦</span>
-    <span class="marquee-item">  🐯تايجر جينز   👋</span>
-    <span class="marquee-sep">✦</span>
-    <span class="marquee-item">  🐯 Tiger Jeans  👋</span>
-    <span class="marquee-sep">✦</span>
-    <span class="marquee-item">  🐯تايجر جينز   👋</span>
-    <span class="marquee-sep">✦</span>
-    <span class="marquee-item">  🐯 Tiger Jeans  👋</span>
-    <span class="marquee-sep">✦</span>
-    <span class="marquee-item">  🐯تايجر جينز   👋</span>
-    <span class="marquee-sep">✦</span>
-    <span class="marquee-item">  🐯 Tiger Jeans  👋</span>
-    <span class="marquee-sep">✦</span>
-    <span class="marquee-item">  🐯تايجر جينز   👋</span>
-  </div>
-</div>
-
 <!-- ====== Hero Section ====== -->
 <section class="hero-section">
   <div class="hero-blob b1"></div>
@@ -530,6 +509,29 @@
     <div class="hero-buttons">
       <a href="#products" class="btn-primary">تسوق الآن <i class='bx bx-left-arrow-alt'></i></a>
       <a href="#deals-section" class="btn-secondary">عروض مميزة</a>
+    </div>
+  </div>
+</section>
+
+<!-- ====== Products Section ====== -->
+<section class="section" id="products">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <span class="eyebrow">التشكيلة الكاملة</span>
+        <h2>أحدث المنتجات</h2>
+      </div>
+      <a href="#" class="view-all">عرض الكل ←</a>
+    </div>
+
+    <!-- Category Filters -->
+    <div class="category-filters" id="catFilters">
+      <button class="cat-chip active" data-cat="all">الكل</button>
+    </div>
+
+    <!-- Products Grid with Flip Animation -->
+    <div class="products-grid" id="productsGrid">
+      <div class="loading-state">جاري تحميل المنتجات...</div>
     </div>
   </div>
 </section>
@@ -616,29 +618,6 @@
           <p>طرق دفع موثوقة</p>
         </div>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- ====== Products Section ====== -->
-<section class="section" id="products">
-  <div class="container">
-    <div class="section-header">
-      <div>
-        <span class="eyebrow">التشكيلة الكاملة</span>
-        <h2>أحدث المنتجات</h2>
-      </div>
-      <a href="#" class="view-all">عرض الكل ←</a>
-    </div>
-
-    <!-- Category Filters -->
-    <div class="category-filters" id="catFilters">
-      <button class="cat-chip active" data-cat="all">الكل</button>
-    </div>
-
-    <!-- Products Grid with Flip Animation -->
-    <div class="products-grid" id="productsGrid">
-      <div class="loading-state">جاري تحميل المنتجات...</div>
     </div>
   </div>
 </section>
@@ -805,6 +784,21 @@
 
 <!-- ====== Scroll to Top ====== -->
 <button class="scroll-top-btn" id="scrollTopBtn" onclick="scrollToTop()" title="للأعلى"><i class='bx bx-up-arrow-alt'></i></button>
+
+<!-- ====== "How to buy" help button (reopens the tour anytime) ====== -->
+<button class="tour-help-btn" onclick="openTour()" title="كيف أشتري من الموقع؟" aria-label="كيف أشتري من الموقع؟"><i class='bx bx-help-circle'></i></button>
+
+<!-- ====== First-Visit Shopping Guide ====== -->
+<div class="tour-overlay" id="shopTourOverlay">
+  <div class="tour-card">
+    <button class="tour-skip" onclick="skipTour()">تخطي <i class='bx bx-x'></i></button>
+    <div class="tour-steps" id="tourSteps"></div>
+    <div class="tour-footer">
+      <div class="tour-dots" id="tourDots"></div>
+      <button class="btn-primary tour-next" id="tourNextBtn" onclick="nextTourStep()">التالي <i class='bx bx-left-arrow-alt'></i></button>
+    </div>
+  </div>
+</div>
 
 <!-- ====== Auth Modal ====== -->
 <div class="modal-overlay" id="authModal">
@@ -1052,29 +1046,6 @@ function applySearchFromUrl() {
   }
 }
 
-// Default marquee messages (used until/unless the admin sets custom ones)
-const DEFAULT_MARQUEE = [
-  "⭐ نقدم 5 توصيل من أجلنا من أكثر 10,000 عملي",
-  "🎁 خصم خاص لمحدود وقت",
-  "📢 مجددة خصوصية دجين وصلت حديثاً - تشكيل الربيع",
-  "🔥 التوصيل مجاني للطلبات فوق 500 جنيه"
-];
-
-function renderMarquee(messages) {
-  const list = (messages && messages.length) ? messages : DEFAULT_MARQUEE;
-  const el = document.getElementById("marqueeContent");
-  if (!el) return;
-  // Duplicated twice so the CSS animation (0 -> -50%) loops seamlessly
-  const build = () => list.map(m => `<span class="marquee-item">${m}</span><span class="marquee-sep">✦</span>`).join("");
-  el.innerHTML = build() + build();
-}
-
-// Load marquee (moving announcement strip) from admin settings
-db.ref("banners/marquee").on("value", (snap) => {
-  const val = snap.val();
-  renderMarquee(Array.isArray(val) ? val : (val ? Object.values(val) : null));
-});
-
 // Load banners
 db.ref("banners/hero").on("value", (snap) => {
   const b = snap.val();
@@ -1280,6 +1251,7 @@ function renderProducts() {
             <div class="product-overlay v2">
               <button class="overlay-btn eye-btn" style="--d:0" title="معاينة سريعة" onclick="event.preventDefault();openQuickView('${p.id}')"><i class='bx bx-show'></i></button>
               <button class="overlay-btn add-cart-btn" style="--d:1" onclick="event.preventDefault();quickAdd('${p.id}', this, event)"><i class='bx bx-cart-add'></i> أضف للسلة</button>
+              <button class="overlay-btn buy-now-btn" style="--d:2" onclick="event.preventDefault();buyNowQuick('${p.id}')"><i class='bx bx-bolt'></i> اشترِ الآن</button>
             </div>
           </div>
           <div class="product-body">
@@ -1491,6 +1463,22 @@ function quickAdd(id, btnEl, evt) {
   flyToCart(evt);
 }
 
+// ====== Buy Now: add to cart then go straight to checkout (fewer steps) ======
+function buyNowQuick(id) {
+  const p = ALL_PRODUCTS.find((x) => x.id === id);
+  if (!p) return;
+  addToCart({
+    id: p.id,
+    name: p.name,
+    price: p.price,
+    image: (p.images && p.images[0]) || "",
+    size: (p.sizes && p.sizes[0]) || "",
+    color: (p.colors && p.colors.length) ? colorName(p.colors[0]) : "",
+    qty: 1
+  });
+  window.location.href = "checkout.html";
+}
+
 // ====== Fly-to-cart animation ======
 function flyToCart(evt) {
   const cartBtn = document.querySelector(".cart-btn");
@@ -1590,6 +1578,108 @@ function observeReveals() {
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".stat-item, .feature-card, .deal-card, section > .container > h2, .section-header").forEach((el) => el.classList.add("reveal"));
   observeReveals();
+});
+
+// ====== First-Visit Shopping Guide (skippable animated tour) ======
+const TOUR_STORAGE_KEY = "tiger_shop_tour_seen_v1";
+const TOUR_STEPS = [
+  {
+    icon: "bx bx-run",
+    num: "الخطوة ١ من ٤",
+    title: "تصفح المنتجات بسهولة",
+    text: "كل منتج معروض بصورة واضحة، وتحته السعر والمقاسات المتاحة مباشرة، من غير أي خطوات زيادة."
+  },
+  {
+    icon: "bx bx-search-alt",
+    num: "الخطوة ٢ من ٤",
+    title: "اختَر المقاس واللون",
+    text: "اضغط على أي منتج لعرض تفاصيله الكاملة واختيار المقاس واللون المناسبين، ومعاك دليل مقاسات لو محتاج تتأكد."
+  },
+  {
+    icon: "bx bx-cart-add",
+    num: "الخطوة ٣ من ٤",
+    title: "أضف للسلة أو اشترِ فورًا",
+    text: "زر «أضف للسلة» يخليك تكمل تسوق، وزر «اشترِ الآن» يوديك على طول لصفحة الدفع بضغطة واحدة."
+  },
+  {
+    icon: "bx bx-check-shield",
+    num: "الخطوة ٤ من ٤",
+    title: "أكمل بياناتك وخلاص",
+    text: "دخّل بيانات التوصيل واختَر طريقة الدفع، وطلبك هيوصلك لباب البيت. جاهز نبدأ؟"
+  }
+];
+let tourIdx = 0;
+
+function buildTour() {
+  const wrap = document.getElementById("tourSteps");
+  const dots = document.getElementById("tourDots");
+  if (!wrap || !dots) return;
+  wrap.innerHTML = TOUR_STEPS
+    .map(
+      (s, i) => `
+    <div class="tour-step ${i === 0 ? "active" : ""}" data-i="${i}">
+      <span class="tour-badge-num">${s.num}</span>
+      <div class="tour-icon-wrap"><i class='${s.icon}'></i></div>
+      <h3>${s.title}</h3>
+      <p>${s.text}</p>
+    </div>`
+    )
+    .join("");
+  dots.innerHTML = TOUR_STEPS
+    .map((_, i) => `<button type="button" class="tour-dot ${i === 0 ? "active" : ""}" data-i="${i}" onclick="showTourStep(${i})" aria-label="الخطوة ${i + 1}"></button>`)
+    .join("");
+}
+
+function showTourStep(i) {
+  tourIdx = i;
+  document.querySelectorAll(".tour-step").forEach((el) => el.classList.toggle("active", +el.dataset.i === i));
+  document.querySelectorAll(".tour-dot").forEach((el) => el.classList.toggle("active", +el.dataset.i === i));
+  const btn = document.getElementById("tourNextBtn");
+  if (btn) {
+    btn.innerHTML = i === TOUR_STEPS.length - 1
+      ? "ابدأ التسوق <i class='bx bx-shopping-bag'></i>"
+      : "التالي <i class='bx bx-left-arrow-alt'></i>";
+  }
+}
+
+function nextTourStep() {
+  if (tourIdx >= TOUR_STEPS.length - 1) {
+    closeTour();
+    document.getElementById("products")?.scrollIntoView({ behavior: "smooth" });
+    return;
+  }
+  showTourStep(tourIdx + 1);
+}
+
+function skipTour() {
+  closeTour();
+}
+
+function closeTour() {
+  const overlay = document.getElementById("shopTourOverlay");
+  if (overlay) overlay.classList.remove("show");
+  document.body.style.overflow = "";
+  try { localStorage.setItem(TOUR_STORAGE_KEY, "1"); } catch (e) {}
+}
+
+function openTour() {
+  buildTour();
+  showTourStep(0);
+  const overlay = document.getElementById("shopTourOverlay");
+  if (overlay) overlay.classList.add("show");
+  document.body.style.overflow = "hidden";
+}
+
+document.getElementById("shopTourOverlay")?.addEventListener("click", (e) => {
+  if (e.target.id === "shopTourOverlay") closeTour();
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  let seen = false;
+  try { seen = localStorage.getItem(TOUR_STORAGE_KEY) === "1"; } catch (e) {}
+  if (!seen) {
+    setTimeout(openTour, 900);
+  }
 });
 
 // ====== Scroll to top button ======

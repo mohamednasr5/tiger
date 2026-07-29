@@ -185,6 +185,85 @@
 }
 
 @media(max-width:900px){.checkout-layout{grid-template-columns:1fr}.row2{grid-template-columns:1fr}.pay-options{grid-template-columns:1fr}}
+
+/* ===== Checkout Stepper ===== */
+.checkout-stepper{display:flex;align-items:center;justify-content:center;gap:.6rem;padding:1.6rem 0 .4rem;max-width:520px;margin:0 auto}
+.step-item{display:flex;flex-direction:column;align-items:center;gap:.4rem;color:var(--text-dim);text-decoration:none;flex:0 0 auto}
+.step-circle{width:32px;height:32px;border-radius:50%;background:var(--surface);border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;transition:.25s;color:var(--text-dim)}
+.step-item span{font-size:.78rem;font-weight:700}
+.step-item.active .step-circle{border-color:var(--gold);color:var(--gold);background:rgba(212,175,55,.1)}
+.step-item.active span{color:var(--text)}
+.step-item.done .step-circle{background:var(--gold);border-color:var(--gold);color:#1a1a1a}
+.step-item.done span{color:var(--gold)}
+.step-line{width:40px;height:2px;background:var(--line);flex:0 0 auto}
+@media(max-width:480px){.step-line{width:22px}.checkout-stepper{gap:.3rem}}
+
+/* ===== Trust Bar ===== */
+.trust-bar{display:flex;flex-wrap:wrap;justify-content:center;gap:1.4rem;padding:1rem 0;margin-bottom:.5rem;border-bottom:1px solid var(--line)}
+.trust-item{display:flex;align-items:center;gap:.5rem;font-size:.82rem;color:var(--text-dim)}
+.trust-item i{color:var(--gold);font-size:1.15rem}
+@media(max-width:600px){.trust-bar{gap:.9rem}.trust-item{font-size:.72rem}}
+
+/* ===== Layout ===== */
+.checkout-layout{align-items:start}
+.checkout-main{display:flex;flex-direction:column;gap:1.2rem}
+.step-panel.step-hidden{display:none}
+
+/* ===== Field validation ===== */
+.field-error{display:none;color:var(--danger);font-size:.78rem;margin-top:.4rem}
+.field-hint{display:block;color:var(--text-dim);font-size:.76rem;margin-top:.4rem}
+input.invalid,select.invalid{border-color:var(--danger)}
+
+/* ===== Shipping note ===== */
+.shipping-note{display:none;align-items:center;gap:.6rem;background:rgba(212,175,55,.08);border:1px dashed var(--gold-deep);border-radius:10px;padding:.7rem 1rem;margin-top:1.2rem;font-size:.85rem;color:var(--text)}
+.shipping-note i{color:var(--gold);font-size:1.2rem;flex:0 0 auto}
+
+/* ===== Order Summary (collapsible on mobile) ===== */
+.order-summary-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.order-summary-header h3{margin:0;font-family:'Cairo',sans-serif}
+.summary-count{color:var(--text-dim);font-weight:600;font-size:.85rem}
+.summary-header-total{display:none;align-items:center;gap:.5rem;font-weight:800;color:var(--gold)}
+.summary-header-total i{transition:transform .25s;font-size:1.3rem}
+.order-summary-card.expanded .summary-header-total i{transform:rotate(180deg)}
+@media(max-width:900px){
+  .summary-header-total{display:flex}
+  .order-summary-body{display:none}
+  .order-summary-card.expanded .order-summary-body{display:block;margin-top:1rem}
+}
+
+/* ===== Support inline link ===== */
+.support-inline{display:flex;align-items:center;justify-content:center;gap:.5rem;margin-top:1rem;font-size:.85rem;color:var(--text-dim);text-align:center}
+.support-inline i{color:#25D366;font-size:1.2rem}
+.support-inline a{color:var(--gold);font-weight:700}
+
+/* ===== Skeleton loaders ===== */
+.skeleton{position:relative;overflow:hidden;pointer-events:none;color:transparent !important;background:var(--surface-2) !important}
+.skeleton *{visibility:hidden}
+.skeleton::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent);
+  transform:translateX(-100%);
+  animation:skeleton-shimmer 1.3s infinite;
+}
+@keyframes skeleton-shimmer{100%{transform:translateX(100%)}}
+
+/* ===== Sticky bottom actions ===== */
+.checkout-actions{display:flex;gap:.8rem;margin-top:.5rem}
+.checkout-actions .btn-primary,.checkout-actions .btn-secondary{flex:1;display:flex;align-items:center;justify-content:center;gap:.4rem}
+#backBtn{flex:0 0 auto;padding:0 1.3rem}
+@media(max-width:900px){
+  .checkout-actions{
+    position:fixed;left:0;right:0;
+    bottom:calc(80px + env(safe-area-inset-bottom));
+    background:color-mix(in srgb, var(--bg) 92%, transparent);
+    -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+    padding:.8rem 1rem;margin:0;
+    border-top:1px solid var(--line);
+    z-index:390;
+    box-shadow:0 -8px 24px rgba(0,0,0,.3);
+  }
+  #checkoutForm{padding-bottom:96px}
+}
 </style>
 </head>
 <body>
@@ -221,155 +300,227 @@
 
 <!-- Checkout Content -->
 <div class="container" id="checkoutContainer">
-  
+
+  <!-- Stepper: Cart (done, external) > Shipping > Payment -->
+  <div class="checkout-stepper" id="checkoutStepper">
+    <a href="cart.html" class="step-item done" title="الرجوع للسلة">
+      <div class="step-circle"><i class='bx bx-check'></i></div>
+      <span>السلة</span>
+    </a>
+    <div class="step-line"></div>
+    <div class="step-item active" data-step-indicator="1">
+      <div class="step-circle">2</div>
+      <span>الشحن</span>
+    </div>
+    <div class="step-line"></div>
+    <div class="step-item" data-step-indicator="2">
+      <div class="step-circle">3</div>
+      <span>الدفع</span>
+    </div>
+  </div>
+
+  <!-- Trust signals -->
+  <div class="trust-bar">
+    <div class="trust-item"><i class='bx bx-shield-check'></i><span>دفع آمن 100%</span></div>
+    <div class="trust-item"><i class='bx bx-refresh'></i><span>استبدال واسترجاع سهل</span></div>
+    <div class="trust-item"><i class='bx bx-truck'></i><span>توصيل خلال 2-5 أيام عمل</span></div>
+  </div>
+
   <!-- Checkout Form -->
   <div class="checkout-layout" id="checkoutForm">
-    
-    <!-- Left Column - Form -->
-    <div class="card">
-      <h3 style="margin-bottom:1.4rem;font-family:'Cairo',sans-serif">بيانات التوصيل</h3>
-      
-      <div class="row2">
-        <div class="field"><label>الاسم الكامل</label><input id="cName" placeholder="مثال: أحمد محمد" /></div>
-        <div class="field"><label>رقم الموبايل</label><input id="cPhone" placeholder="01xxxxxxxxx" /></div>
-      </div>
-      
-      <div class="row2">
-        <div class="field"><label>المحافظة</label><select id="cCity"><option value="">اختر المحافظة</option></select></div>
-        <div class="field"><label>العنوان بالتفصيل</label><input id="cAddress" placeholder="الشارع، رقم العمارة..." /></div>
-      </div>
-      
-      <div class="field">
-        <label>ملاحظات (اختياري)</label>
-        <textarea id="cNotes" rows="2" placeholder="أي تفاصيل إضافية"></textarea>
-      </div>
 
-      <h3 style="margin:2rem 0 1.2rem;font-family:'Cairo',sans-serif">طريقة الدفع</h3>
-      <div class="pay-options">
-        <div class="pay-option active" data-method="vodafone" onclick="selectPay('vodafone', this)">
-          <img src="images/payments/vodafone-cash.png" alt="فودافون كاش" class="pay-option-icon" />
-          <div>فودافون كاش</div>
-        </div>
-        <div class="pay-option" data-method="instapay" onclick="selectPay('instapay', this)">
-          <img src="images/payments/instapay.png" alt="انستاباي" class="pay-option-icon" />
-          <div>انستاباي</div>
-        </div>
-        <div class="pay-option" data-method="cod" onclick="selectPay('cod', this)">
-          <img src="images/payments/cash-on-delivery.png" alt="الدفع عند الاستلام" class="pay-option-icon" />
-          <div>عند الاستلام</div>
-        </div>
-        <div class="pay-option" data-method="giftcard" onclick="selectPay('giftcard', this)">
-          <img src="images/payments/gift-card.png" alt="بطاقة هدايا" class="pay-option-icon" />
-          <div>بطاقة هدايا</div>
-        </div>
-      </div>
+    <!-- Main Column - Steps -->
+    <div class="checkout-main">
 
-      <!-- Payment Details (Dynamic) -->
-      <div class="pay-number-box" id="payNumberBox">
-        <!-- Vodafone / Instapay / COD Details -->
-        <div id="traditionalPayDetails">
-          <div class="pay-number-header">
-            <span class="pay-number-label" id="payLabel">حوّل المبلغ على رقم فودافون كاش:</span>
+      <!-- STEP 1: Shipping -->
+      <div class="card step-panel" id="stepShipping">
+        <h3 style="margin-bottom:1.4rem;font-family:'Cairo',sans-serif">بيانات التوصيل</h3>
+
+        <div class="row2">
+          <div class="field">
+            <label>الاسم الكامل</label>
+            <input id="cName" placeholder="مثال: أحمد محمد" autocomplete="name" onblur="validateField('cName')" oninput="clearFieldError('cName')" />
+            <span class="field-error" id="err-cName"></span>
           </div>
-          <div class="pay-number-value">
-            <b id="payNumberVal">جاري التحميل...</b>
-            <button class="copy-btn" id="copyPhoneBtn" onclick="copyToClipboard(document.getElementById('payNumberVal').textContent, this)">
-              <i class='bx bx-copy'></i> نسخ
-            </button>
-          </div>
-          
-          <!-- Owner Name Display -->
-          <div id="ownerNameDisplay" style="margin-top:.7rem;padding:.6rem .8rem;background:rgba(212,175,55,.08);border-radius:8px;display:none">
-            <span style="font-size:.82rem;color:var(--text-dim)">اسم صاحب الحساب: </span>
-            <b id="ownerNameText" style="font-size:.9rem;color:var(--gold);font-family:'Cairo',sans-serif"></b>
-          </div>
-          
-          <!-- Instapay Link (shown when instapay selected) -->
-          <div id="instapaySection" style="display:none;margin-top:1rem;padding-top:1rem;border-top:1px dashed var(--line)">
-            <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:.6rem">أو اضغط للدفع مباشرة عبر إنستاباي:</p>
-            <a href="#" target="_blank" class="instapay-link" id="instapayLink">
-              <i class='bx bx-link-external'></i> فتح رابط الدفع
-            </a>
+          <div class="field">
+            <label>رقم الموبايل</label>
+            <input id="cPhone" type="tel" inputmode="numeric" placeholder="01xxxxxxxxx" autocomplete="tel" onblur="validateField('cPhone')" oninput="clearFieldError('cPhone')" />
+            <span class="field-hint">نستخدمه للتواصل بخصوص التوصيل فقط</span>
+            <span class="field-error" id="err-cPhone"></span>
           </div>
         </div>
 
-        <!-- Gift Card Payment Details -->
-        <div id="giftCardPayDetails" style="display:none">
-          <div class="gc-pay-inputs">
-            <div class="field">
-              <label><i class='bx bx-credit-card' style="color:var(--gold)"></i> رقم البطاقة</label>
-              <input type="text" id="gcCardNumberInput" placeholder="TG9A-KD82-XP91-LQW7" style="direction:ltr;text-align:center;font-family:'Cairo',sans-serif;letter-spacing:1px" maxlength="19" />
+        <div class="row2">
+          <div class="field">
+            <label>المحافظة</label>
+            <select id="cCity" autocomplete="address-level1" onblur="validateField('cCity')"><option value="">اختر المحافظة</option></select>
+            <span class="field-error" id="err-cCity"></span>
+          </div>
+          <div class="field">
+            <label>العنوان بالتفصيل</label>
+            <input id="cAddress" placeholder="الشارع، رقم العمارة..." autocomplete="street-address" onblur="validateField('cAddress')" oninput="clearFieldError('cAddress')" />
+            <span class="field-error" id="err-cAddress"></span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>ملاحظات (اختياري)</label>
+          <textarea id="cNotes" rows="2" placeholder="أي تفاصيل إضافية"></textarea>
+        </div>
+
+        <div class="shipping-note" id="shippingNote">
+          <i class='bx bx-truck'></i> <span id="shippingNoteText"></span>
+        </div>
+      </div>
+
+      <!-- STEP 2: Payment -->
+      <div class="card step-panel step-hidden" id="stepPayment">
+        <h3 style="margin-bottom:1.2rem;font-family:'Cairo',sans-serif">طريقة الدفع</h3>
+        <div class="pay-options skeleton" id="payOptions">
+          <div class="pay-option active" data-method="vodafone" onclick="selectPay('vodafone', this)">
+            <img src="images/payments/vodafone-cash.png" alt="فودافون كاش" class="pay-option-icon" />
+            <div>فودافون كاش</div>
+          </div>
+          <div class="pay-option" data-method="instapay" onclick="selectPay('instapay', this)">
+            <img src="images/payments/instapay.png" alt="انستاباي" class="pay-option-icon" />
+            <div>انستاباي</div>
+          </div>
+          <div class="pay-option" data-method="cod" onclick="selectPay('cod', this)">
+            <img src="images/payments/cash-on-delivery.png" alt="الدفع عند الاستلام" class="pay-option-icon" />
+            <div>عند الاستلام</div>
+          </div>
+          <div class="pay-option" data-method="giftcard" onclick="selectPay('giftcard', this)">
+            <img src="images/payments/gift-card.png" alt="بطاقة هدايا" class="pay-option-icon" />
+            <div>بطاقة هدايا</div>
+          </div>
+        </div>
+
+        <!-- Payment Details (Dynamic) -->
+        <div class="pay-number-box" id="payNumberBox">
+          <!-- Vodafone / Instapay / COD Details -->
+          <div id="traditionalPayDetails">
+            <div class="pay-number-header">
+              <span class="pay-number-label" id="payLabel">حوّل المبلغ على رقم فودافون كاش:</span>
             </div>
-            <div class="field">
-              <label><i class='bx bx-lock' style="color:var(--gold)"></i> الرقم السري (PIN)</label>
-              <input type="password" id="gcPinInput" placeholder="••••••" style="direction:ltr;text-align:center;letter-spacing:4px" maxlength="6" />
-            </div>
-          </div>
-          <div id="gcPayStatusMsg" style="font-size:.85rem;margin-top:.6rem;padding:.5rem .8rem;border-radius:8px;display:none"></div>
-          
-          <!-- Partial Payment Section (shown when card doesn't cover full amount) -->
-          <div id="partialPaymentSection" style="display:none;margin-top:1.2rem;padding:1rem;background:rgba(212,175,55,.06);border:1px dashed var(--gold);border-radius:12px">
-            <h4 style="margin:0 0 .8rem;color:var(--gold);font-family:'Cairo',sans-serif;display:flex;align-items:center;gap:.5rem">
-              <i class='bx bx-info-circle'></i> دفع المتبقي
-            </h4>
-            <div id="partialPaymentInfo" style="margin-bottom:1rem;font-size:.9rem"></div>
-            <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:.8rem">اختر طريقة الدفع لاستكمال المبلغ:</p>
-            <div class="partial-pay-options" style="display:flex;gap:.6rem;flex-wrap:wrap">
-              <button class="btn-secondary partial-pay-btn active" data-pmethod="vodafone" onclick="selectPartialPay('vodafone',this)">
-                <img src="images/payments/vodafone-cash.png" style="width:20px;height:20px;margin-left:4px" /> فودافون كاش
-              </button>
-              <button class="btn-secondary partial-pay-btn" data-pmethod="instapay" onclick="selectPartialPay('instapay',this)">
-                <img src="images/payments/instapay.png" style="width:20px;height:20px;margin-left:4px" /> انستاباي
+            <div class="pay-number-value">
+              <b id="payNumberVal">جاري التحميل...</b>
+              <button class="copy-btn" id="copyPhoneBtn" onclick="copyToClipboard(document.getElementById('payNumberVal').textContent, this)">
+                <i class='bx bx-copy'></i> نسخ
               </button>
             </div>
-            <div id="partialPayDetails" style="margin-top:1rem"></div>
+
+            <!-- Owner Name Display -->
+            <div id="ownerNameDisplay" style="margin-top:.7rem;padding:.6rem .8rem;background:rgba(212,175,55,.08);border-radius:8px;display:none">
+              <span style="font-size:.82rem;color:var(--text-dim)">اسم صاحب الحساب: </span>
+              <b id="ownerNameText" style="font-size:.9rem;color:var(--gold);font-family:'Cairo',sans-serif"></b>
+            </div>
+
+            <!-- Instapay Link (shown when instapay selected) -->
+            <div id="instapaySection" style="display:none;margin-top:1rem;padding-top:1rem;border-top:1px dashed var(--line)">
+              <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:.6rem">أو اضغط للدفع مباشرة عبر إنستاباي:</p>
+              <a href="#" target="_blank" class="instapay-link" id="instapayLink">
+                <i class='bx bx-link-external'></i> فتح رابط الدفع
+              </a>
+            </div>
           </div>
+
+          <!-- Gift Card Payment Details -->
+          <div id="giftCardPayDetails" style="display:none">
+            <div class="gc-pay-inputs">
+              <div class="field">
+                <label><i class='bx bx-credit-card' style="color:var(--gold)"></i> رقم البطاقة</label>
+                <input type="text" id="gcCardNumberInput" placeholder="TG9A-KD82-XP91-LQW7" style="direction:ltr;text-align:center;font-family:'Cairo',sans-serif;letter-spacing:1px" maxlength="19" />
+              </div>
+              <div class="field">
+                <label><i class='bx bx-lock' style="color:var(--gold)"></i> الرقم السري (PIN)</label>
+                <input type="password" id="gcPinInput" placeholder="••••••" style="direction:ltr;text-align:center;letter-spacing:4px" maxlength="6" />
+              </div>
+            </div>
+            <div id="gcPayStatusMsg" style="font-size:.85rem;margin-top:.6rem;padding:.5rem .8rem;border-radius:8px;display:none"></div>
+
+            <!-- Partial Payment Section (shown when card doesn't cover full amount) -->
+            <div id="partialPaymentSection" style="display:none;margin-top:1.2rem;padding:1rem;background:rgba(212,175,55,.06);border:1px dashed var(--gold);border-radius:12px">
+              <h4 style="margin:0 0 .8rem;color:var(--gold);font-family:'Cairo',sans-serif;display:flex;align-items:center;gap:.5rem">
+                <i class='bx bx-info-circle'></i> دفع المتبقي
+              </h4>
+              <div id="partialPaymentInfo" style="margin-bottom:1rem;font-size:.9rem"></div>
+              <p style="font-size:.85rem;color:var(--text-dim);margin-bottom:.8rem">اختر طريقة الدفع لاستكمال المبلغ:</p>
+              <div class="partial-pay-options" style="display:flex;gap:.6rem;flex-wrap:wrap">
+                <button class="btn-secondary partial-pay-btn active" data-pmethod="vodafone" onclick="selectPartialPay('vodafone',this)">
+                  <img src="images/payments/vodafone-cash.png" style="width:20px;height:20px;margin-left:4px" /> فودافون كاش
+                </button>
+                <button class="btn-secondary partial-pay-btn" data-pmethod="instapay" onclick="selectPartialPay('instapay',this)">
+                  <img src="images/payments/instapay.png" style="width:20px;height:20px;margin-left:4px" /> انستاباي
+                </button>
+              </div>
+              <div id="partialPayDetails" style="margin-top:1rem"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Receipt Upload (hidden for giftcard payment method) -->
+        <div class="field" id="receiptField">
+          <label id="receiptLabel">ارفع صورة إيصال التحويل (اختياري للدفع عند الاستلام)</label>
+          <div class="upload-area" onclick="document.getElementById('receiptInput').click()">
+            <img id="receiptPreview" style="display:none" alt="" />
+            <div id="receiptPlaceholder">
+              <i class='bx bx-cloud-upload' style="font-size:2.2rem;color:var(--gold)"></i>
+              <p style="margin-top:.6rem;color:var(--text-dim)">اضغط لرفع صورة الإيصال</p>
+            </div>
+            <div id="receiptStatus"></div>
+          </div>
+          <input type="file" id="receiptInput" accept="image/*" style="display:none" onchange="onReceiptChange()" />
         </div>
       </div>
 
-      <!-- Receipt Upload (hidden for giftcard payment method) -->
-      <div class="field" id="receiptField">
-        <label id="receiptLabel">ارفع صورة إيصال التحويل (اختياري للدفع عند الاستلام)</label>
-        <div class="upload-area" onclick="document.getElementById('receiptInput').click()">
-          <img id="receiptPreview" style="display:none" alt="" />
-          <div id="receiptPlaceholder">
-            <i class='bx bx-cloud-upload' style="font-size:2.2rem;color:var(--gold)"></i>
-            <p style="margin-top:.6rem;color:var(--text-dim)">اضغط لرفع صورة الإيصال</p>
-          </div>
-          <div id="receiptStatus"></div>
-        </div>
-        <input type="file" id="receiptInput" accept="image/*" style="display:none" onchange="onReceiptChange()" />
+      <!-- Step Actions -->
+      <div class="checkout-actions" id="checkoutActions">
+        <button class="btn-secondary" id="backBtn" style="display:none" onclick="goToStep(1)"><i class='bx bx-chevron-right'></i> رجوع</button>
+        <button class="btn-primary full-width" id="nextBtn" onclick="goToStep(2)">التالي <i class='bx bx-chevron-left'></i></button>
+        <button class="btn-primary full-width" id="submitBtn" style="display:none" onclick="submitOrder()">تأكيد الطلب <i class='bx bx-check-double'></i></button>
       </div>
-
-      <button class="btn-primary full-width" style="margin-top:1.5rem" onclick="submitOrder()" id="submitBtn">تأكيد الدفع <i class='bx bx-check-double'></i></button>
     </div>
 
-    <!-- Right Column - Order Summary -->
-    <div class="card" style="height:fit-content;position:sticky;top:100px">
-      <h3 style="margin-bottom:1.2rem;font-family:'Cairo',sans-serif">طلبك</h3>
-      <div id="orderItemsList"></div>
-      <div class="summary-row"><span>المجموع الفرعي</span><span id="sSub">0 ج.م</span></div>
-      <div class="summary-row"><span>الشحن</span><span id="sShip">يحدد لاحقاً</span></div>
-      <div id="discountRow" class="summary-row" style="display:none"><span>الخصم</span><span id="sDiscount" style="color:var(--success)">-0 ج.م</span></div>
-      <div id="giftCardRow" class="summary-row" style="display:none"><span>بطاقة الهدايا</span><span id="sGiftCard" style="color:var(--success)">-0 ج.م</span></div>
-      <div class="summary-row total"><span>الإجمالي</span><span id="sTotal">0 ج.م</span></div>
-      
-      <div class="field" style="margin-top:1.3rem">
-        <label>كود الخصم (إن وجد)</label>
-        <div style="display:flex;gap:.6rem">
-          <input id="promoCode" placeholder="أدخل الكود" style="flex:1" />
-          <button class="btn-primary" style="padding:0 1.2rem" onclick="applyPromo()">تطبيق</button>
+    <!-- Sidebar - Order Summary -->
+    <div class="checkout-sidebar" style="height:fit-content;position:sticky;top:100px">
+      <div class="card order-summary-card" id="orderSummaryCard">
+        <div class="order-summary-header" onclick="toggleSummary()">
+          <h3>طلبك <span class="summary-count" id="summaryCount"></span></h3>
+          <div class="summary-header-total">
+            <span id="sTotalMini">0 ج.م</span>
+            <i class='bx bx-chevron-down'></i>
+          </div>
+        </div>
+        <div class="order-summary-body" id="orderSummaryBody">
+          <div id="orderItemsList"></div>
+          <div class="summary-row"><span>المجموع الفرعي</span><span id="sSub">0 ج.م</span></div>
+          <div class="summary-row"><span>الشحن</span><span id="sShip">يحدد لاحقاً</span></div>
+          <div id="discountRow" class="summary-row" style="display:none"><span>الخصم</span><span id="sDiscount" style="color:var(--success)">-0 ج.م</span></div>
+          <div id="giftCardRow" class="summary-row" style="display:none"><span>بطاقة الهدايا</span><span id="sGiftCard" style="color:var(--success)">-0 ج.م</span></div>
+          <div class="summary-row total"><span>الإجمالي</span><span id="sTotal">0 ج.م</span></div>
+
+          <div class="field" style="margin-top:1.3rem">
+            <label>كود الخصم (إن وجد)</label>
+            <div style="display:flex;gap:.6rem">
+              <input id="promoCode" placeholder="أدخل الكود" style="flex:1" />
+              <button class="btn-primary" style="padding:0 1.2rem" onclick="applyPromo()">تطبيق</button>
+            </div>
+          </div>
+
+          <div class="field" id="giftCardField">
+            <label><i class='bx bx-gift' style="color:var(--gold)"></i> ادفع ببطاقة هدايا (اختياري)</label>
+            <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+              <input id="giftCardNumberInput" placeholder="TG9A-KD82-XP91-LQW7" style="flex:1;min-width:140px;direction:ltr" />
+              <input id="giftCardPinInput" placeholder="PIN" style="width:90px;direction:ltr" maxlength="6" />
+              <button class="btn-secondary" style="padding:0 1.1rem" onclick="applyGiftCardAtCheckout()">تطبيق</button>
+            </div>
+            <div id="giftCardStatusMsg" style="font-size:.8rem;margin-top:.4rem"></div>
+          </div>
         </div>
       </div>
 
-      <div class="field" id="giftCardField">
-        <label><i class='bx bx-gift' style="color:var(--gold)"></i> ادفع ببطاقة هدايا (اختياري)</label>
-        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
-          <input id="giftCardNumberInput" placeholder="TG9A-KD82-XP91-LQW7" style="flex:1;min-width:140px;direction:ltr" />
-          <input id="giftCardPinInput" placeholder="PIN" style="width:90px;direction:ltr" maxlength="6" />
-          <button class="btn-secondary" style="padding:0 1.1rem" onclick="applyGiftCardAtCheckout()">تطبيق</button>
-        </div>
-        <div id="giftCardStatusMsg" style="font-size:.8rem;margin-top:.4rem"></div>
+      <div class="support-inline">
+        <i class='bx bxl-whatsapp'></i> محتاج مساعدة؟ <a href="#" id="supportWhatsapp" target="_blank">تواصل معنا واتساب</a>
       </div>
     </div>
   </div>
@@ -426,17 +577,105 @@ let discountAmount = 0;
 let appliedGiftCard = null; // { key, cardNumber, deduction }
 let partialPayMethod = "vodafone"; // for partial payment when gift card doesn't cover full amount
 let gcPaymentData = null; // stores validated gift card data when used as primary payment
+let currentStep = 1; // 1 = shipping, 2 = payment (state machine — no data reset when moving between steps)
 
 const cart = getCart();
 if (!cart.length) location.href = "cart.html";
+
+// Support WhatsApp link (general help, not order-specific)
+document.getElementById("supportWhatsapp").href =
+  "https://wa.me/201012345678?text=" + encodeURIComponent("مرحباً، محتاج مساعدة في إتمام الطلب على Tiger Jeans");
+
+// ====== Step Navigation (state machine — validation per step, data preserved on back) ======
+function goToStep(step) {
+  if (step === 2 && currentStep === 1) {
+    if (!validateStep1()) {
+      showToast("من فضلك أكمل بيانات التوصيل بشكل صحيح");
+      const firstInvalid = document.querySelector("#stepShipping .invalid");
+      if (firstInvalid) firstInvalid.focus();
+      return;
+    }
+  }
+  currentStep = step;
+  document.getElementById("stepShipping").classList.toggle("step-hidden", step !== 1);
+  document.getElementById("stepPayment").classList.toggle("step-hidden", step !== 2);
+  document.getElementById("backBtn").style.display = step === 2 ? "flex" : "none";
+  document.getElementById("nextBtn").style.display = step === 1 ? "flex" : "none";
+  document.getElementById("submitBtn").style.display = step === 2 ? "flex" : "none";
+  document.querySelectorAll(".step-item[data-step-indicator]").forEach((el) => {
+    const s = parseInt(el.getAttribute("data-step-indicator"), 10);
+    el.classList.toggle("active", s === step);
+    el.classList.toggle("done", s < step);
+  });
+  const stepper = document.getElementById("checkoutStepper");
+  if (stepper) window.scrollTo({ top: stepper.offsetTop - 20, behavior: "smooth" });
+}
+
+// ====== Adaptive per-field validation (shows the exact issue under the field) ======
+const fieldRules = {
+  cName: (v) => (!v ? "من فضلك أدخل الاسم بالكامل" : v.length < 3 ? "الاسم قصير جدًا" : ""),
+  cPhone: (v) => (!v ? "من فضلك أدخل رقم الموبايل" : !/^01[0125][0-9]{8}$/.test(v) ? "رقم الموبايل يجب أن يكون 11 رقم ويبدأ بـ 010/011/012/015" : ""),
+  cCity: (v) => (!v ? "من فضلك اختر المحافظة" : ""),
+  cAddress: (v) => (!v ? "من فضلك أدخل العنوان بالتفصيل" : v.length < 5 ? "العنوان قصير جدًا، أضف تفاصيل أكثر" : ""),
+};
+
+function validateField(id) {
+  const el = document.getElementById(id);
+  const errEl = document.getElementById("err-" + id);
+  const rule = fieldRules[id];
+  if (!el || !errEl || !rule) return true;
+  const msg = rule(el.value.trim());
+  if (msg) {
+    errEl.textContent = msg;
+    errEl.style.display = "block";
+    el.classList.add("invalid");
+    return false;
+  }
+  errEl.textContent = "";
+  errEl.style.display = "none";
+  el.classList.remove("invalid");
+  return true;
+}
+
+function clearFieldError(id) {
+  const el = document.getElementById(id);
+  const errEl = document.getElementById("err-" + id);
+  if (el) el.classList.remove("invalid");
+  if (errEl) { errEl.textContent = ""; errEl.style.display = "none"; }
+}
+
+function validateStep1() {
+  let allValid = true;
+  Object.keys(fieldRules).forEach((id) => { if (!validateField(id)) allValid = false; });
+  return allValid;
+}
+
+// ====== Collapsible order summary (mobile) — total always visible, details expand on tap ======
+function toggleSummary() {
+  document.getElementById("orderSummaryCard").classList.toggle("expanded");
+}
+
+// ====== Shipping cost + delivery estimate shown as soon as governorate is picked ======
+function updateShippingNote() {
+  const city = document.getElementById("cCity").value;
+  const note = document.getElementById("shippingNote");
+  const noteText = document.getElementById("shippingNoteText");
+  if (!note || !noteText) return;
+  if (!city) { note.style.display = "none"; return; }
+  const cost = getShippingCost();
+  noteText.textContent = `الشحن إلى ${city}: ${fmtPrice(cost)} — يصل خلال 2-5 أيام عمل تقريبًا`;
+  note.style.display = "flex";
+}
 
 // Populate governorates dropdown
 document.getElementById("cCity").innerHTML =
   '<option value="">اختر المحافظة</option>' +
   EGYPT_GOVERNORATES.map((g) => `<option value="${g}">${g}</option>`).join("");
 document.getElementById("cCity").addEventListener("change", () => {
+  clearFieldError("cCity");
   updatePayNumber();
   updateTotals();
+  updateShippingNote();
 });
 
 // Render order items
@@ -447,7 +686,11 @@ function renderOrder() {
       <div class="item-name">${i.name}${i.size ? " - " + i.size : ""} × ${i.qty}</div>
       <div class="item-price">${fmtPrice(i.price * i.qty)}</div>
     </div>`).join("");
-  
+
+  const totalQty = cart.reduce((s, i) => s + (i.qty || 1), 0);
+  const countEl = document.getElementById("summaryCount");
+  if (countEl) countEl.textContent = `(${totalQty} منتج)`;
+
   updateTotals();
 }
 renderOrder();
@@ -463,6 +706,8 @@ db.ref("settings/payment").once("value").then((snap) => {
   if (!paySettings.instapay) paySettings.instapay = "engmohamednasr";
   if (!paySettings.instapayLink) paySettings.instapayLink = "https://ipn.eg/S/engmohamednasr/instapay/8NShbl";
   updatePayNumber();
+  const payOptionsEl = document.getElementById("payOptions");
+  if (payOptionsEl) payOptionsEl.classList.remove("skeleton");
 });
 
 // Load payment methods status (enabled/disabled) from admin
@@ -496,6 +741,9 @@ db.ref("settings/paymentMethods").once("value").then((snap) => {
       selectPay(availablePaymentMethods[0], firstAvailable);
     }
   }
+
+  const payOptionsEl2 = document.getElementById("payOptions");
+  if (payOptionsEl2) payOptionsEl2.classList.remove("skeleton");
   
   // Show warning if no payment methods available
   if (availablePaymentMethods.length === 0) {
@@ -521,6 +769,7 @@ db.ref("shippingRates").once("value").then((snap) => {
   });
   updatePayNumber();
   updateTotals();
+  updateShippingNote();
 });
 
 // Returns the shipping cost for the currently selected governorate.
@@ -805,6 +1054,9 @@ function updateTotals() {
   } else {
     giftRow.style.display = "none";
   }
+
+  const miniTotal = document.getElementById("sTotalMini");
+  if (miniTotal) miniTotal.textContent = fmtPrice(Math.max(0, total));
 }
 
 // ====== Gift Card redemption at checkout ======
@@ -957,13 +1209,10 @@ async function submitOrder() {
   const address = document.getElementById("cAddress").value.trim();
   const notes = document.getElementById("cNotes").value.trim();
 
-  // Validation
-  if (!name || !phone || !city || !address) {
-    showToast("من فضلك أكمل بيانات التوصيل");
-    return;
-  }
-  if (!/^01[0125][0-9]{8}$/.test(phone)) {
-    showToast("رقم الموبايل غير صحيح");
+  // Validation (adaptive per-field messages + safety net back to step 1)
+  if (!validateStep1()) {
+    goToStep(1);
+    showToast("من فضلك أكمل بيانات التوصيل بشكل صحيح");
     return;
   }
   
