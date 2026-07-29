@@ -312,6 +312,11 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
   position:relative;
   overflow:hidden;
 }
+/* Hero now shown as a secondary promo banner below the products */
+.hero-section--secondary{padding:3.4rem 0 3rem}
+/* Products are the very first thing visitors see */
+.section-products-first{padding-top:2.2rem}
+@media(max-width:768px){.section-products-first{padding-top:1.6rem}}
 .hero-section::before{
   content:'';
   position:absolute;
@@ -1628,6 +1633,183 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
 .tour-dot{width:8px;height:8px;border-radius:50%;background:var(--line);transition:.3s;cursor:pointer;border:none;padding:0}
 .tour-dot.active{background:var(--gold);width:22px;border-radius:6px}
 .tour-next{padding:.65rem 1.5rem;font-size:.85rem;white-space:nowrap}
+
+/* ====== Live Purchase-Flow Demo inside the Shopping Guide ====== */
+.tour-card--demo{max-width:460px}
+.tour-mock{
+  position:relative;
+  height:172px;
+  border-radius:14px;
+  background:var(--bg-alt);
+  border:1px solid var(--line);
+  overflow:hidden;
+  margin-bottom:1.1rem;
+  padding:.85rem;
+}
+.tm-cursor{
+  position:absolute;
+  font-size:1.35rem;
+  color:#fff;
+  filter:drop-shadow(0 2px 5px rgba(0,0,0,.55));
+  z-index:5;
+  transform:translate(-4px,-2px);
+}
+
+/* -- Step 1: browsing -- */
+.tm-browse .tm-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;height:100%}
+.tm-browse .tm-card{
+  background:var(--surface);border-radius:8px;border:1px solid var(--line);
+  position:relative;display:flex;align-items:flex-end;justify-content:center;padding-bottom:.3rem;
+}
+.tm-browse .tm-price{font-size:.6rem;color:var(--gold);font-weight:800;opacity:0;transition:.2s}
+.tm-browse .tm-target{animation:tmTargetPulse 2.6s ease-in-out infinite}
+.tm-browse .tm-target .tm-price{animation:tmPriceShow 2.6s ease-in-out infinite}
+@keyframes tmTargetPulse{
+  0%,35%,100%{transform:scale(1);border-color:var(--line);box-shadow:none}
+  55%,80%{transform:scale(1.1);border-color:var(--gold);box-shadow:0 0 0 3px rgba(212,175,55,.25)}
+}
+.tm-target-jeans{
+  background-image:url('images/product-3.png');
+  background-size:cover;background-position:center;
+}
+.tm-target-jeans .tm-price{background:rgba(0,0,0,.55);border-radius:5px;padding:0 .3rem;color:#fff}
+@keyframes tmPriceShow{0%,35%,100%{opacity:0}55%,80%{opacity:1}}
+.tm-cursor-1{animation:tmCursor1 2.6s ease-in-out infinite}
+@keyframes tmCursor1{
+  0%{left:8%;top:75%}
+  40%{left:40%;top:42%}
+  55%,80%{left:40%;top:42%;transform:translate(-4px,-2px) scale(.82)}
+  90%{transform:translate(-4px,-2px) scale(1)}
+  100%{left:8%;top:75%}
+}
+
+/* -- Step 2: size / color select -- */
+.tm-select{display:flex;gap:.9rem;align-items:center}
+.tm-select-photo{
+  width:64px;height:100%;border-radius:10px;background:var(--surface);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:1.7rem;color:var(--text-dim);flex:0 0 auto;
+  position:relative;overflow:hidden;
+}
+.tm-jeans-photo{
+  background-image:url('images/product-3.png');
+  background-size:150%;background-position:center;
+  animation:tmPhotoZoom 2.6s ease-in-out infinite;
+}
+@keyframes tmPhotoZoom{
+  0%,35%,100%{background-size:150%}
+  55%,80%{background-size:230%}
+}
+.tm-zoom-lens{
+  position:absolute;top:6px;left:6px;width:20px;height:20px;border-radius:50%;
+  background:rgba(0,0,0,.55);color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:.85rem;opacity:0;animation:tmLensShow 2.6s ease-in-out infinite;
+}
+@keyframes tmLensShow{0%,35%,100%{opacity:0}55%,80%{opacity:1}}
+.tm-select-side{flex:1;min-width:0}
+.tm-label{font-size:.66rem;color:var(--text-dim);margin-bottom:.3rem;font-weight:700}
+.tm-sizes{display:flex;gap:.35rem;margin-bottom:.6rem}
+.tm-size{
+  width:26px;height:26px;border-radius:7px;border:1px solid var(--line);background:var(--surface);
+  display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:800;color:var(--text-dim);
+}
+.tm-size-target{animation:tmSizePick 2.6s ease-in-out infinite}
+@keyframes tmSizePick{
+  0%,35%,100%{border-color:var(--line);color:var(--text-dim);background:var(--surface)}
+  55%,90%{border-color:var(--gold);color:#000;background:var(--gold)}
+}
+.tm-colors{display:flex;gap:.4rem}
+.tm-color{width:20px;height:20px;border-radius:50%;border:2px solid transparent;display:inline-block}
+.tm-color.c-navy{background:#2e3a52}
+.tm-color.c-black{background:#111}
+.tm-color.c-beige{background:#c9b28b}
+.tm-color-target{animation:tmColorPick 2.6s ease-in-out infinite}
+@keyframes tmColorPick{
+  0%,55%,100%{border-color:transparent;box-shadow:none}
+  70%,90%{border-color:var(--gold);box-shadow:0 0 0 2px rgba(212,175,55,.3)}
+}
+.tm-cursor-2{animation:tmCursor2 2.6s ease-in-out infinite}
+@keyframes tmCursor2{
+  0%{left:30%;top:80%}
+  30%{left:58%;top:52%}
+  55%,72%{left:58%;top:52%;transform:translate(-4px,-2px) scale(.82)}
+  75%{left:80%;top:70%}
+  85%,95%{left:80%;top:70%;transform:translate(-4px,-2px) scale(.82)}
+  100%{left:30%;top:80%;transform:translate(-4px,-2px) scale(1)}
+}
+
+/* -- Step 3: add to cart -- */
+.tm-addcart{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem}
+.tm-cart-icon{
+  position:absolute;top:.7rem;left:.7rem;font-size:1.5rem;color:var(--text-dim);
+}
+.tm-cart-badge{
+  position:absolute;top:-4px;right:-8px;background:var(--gold);color:#000;
+  font-size:.6rem;font-weight:900;border-radius:50%;width:16px;height:16px;
+  display:flex;align-items:center;justify-content:center;
+}
+.tm-cart-badge{animation:tmCartBadge 2.4s ease-in-out infinite}
+@keyframes tmCartBadge{0%,60%{content:"0"}0%,55%{transform:scale(1)}65%{transform:scale(1.5)}75%,100%{transform:scale(1)}}
+.tm-add-btn{
+  background:var(--gold);color:#000;border:none;border-radius:10px;
+  padding:.65rem 1.3rem;font-weight:800;font-size:.85rem;display:flex;align-items:center;gap:.4rem;
+  font-family:'Cairo',sans-serif;cursor:default;
+  animation:tmAddBtnPress 2.4s ease-in-out infinite;
+}
+@keyframes tmAddBtnPress{0%,55%,100%{transform:scale(1);filter:brightness(1)}62%{transform:scale(.93);filter:brightness(1.15)}70%{transform:scale(1)}}
+.tm-fly-dot{
+  position:absolute;width:10px;height:10px;border-radius:50%;background:var(--gold);
+  top:60%;left:52%;opacity:0;
+  animation:tmFlyDot 2.4s ease-in-out infinite;
+}
+@keyframes tmFlyDot{
+  0%,58%{opacity:0;top:60%;left:52%;transform:scale(1)}
+  62%{opacity:1;top:60%;left:52%;transform:scale(1)}
+  85%{opacity:1;top:14%;left:14%;transform:scale(.4)}
+  90%,100%{opacity:0;top:14%;left:14%}
+}
+.tm-cursor-3{animation:tmCursor3 2.4s ease-in-out infinite}
+@keyframes tmCursor3{
+  0%{left:52%;top:85%}
+  40%{left:58%;top:60%}
+  55%,70%{left:58%;top:60%;transform:translate(-4px,-2px) scale(.82)}
+  100%{left:52%;top:85%;transform:translate(-4px,-2px) scale(1)}
+}
+
+/* -- Step 4: shipping + payment -- */
+.tm-checkout{display:flex;flex-direction:column;gap:.5rem;padding:.7rem .9rem;justify-content:center}
+.tm-field{display:flex;align-items:center;gap:.5rem;font-size:.72rem}
+.tm-field-label{color:var(--text-dim);font-weight:700;flex:0 0 auto;width:44px}
+.tm-typed{
+  flex:1;min-width:0;height:20px;border:1px solid var(--line);border-radius:6px;
+  background:var(--surface);padding:0 .5rem;display:flex;align-items:center;
+  font-size:.72rem;color:var(--text);white-space:nowrap;overflow:hidden;
+}
+.tm-typed::after{content:"";display:inline-block}
+.tm-typed-name::after{content:"أحمد محمد";animation:tmType1 3.6s steps(9) infinite}
+.tm-typed-address::after{content:"القاهرة، مدينة نصر";animation:tmType2 3.6s steps(18) infinite}
+@keyframes tmType1{0%,10%{content:""}12%{content:"أ"}16%{content:"أح"}20%{content:"أحم"}24%{content:"أحمد"}28%{content:"أحمد "}32%{content:"أحمد م"}36%{content:"أحمد مح"}40%{content:"أحمد محم"}44%,92%{content:"أحمد محمد"}100%{content:""}}
+@keyframes tmType2{0%,14%{content:""}18%{content:"القاهرة"}30%{content:"القاهرة، "}44%{content:"القاهرة، مدينة"}56%,92%{content:"القاهرة، مدينة نصر"}100%{content:""}}
+.tm-pay-row{display:flex;gap:.4rem;margin-top:.3rem}
+.tm-pay-chip{
+  flex:1;text-align:center;font-size:.62rem;font-weight:700;color:var(--text-dim);
+  border:1px solid var(--line);border-radius:8px;padding:.4rem .2rem;background:var(--surface);
+}
+.tm-pay-target{animation:tmPayPick 3.6s ease-in-out infinite}
+@keyframes tmPayPick{
+  0%,60%,100%{border-color:var(--line);color:var(--text-dim);background:var(--surface)}
+  75%,90%{border-color:var(--gold);color:#000;background:var(--gold)}
+}
+.tm-success{
+  display:flex;align-items:center;justify-content:center;gap:.4rem;
+  margin-top:.4rem;font-size:.78rem;font-weight:800;color:var(--gold);opacity:0;
+  animation:tmSuccessShow 3.6s ease-in-out infinite;
+}
+.tm-success i{font-size:1.1rem}
+@keyframes tmSuccessShow{0%,88%{opacity:0;transform:translateY(6px)}94%,100%{opacity:1;transform:translateY(0)}}
+@media(max-width:480px){
+  .tour-mock{height:150px}
+  .tm-select-photo{width:52px}
+}
 
 /* ---- Fly to cart flying icon ---- */
 .fly-icon{

@@ -498,23 +498,8 @@
 </header>
 
 <main>
-<!-- ====== Hero Section ====== -->
-<section class="hero-section">
-  <div class="hero-blob b1"></div>
-  <div class="hero-blob b2"></div>
-  <div class="container">
-    <div class="hero-badge">✨ اكتشف أحدث تشكيلات Tiger</div>
-    <h1 class="hero-title">اكتشِف أناقة<br><span class="gold-text">تليق بك</span></h1>
-    <p class="hero-desc">مشتري وصول البنر الذي تأثير أونر والملابس العصرية<br>بأسعار منافسة وجودة لا تضاهى</p>
-    <div class="hero-buttons">
-      <a href="#products" class="btn-primary">تسوق الآن <i class='bx bx-left-arrow-alt'></i></a>
-      <a href="#deals-section" class="btn-secondary">عروض مميزة</a>
-    </div>
-  </div>
-</section>
-
-<!-- ====== Products Section ====== -->
-<section class="section" id="products">
+<!-- ====== Products Section (first thing visitors see) ====== -->
+<section class="section section-products-first" id="products">
   <div class="container">
     <div class="section-header">
       <div>
@@ -532,6 +517,21 @@
     <!-- Products Grid with Flip Animation -->
     <div class="products-grid" id="productsGrid">
       <div class="loading-state">جاري تحميل المنتجات...</div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== Hero / Promo Banner (moved below products) ====== -->
+<section class="hero-section hero-section--secondary">
+  <div class="hero-blob b1"></div>
+  <div class="hero-blob b2"></div>
+  <div class="container">
+    <div class="hero-badge">✨ اكتشف أحدث تشكيلات Tiger</div>
+    <h1 class="hero-title">اكتشِف أناقة<br><span class="gold-text">تليق بك</span></h1>
+    <p class="hero-desc">مشتري وصول البنر الذي تأثير أونر والملابس العصرية<br>بأسعار منافسة وجودة لا تضاهى</p>
+    <div class="hero-buttons">
+      <a href="#products" class="btn-primary">تسوق الآن <i class='bx bx-left-arrow-alt'></i></a>
+      <a href="#deals-section" class="btn-secondary">عروض مميزة</a>
     </div>
   </div>
 </section>
@@ -788,13 +788,95 @@
 <!-- ====== "How to buy" help button (reopens the tour anytime) ====== -->
 <button class="tour-help-btn" onclick="openTour()" title="كيف أشتري من الموقع؟" aria-label="كيف أشتري من الموقع؟"><i class='bx bx-help-circle'></i></button>
 
-<!-- ====== First-Visit Shopping Guide ====== -->
+<!-- ====== First-Visit Shopping Guide (live simulated demo, not just icons) ====== -->
 <div class="tour-overlay" id="shopTourOverlay">
-  <div class="tour-card">
+  <div class="tour-card tour-card--demo">
     <button class="tour-skip" onclick="skipTour()">تخطي <i class='bx bx-x'></i></button>
-    <div class="tour-steps" id="tourSteps"></div>
+
+    <div class="tour-steps" id="tourSteps">
+
+      <!-- Step 1: Browsing products -->
+      <div class="tour-step active" data-i="0">
+        <span class="tour-badge-num">الخطوة ١ من ٤</span>
+        <div class="tour-mock tm-browse">
+          <div class="tm-grid">
+            <div class="tm-card"><span class="tm-price"></span></div>
+            <div class="tm-card tm-target tm-target-jeans"><span class="tm-price">999 ج.م</span></div>
+            <div class="tm-card"><span class="tm-price"></span></div>
+            <div class="tm-card"><span class="tm-price"></span></div>
+          </div>
+          <div class="tm-cursor tm-cursor-1"><i class='bx bxs-pointer'></i></div>
+        </div>
+        <h3>تصفح المنتجات بسهولة</h3>
+        <p>كل منتج معروض بصورة حقيقية واضحة، وتحته السعر والمقاسات المتاحة مباشرة، من غير أي خطوات زيادة.</p>
+      </div>
+
+      <!-- Step 2: Real product page + zoom -->
+      <div class="tour-step" data-i="1">
+        <span class="tour-badge-num">الخطوة ٢ من ٤</span>
+        <div class="tour-mock tm-select">
+          <div class="tm-select-photo tm-jeans-photo">
+            <span class="tm-zoom-lens"><i class='bx bx-search-alt'></i></span>
+          </div>
+          <div class="tm-select-side">
+            <div class="tm-label">المقاس</div>
+            <div class="tm-sizes">
+              <span class="tm-size">S</span>
+              <span class="tm-size">M</span>
+              <span class="tm-size tm-size-target">L</span>
+              <span class="tm-size">XL</span>
+            </div>
+            <div class="tm-label">اللون</div>
+            <div class="tm-colors">
+              <span class="tm-color c-navy"></span>
+              <span class="tm-color c-black tm-color-target"></span>
+              <span class="tm-color c-beige"></span>
+            </div>
+          </div>
+          <div class="tm-cursor tm-cursor-2"><i class='bx bxs-pointer'></i></div>
+        </div>
+        <h3>افتح المنتج وكبّر الصورة</h3>
+        <p>لما تدوس على البنطلون بيفتحلك صفحته بصورة حقيقية تقدر تكبّرها وتتفرج على التفاصيل، وتختار المقاس واللون المناسبين، ومعاك دليل مقاسات لو محتاج تتأكد.</p>
+      </div>
+
+      <!-- Step 3: Add to cart -->
+      <div class="tour-step" data-i="2">
+        <span class="tour-badge-num">الخطوة ٣ من ٤</span>
+        <div class="tour-mock tm-addcart">
+          <div class="tm-cart-icon"><i class='bx bx-cart'></i><span class="tm-cart-badge">0</span></div>
+          <button class="tm-add-btn"><i class='bx bx-cart-add'></i> أضف للسلة</button>
+          <div class="tm-fly-dot"></div>
+          <div class="tm-cursor tm-cursor-3"><i class='bx bxs-pointer'></i></div>
+        </div>
+        <h3>أضف للسلة أو اشترِ فورًا</h3>
+        <p>زر «أضف للسلة» يخليك تكمل تسوق، وزر «اشترِ الآن» يوديك على طول لصفحة الدفع بضغطة واحدة.</p>
+      </div>
+
+      <!-- Step 4: Shipping + payment -->
+      <div class="tour-step" data-i="3">
+        <span class="tour-badge-num">الخطوة ٤ من ٤</span>
+        <div class="tour-mock tm-checkout">
+          <div class="tm-field"><span class="tm-field-label">الاسم</span><span class="tm-typed tm-typed-name"></span></div>
+          <div class="tm-field"><span class="tm-field-label">العنوان</span><span class="tm-typed tm-typed-address"></span></div>
+          <div class="tm-pay-row">
+            <span class="tm-pay-chip">فودافون كاش</span>
+            <span class="tm-pay-chip tm-pay-target">عند الاستلام</span>
+            <span class="tm-pay-chip">إنستاباي</span>
+          </div>
+          <div class="tm-success"><i class='bx bx-check-circle'></i> تم الطلب بنجاح</div>
+        </div>
+        <h3>أكمل بياناتك وخلاص</h3>
+        <p>دخّل بيانات التوصيل واختَر طريقة الدفع، وطلبك هيوصلك لباب البيت. جاهز نبدأ؟</p>
+      </div>
+
+    </div>
     <div class="tour-footer">
-      <div class="tour-dots" id="tourDots"></div>
+      <div class="tour-dots" id="tourDots">
+        <button type="button" class="tour-dot active" data-i="0" onclick="showTourStep(0)" aria-label="الخطوة 1"></button>
+        <button type="button" class="tour-dot" data-i="1" onclick="showTourStep(1)" aria-label="الخطوة 2"></button>
+        <button type="button" class="tour-dot" data-i="2" onclick="showTourStep(2)" aria-label="الخطوة 3"></button>
+        <button type="button" class="tour-dot" data-i="3" onclick="showTourStep(3)" aria-label="الخطوة 4"></button>
+      </div>
       <button class="btn-primary tour-next" id="tourNextBtn" onclick="nextTourStep()">التالي <i class='bx bx-left-arrow-alt'></i></button>
     </div>
   </div>
@@ -1580,55 +1662,10 @@ document.addEventListener("DOMContentLoaded", () => {
   observeReveals();
 });
 
-// ====== First-Visit Shopping Guide (skippable animated tour) ======
+// ====== First-Visit Shopping Guide (live simulated demo, skippable) ======
 const TOUR_STORAGE_KEY = "tiger_shop_tour_seen_v1";
-const TOUR_STEPS = [
-  {
-    icon: "bx bx-run",
-    num: "الخطوة ١ من ٤",
-    title: "تصفح المنتجات بسهولة",
-    text: "كل منتج معروض بصورة واضحة، وتحته السعر والمقاسات المتاحة مباشرة، من غير أي خطوات زيادة."
-  },
-  {
-    icon: "bx bx-search-alt",
-    num: "الخطوة ٢ من ٤",
-    title: "اختَر المقاس واللون",
-    text: "اضغط على أي منتج لعرض تفاصيله الكاملة واختيار المقاس واللون المناسبين، ومعاك دليل مقاسات لو محتاج تتأكد."
-  },
-  {
-    icon: "bx bx-cart-add",
-    num: "الخطوة ٣ من ٤",
-    title: "أضف للسلة أو اشترِ فورًا",
-    text: "زر «أضف للسلة» يخليك تكمل تسوق، وزر «اشترِ الآن» يوديك على طول لصفحة الدفع بضغطة واحدة."
-  },
-  {
-    icon: "bx bx-check-shield",
-    num: "الخطوة ٤ من ٤",
-    title: "أكمل بياناتك وخلاص",
-    text: "دخّل بيانات التوصيل واختَر طريقة الدفع، وطلبك هيوصلك لباب البيت. جاهز نبدأ؟"
-  }
-];
+const TOUR_STEP_COUNT = 4;
 let tourIdx = 0;
-
-function buildTour() {
-  const wrap = document.getElementById("tourSteps");
-  const dots = document.getElementById("tourDots");
-  if (!wrap || !dots) return;
-  wrap.innerHTML = TOUR_STEPS
-    .map(
-      (s, i) => `
-    <div class="tour-step ${i === 0 ? "active" : ""}" data-i="${i}">
-      <span class="tour-badge-num">${s.num}</span>
-      <div class="tour-icon-wrap"><i class='${s.icon}'></i></div>
-      <h3>${s.title}</h3>
-      <p>${s.text}</p>
-    </div>`
-    )
-    .join("");
-  dots.innerHTML = TOUR_STEPS
-    .map((_, i) => `<button type="button" class="tour-dot ${i === 0 ? "active" : ""}" data-i="${i}" onclick="showTourStep(${i})" aria-label="الخطوة ${i + 1}"></button>`)
-    .join("");
-}
 
 function showTourStep(i) {
   tourIdx = i;
@@ -1636,14 +1673,14 @@ function showTourStep(i) {
   document.querySelectorAll(".tour-dot").forEach((el) => el.classList.toggle("active", +el.dataset.i === i));
   const btn = document.getElementById("tourNextBtn");
   if (btn) {
-    btn.innerHTML = i === TOUR_STEPS.length - 1
+    btn.innerHTML = i === TOUR_STEP_COUNT - 1
       ? "ابدأ التسوق <i class='bx bx-shopping-bag'></i>"
       : "التالي <i class='bx bx-left-arrow-alt'></i>";
   }
 }
 
 function nextTourStep() {
-  if (tourIdx >= TOUR_STEPS.length - 1) {
+  if (tourIdx >= TOUR_STEP_COUNT - 1) {
     closeTour();
     document.getElementById("products")?.scrollIntoView({ behavior: "smooth" });
     return;
@@ -1663,7 +1700,6 @@ function closeTour() {
 }
 
 function openTour() {
-  buildTour();
   showTourStep(0);
   const overlay = document.getElementById("shopTourOverlay");
   if (overlay) overlay.classList.add("show");
