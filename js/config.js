@@ -196,6 +196,62 @@ function updateCartBadge() {
   });
 }
 
+// ====== تذكير سلة المشتريات أثناء التصفح ======
+// يظهر إشعار للعميل وهو بيتصفح الموقع لو عنده منتجات في السلة ولسه ماكملش الشراء
+const CART_REMINDER_LAST_SHOWN_KEY = "tj_cart_reminder_last_shown";
+const CART_REMINDER_COOLDOWN_MS = 60 * 1000; // مايتكررش قبل مرور دقيقة من آخر مرة اتقفل فيها
+
+function showCartReminder() {
+  // متظهرش في صفحة السلة أو صفحة إتمام الطلب لأن العميل أصلاً موجود فيها
+  const path = window.location.pathname.toLowerCase();
+  if (path.includes("cart.html") || path.includes("checkout.html")) return;
+
+  const count = cartCount();
+  if (count <= 0) return;
+
+  if (document.getElementById("cartReminderToast")) return;
+
+  try {
+    const last = Number(sessionStorage.getItem(CART_REMINDER_LAST_SHOWN_KEY) || 0);
+    if (Date.now() - last < CART_REMINDER_COOLDOWN_MS) return;
+  } catch (e) {}
+
+  const el = document.createElement("div");
+  el.id = "cartReminderToast";
+  el.className = "cart-reminder-toast";
+  el.innerHTML = `
+    <button type="button" class="cart-reminder-close" aria-label="إغلاق"><i class='bx bx-x'></i></button>
+    <div class="cart-reminder-icon"><i class='bx bx-cart-alt'></i></div>
+    <div class="cart-reminder-body">
+      <strong>لديك ${count} ${count === 1 ? "منتج" : "منتجات"} بانتظارك في السلة 🛍️</strong>
+      <span>كمّل عملية الشراء دلوقتي قبل نفاذ الكمية</span>
+    </div>
+    <a href="cart.html" class="cart-reminder-btn">اذهب للسلة <i class='bx bx-left-arrow-alt'></i></a>
+  `;
+  document.body.appendChild(el);
+
+  el.querySelector(".cart-reminder-close").addEventListener("click", dismissCartReminder);
+
+  requestAnimationFrame(() => el.classList.add("show"));
+
+  try { sessionStorage.setItem(CART_REMINDER_LAST_SHOWN_KEY, String(Date.now())); } catch (e) {}
+
+  clearTimeout(window.__cartReminderTimer);
+  window.__cartReminderTimer = setTimeout(dismissCartReminder, 9000);
+}
+
+function dismissCartReminder() {
+  const el = document.getElementById("cartReminderToast");
+  if (!el) return;
+  el.classList.remove("show");
+  clearTimeout(window.__cartReminderTimer);
+  setTimeout(() => el.remove(), 400);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(showCartReminder, 2500);
+});
+
 // ====== إدارة المفضلة (localStorage) ======
 const WISHLIST_KEY = "tj_wishlist";
 

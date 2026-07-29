@@ -1663,6 +1663,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ====== First-Visit Shopping Guide (live simulated demo, skippable) ======
+// ملحوظة: بتستخدم sessionStorage مش localStorage، يعني بتظهر مرة واحدة في كل جلسة تصفح (Session)
+// لو المستخدم قفل المتصفح وفتحه تاني هتظهر تاني، لكن لو عمل Refresh أو انتقل بين صفحات الموقع في نفس الزيارة مش هتتكرر
 const TOUR_STORAGE_KEY = "tiger_shop_tour_seen_v1";
 const TOUR_STEP_COUNT = 4;
 let tourIdx = 0;
@@ -1696,7 +1698,7 @@ function closeTour() {
   const overlay = document.getElementById("shopTourOverlay");
   if (overlay) overlay.classList.remove("show");
   document.body.style.overflow = "";
-  try { localStorage.setItem(TOUR_STORAGE_KEY, "1"); } catch (e) {}
+  try { sessionStorage.setItem(TOUR_STORAGE_KEY, "1"); } catch (e) {}
 }
 
 function openTour() {
@@ -1712,7 +1714,7 @@ document.getElementById("shopTourOverlay")?.addEventListener("click", (e) => {
 
 document.addEventListener("DOMContentLoaded", () => {
   let seen = false;
-  try { seen = localStorage.getItem(TOUR_STORAGE_KEY) === "1"; } catch (e) {}
+  try { seen = sessionStorage.getItem(TOUR_STORAGE_KEY) === "1"; } catch (e) {}
   if (!seen) {
     setTimeout(openTour, 900);
   }
