@@ -1,4 +1,3 @@
-
 :root{
   --bg:#0a0a0c;
   --bg-alt:#111114;
@@ -1776,8 +1775,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
 .tm-cursor-1{animation:tmCursor1 2.6s ease-in-out infinite}
 @keyframes tmCursor1{
   0%{left:8%;top:75%}
-  40%{left:40%;top:42%}
-  55%,80%{left:40%;top:42%;transform:translate(-4px,-2px) scale(.82)}
+  40%{left:62%;top:42%}
+  55%,80%{left:62%;top:42%;transform:translate(-4px,-2px) scale(.82)}
   90%{transform:translate(-4px,-2px) scale(1)}
   100%{left:8%;top:75%}
 }
